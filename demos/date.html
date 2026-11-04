@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>🍷 נצא לדייט? | דוגמה מ-Matanot</title>
+  <meta name="description" content="דוגמה להפתעה בקישור: הזמנה לדייט עם כפתור לא שבורח." />
+  <link rel="icon" type="image/png" href="../images/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&family=Suez+One&family=Playpen+Sans+Hebrew:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="engine.css" />
+</head>
+<body>
+<script>
+window.DEMO = {
+  theme: { bg: "linear-gradient(170deg,#FFF5F8,#FBD3E0)", accent: "#E26D93", "accent-deep": "#B83563", ink: "#6B1838", soft: "#FDE6EE", "env-a": "#E26D93", "env-b": "#B83563" },
+  deco: ["💕", "🌹", "✨", "💌"],
+  confettiEmoji: ["💖", "🌹", "🥰"],
+  steps: [
+    { type: "envelope", to: "לנועה 💌", title: "מישהו רוצה לשאול אותך משהו", letter: "🌹", hint: "לחצי על המעטפה" },
+    { type: "runaway", emoji: "🥺", title: "נצא לדייט?", yes: "כן! 😍", no: "לא", hint: "רמז: יש רק תשובה אחת נכונה 😉",
+      noTexts: ["בטוחה? 🥺", "תחשבי שוב", "כמעט...", "לא תצליחי 😏", "אין מצב 🙈", "נו נועההה"],
+      after: "ידעתי!!!", afterEmoji: "🥰", afterText: "עכשיו רק נשאר לסגור פרטים...", cta: "בואי נתכנן ←" },
+    { type: "choice", key: "food", emoji: "🍽️", title: "מה בא לך לאכול?", options: [
+      { emoji: "🍣", label: "סושי", reply: "בחירה מעולה. יש לי מקום בראש 🍣" },
+      { emoji: "🍝", label: "איטלקי", reply: "פסטה ויין? אני כבר שם 🍷" },
+      { emoji: "🍔", label: "המבורגר", reply: "הכי כיף. ולא חייבים להתלבש יפה 😅" },
+      { emoji: "🌮", label: "מקסיקני", reply: "טאקו! ואני משלם על הגוואקמולי 🥑" }
+    ] },
+    { type: "choice", key: "after", emoji: "🌙", title: "ומה אחרי?", options: [
+      { emoji: "🎬", label: "סרט", reply: "אני מביא את הפופקורן 🍿" },
+      { emoji: "🌊", label: "הליכה בים", reply: "רומנטי. מאשר 🌅" },
+      { emoji: "🍦", label: "גלידה", reply: "שני כדורים לפחות 🍨" },
+      { emoji: "🎲", label: "תפתיע אותי", reply: "אוי, את לא יודעת למה הסכמת 😏" }
+    ] },
+    { type: "final", variant: "invite", emoji: "💌", title: "זה רשמי!", lines: [
+      { icon: "📅", label: "מתי", value: "יום חמישי הקרוב" },
+      { icon: "⏰", label: "שעה", value: "20:00, אני אוסף אותך" },
+      { icon: "🍽️", label: "אוכל", value: "{food}" },
+      { icon: "🌙", label: "ואחר כך", value: "{after}" },
+      { icon: "👗", label: "דרס קוד", value: "מה שמרגיש לך הכי טוב" }
+    ], note: "מחכה לזה כבר עכשיו 🥰" }
+  ]
+};
+</script>
+<script src="engine.js"></script>
+</body>
+</html>

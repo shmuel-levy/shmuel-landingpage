@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>✈️ מסע הפתעה | דוגמה מ-Matanot</title>
+  <meta name="description" content="דוגמה להפתעה בקישור: הזמנה למסע הפתעה ליום הולדת." />
+  <link rel="icon" type="image/png" href="../images/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&family=Suez+One&family=Playpen+Sans+Hebrew:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="engine.css" />
+</head>
+<body>
+<script>
+window.DEMO = {
+  theme: { bg: "linear-gradient(170deg,#F4F8FF,#DCE7FF)", accent: "#5B8DEF", "accent-deep": "#1F4FB8", ink: "#12297A", soft: "#E6EEFF", "env-a": "#1F5BD1", "env-b": "#12297A" },
+  deco: ["☁️", "✈️", "💙", "✨"],
+  confettiEmoji: ["✈️", "💙", "🌴"],
+  steps: [
+    { type: "envelope", to: "לאהוב שלי ✈️", title: "יש לך הזמנה רשמית", letter: "🎫", hint: "לחץ על המעטפה" },
+    { type: "message", emoji: "🎂", title: "יום הולדת שמח!", text: ["השנה החלטתי שמתנה רגילה לא מספיקה.", "אז הכנתי לך מסע קטן... מוכן?"], cta: "מוכן! ←" },
+    { type: "choice", key: "mood", emoji: "🤔", title: "באיזה מוד אתה מגיע?", options: [
+      { emoji: "😎", label: "רגוע וזורם", reply: "מושלם, כי אין לך מושג מה מחכה לך 😏" },
+      { emoji: "🤩", label: "מתרגש רצח", reply: "תשמור על האנרגיה. תצטרך אותה!" },
+      { emoji: "🥱", label: "צריך קפה קודם", reply: "דאגתי. יש קפה בשדה ☕" }
+    ] },
+    { type: "checklist", emoji: "🧳", title: "מה לארוז?", sub: "סמן כל פריט שכבר בתיק", cta: "התיק מוכן! ←", doneText: "התיק מוכן!", items: [
+      { emoji: "🛂", label: "דרכון (בתוקף!)" }, { emoji: "🩱", label: "בגד ים" }, { emoji: "🕶️", label: "משקפי שמש" },
+      { emoji: "🔌", label: "מטען" }, { emoji: "😁", label: "חיוך ענק" }
+    ] },
+    { type: "final", variant: "ticket", title: "הכרטיס שלך ✈️", ticket: {
+      from: { code: "TLV", city: "תל אביב" }, to: { code: "???", city: "יעד: הפתעה 🤫" },
+      fields: [ { label: "נוסע", value: "האהוב שלי" }, { label: "תאריך", value: "חמישי, 14.08" }, { label: "המראה", value: "06:40" }, { label: "שער", value: "♥ 7" }, { label: "מושב", value: "ליד שלי" }, { label: "מוד", value: "{mood}" } ],
+      note: "תהיה מוכן בבית ב-03:30. את השאר תגלה בשדה 💙"
+    } }
+  ]
+};
+</script>
+<script src="engine.js"></script>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>💍 הצעת נישואין | דוגמה מ-Matanot</title>
+  <meta name="description" content="דוגמה להפתעה בקישור: הצעת נישואין עם אלבום רגעים ולב שמתמלא." />
+  <link rel="icon" type="image/png" href="../images/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&family=Suez+One&family=Playpen+Sans+Hebrew:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="engine.css" />
+</head>
+<body>
+<script>
+window.DEMO = {
+  theme: { bg: "linear-gradient(170deg,#F7F2FF,#E2D4FA)", accent: "#9B7BD8", "accent-deep": "#5E3FA3", ink: "#33215F", soft: "#EFE8FB", "env-a": "#7E5BC6", "env-b": "#4B2F8A" },
+  deco: ["💜", "✨", "💍", "🤍"],
+  confettiEmoji: ["💍", "💜", "✨", "🥂"],
+  confetti: ["#9B7BD8", "#FFD45C", "#FFFFFF", "#F5A9C0", "#5E3FA3"],
+  steps: [
+    { type: "envelope", to: "לאהובה שלי", title: "יש לי משהו להגיד לך", letter: "💜", hint: "לחצי על המעטפה" },
+    { type: "photos", emoji: "📸", title: "הרגעים שלנו", doneText: "ואלה רק חלק קטן 💜", items: [
+      { emoji: "☕", caption: "הדייט הראשון, בית הקפה בפלורנטין" },
+      { emoji: "🏖️", caption: "הקיץ ההוא בסיני" },
+      { emoji: "🐶", caption: "היום שאימצנו את לוקה" },
+      { emoji: "🔑", caption: "המפתח לבית הראשון שלנו" }
+    ] },
+    { type: "message", emoji: "🤍", title: "4 שנים. אלפי רגעים.", text: "ובכל אחד מהם הבנתי עוד קצת כמה אני רוצה את כל השאר איתך." },
+    { type: "hold", emoji: "", title: "תחזיקי את הלב", sub: "לחצי והחזיקי עד שהוא מתמלא", hint: "לאט... עוד קצת...", doneText: "בדיוק ככה הלב שלי מרגיש איתך 💜", cta: "ועכשיו... ←" },
+    { type: "runaway", emoji: "💍", title: "תתחתני איתי?", yes: "כן!!! 💍", no: "לא",
+      noTexts: ["רגע מה?", "נסי שוב 😅", "אין אופציה כזו", "הכפתור מסרב", "אני מחכה 🥺", "באמת?!"] },
+    { type: "final", variant: "card", emoji: "💍✨", title: "היא אמרה כן!", text: ["את האהבה של חיי.", "מהיום, לנצח."], sign: "שלך, תמיד" }
+  ]
+};
+</script>
+<script src="engine.js"></script>
+</body>
+</html>

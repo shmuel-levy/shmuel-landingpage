@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>🍼 יש לנו חדשות | דוגמה מ-Matanot</title>
+  <meta name="description" content="דוגמה להפתעה בקישור: הודעה לסבא וסבתא על הריון, עם כרטיס גירוד." />
+  <link rel="icon" type="image/png" href="../images/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&family=Suez+One&family=Playpen+Sans+Hebrew:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="engine.css" />
+</head>
+<body>
+<script>
+window.DEMO = {
+  theme: { bg: "linear-gradient(170deg,#F3FCF8,#CDEFE0)", accent: "#3DB58A", "accent-deep": "#1B7A57", ink: "#0F4A35", soft: "#E3F7EF", "env-a": "#3DB58A", "env-b": "#1B7A57" },
+  deco: ["💚", "🍼", "⭐", "☁️"],
+  confettiEmoji: ["👶", "💚", "🍼", "⭐"],
+  confetti: ["#3DB58A", "#FFD45C", "#BFD3FF", "#F5A9C0", "#FFFFFF"],
+  steps: [
+    { type: "envelope", to: "לאמא ואבא 💚", title: "יש לנו חדשות...", letter: "🍼", hint: "לחצו על המעטפה" },
+    { type: "quiz", emoji: "🧩", title: "חידון משפחתי קטן", doneEmoji: "🤭", doneText: "כנראה שכבר הבנתם... אבל בואו נוודא ←", cta: "לגלות ←", questions: [
+      { q: "מה הכי חסר אצלנו בבית?", options: ["עוד כרית לספה", "מישהו קטן שיעשה הרבה רעש", "מכונת קפה חדשה"], correct: 1, right: "בדיוק!! 😉", wrong: "כמעט... תחשבו קטן יותר 👶" },
+      { q: "מי הולכת לפנק הכי הרבה?", options: ["סבתא", "סבתא", "גם סבתא"], correct: -1, right: "ברור שסבתא 🥰" }
+    ] },
+    { type: "scratch", emoji: "✨", title: "גרדו כאן", sub: "עם האצבע, לאט לאט...", cover1: "#B9DCCB", cover2: "#EAF7F1", coverText: "גרדו כאן 💚",
+      reveal: { emoji: "👶🍼", text: "אתם הולכים להיות סבא וסבתא!", small: "נפגשים באביב 💚" }, cta: "ומתי? ←" },
+    { type: "countdown", emoji: "⏳", title: "עד שנכיר את הנכד/ה", sub: "כל שנייה נחשבת", daysFromNow: 190, note: "התחילו לסרוג כבר עכשיו 🧶" },
+    { type: "final", variant: "card", emoji: "💚", title: "אנחנו כל כך מתרגשים", text: ["תודה שאתם ההורים הכי טובים בעולם.", "עכשיו תורכם להיות הסבא והסבתא הכי טובים בעולם."], sign: "באהבה, דנה ויואב" }
+  ]
+};
+</script>
+<script src="engine.js"></script>
+</body>
+</html>
