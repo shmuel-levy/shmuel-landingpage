@@ -3,38 +3,42 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>🎂 יום הולדת לחברה הכי טובה | דוגמה מ-Matanot</title>
+  <title>יום הולדת לחברה הכי טובה | דוגמה מ-Matanot</title>
   <meta name="description" content="דוגמה להפתעה בקישור: יום הולדת לחברה הכי טובה, עם טריוויה ונרות לכיבוי." />
+  <meta name="theme-color" content="#FFF9F4" />
   <link rel="icon" type="image/png" href="../images/favicon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&family=Suez+One&family=Playpen+Sans+Hebrew:wght@500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&family=Suez+One&family=Frank+Ruhl+Libre:wght@500;700&family=Playpen+Sans+Hebrew:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../envelope.css" />
   <link rel="stylesheet" href="engine.css" />
 </head>
 <body>
 <script>
 window.DEMO = {
-  theme: { bg: "linear-gradient(170deg,#FFFBEF,#FFE3A3)", accent: "#F2A900", "accent-deep": "#A3501A", ink: "#5B3A00", soft: "#FFF3CC", "env-a": "#F7B733", "env-b": "#E07B2A" },
-  deco: ["🎈", "🎉", "⭐", "💛"],
-  confettiEmoji: ["🎉", "🎂", "💛", "🎈"],
+  palette: "gold", liner: "confetti", mood: "happy", orderType: "birthday",
+  theme: { bg: "linear-gradient(170deg,#FFFBEF,#FFE3A3)", accent: "#F2A900", "accent-deep": "#A3501A", ink: "#5B3A00", soft: "#FFF3CC" },
+  deco: ["balloon", "party", "star", "heart"],
   confetti: ["#F2A900", "#E26D93", "#1F5BD1", "#3DB58A", "#FFFFFF"],
   steps: [
-    { type: "envelope", to: "לשירה, החברה הכי טובה", title: "דחוף!!! תפתחי", letter: "🎂", hint: "לחצי על המעטפה" },
-    { type: "quiz", emoji: "🧠", title: "כמה את מכירה אותי?", doneEmoji: "🏆", doneText: "טוב, ברור שאת הכי מכירה. עכשיו לחלק המביך...", cta: "לחלק המביך ←", questions: [
-      { q: "מה ההזמנה הקבועה שלי בבית קפה?", options: ["הפוך על שיבולת", "אמריקנו", "שוקו חם 🙈"], correct: 2, right: "חחח ברור שאת יודעת", wrong: "באמת? 20 שנה חברות 😤" },
-      { q: "איפה נפגשנו בפעם הראשונה?", options: ["בגן", "בצבא", "בתור לאוטובוס"], correct: 0, right: "גן חבצלת לנצח 🌼", wrong: "נו באמת, בגן!" }
+    { type: "envelope", to: "לשירה, החברה הכי טובה", title: "דחוף!!! תפתחי", mark: "ש", card: { icon: "cake", title: "מזל טוב!", text: "סוף סוף 30" }, hint: "הקישי על החותם" },
+    { type: "quiz", icon: "question", title: "כמה את מכירה אותי?", doneText: "טוב, ברור שאת הכי מכירה. עכשיו לחלק המביך...", cta: "לחלק המביך", questions: [
+      { q: "מה ההזמנה הקבועה שלי בבית קפה?", options: ["הפוך על שיבולת", "אמריקנו", "שוקו חם"], correct: 2, right: "חחח ברור שאת יודעת", wrong: "באמת? 20 שנה חברות" },
+      { q: "איפה נפגשנו בפעם הראשונה?", options: ["בגן", "בצבא", "בתור לאוטובוס"], correct: 0, right: "גן חבצלת לנצח", wrong: "נו באמת, בגן!" }
     ] },
-    { type: "photos", emoji: "🙈", title: "ארכיון הסודות", sub: "תמונות שאסור שאף אחד יראה 😂", doneText: "אל תדאגי, רק אני שומרת עליהן 🤐", items: [
-      { emoji: "🎒", caption: "כיתה ג', והפוני ההוא" },
-      { emoji: "🎤", caption: "קריוקי באילת, 2019" },
-      { emoji: "✈️", caption: "הטיסה שכמעט פספסנו" },
-      { emoji: "🍕", caption: "3 בלילה, פיצה שנייה" }
+    { type: "photos", icon: "camera", title: "ארכיון הסודות", sub: "תמונות שאסור שאף אחד יראה", doneText: "אל תדאגי, רק אני שומרת עליהן", items: [
+      { src: "photos/camera-girl.jpg", caption: "הפאזה של המצלמה הישנה" },
+      { src: "photos/concert.jpg", caption: "ההופעה ההיא, שורה ראשונה" },
+      { src: "photos/pug.jpg", caption: "את, בכל בוקר של מבחן" },
+      { src: "photos/sparkler.jpg", caption: "ראש השנה, 3 בלילה" }
     ] },
-    { type: "candles", emoji: "", title: "תכבי את הנרות!", sub: "לחצי על כל נר ותבקשי משאלה", count: 5, doneText: "🎉 המשאלה בדרך!", cta: "יש לי עוד משהו בשבילך ←" },
-    { type: "final", variant: "card", emoji: "🥳", title: "מזל טוב, שירה!", text: ["תודה שאת שם בכל רגע, הטוב והמביך.", "שתהיה לך שנה של צחוקים, הרפתקאות ואפס תורים לאוטובוס."], sign: "אוהבת, נוי 💛" }
+    { type: "candles", title: "תכבי את הנרות!", sub: "הקישי על כל נר ותבקשי משאלה", count: 5, doneText: "המשאלה בדרך!", cta: "יש לי עוד משהו בשבילך" },
+    { type: "final", variant: "card", icon: "party", title: "מזל טוב, שירה!", text: ["תודה שאת שם בכל רגע, הטוב והמביך.", "שתהיה לך שנה של צחוקים, הרפתקאות ואפס תורים לאוטובוס."], sign: "אוהבת, נוי" }
   ]
 };
 </script>
+<script src="../icons.js"></script>
+<script src="../envelope.js"></script>
 <script src="engine.js"></script>
 </body>
 </html>

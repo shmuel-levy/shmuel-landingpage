@@ -3,40 +3,44 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>🌻 תודה לגננת | דוגמה מ-Matanot</title>
+  <title>תודה לגננת | דוגמה מ-Matanot</title>
   <meta name="description" content="דוגמה להפתעה בקישור: מתנת סוף שנה לגננת מכל הילדים וההורים." />
+  <meta name="theme-color" content="#FFF9F4" />
   <link rel="icon" type="image/png" href="../images/favicon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&family=Suez+One&family=Playpen+Sans+Hebrew:wght@500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&family=Suez+One&family=Frank+Ruhl+Libre:wght@500;700&family=Playpen+Sans+Hebrew:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../envelope.css" />
   <link rel="stylesheet" href="engine.css" />
 </head>
 <body>
 <script>
 window.DEMO = {
-  theme: { bg: "linear-gradient(170deg,#FFFDF3,#FFEFB8)", accent: "#E9B627", "accent-deep": "#2F7D3B", ink: "#2A4A1A", soft: "#FFF6D9", "env-a": "#F5C542", "env-b": "#D99A1A" },
-  deco: ["🌻", "🌼", "🦋", "☀️"],
-  confettiEmoji: ["🌻", "🌼", "💛"],
+  palette: "gold", liner: "dots", mood: "happy", orderType: "thanks",
+  theme: { bg: "linear-gradient(170deg,#FFFDF3,#FFEFB8)", accent: "#E9B627", "accent-deep": "#2F7D3B", ink: "#2A4A1A", soft: "#FFF6D9" },
+  deco: ["flower", "sun", "sprout", "heart"],
   confetti: ["#F5C542", "#2F7D3B", "#F5A9C0", "#BFD3FF", "#FFFFFF"],
   steps: [
-    { type: "envelope", to: "למירי הגננת 🌻", title: "יש לך דואר מגן חבצלת", letter: "🌻", hint: "לחצי על המעטפה" },
-    { type: "photos", emoji: "📸", title: "השנה שלנו", doneText: "איזו שנה הייתה 💛", items: [
-      { emoji: "🎨", caption: "יום הצבעים" },
-      { emoji: "🍂", caption: "סוכות בגן" },
-      { emoji: "🎭", caption: "פורים: 30 גיבורי-על וגננת אחת" },
-      { emoji: "🌱", caption: "הגינה ששתלנו יחד" }
+    { type: "envelope", to: "למירי הגננת", title: "יש לך דואר מגן חבצלת", mark: "מ", card: { icon: "flower", title: "מגן חבצלת", text: "באהבה" }, hint: "הקישי על החותם" },
+    { type: "photos", icon: "camera", title: "השנה שלנו", doneText: "איזו שנה הייתה", items: [
+      { src: "photos/tulips.jpg", caption: "הגינה ששתלנו יחד" },
+      { src: "photos/cookies.jpg", caption: "יום האפייה הגדול" },
+      { src: "photos/strawberries.jpg", caption: "הטיול לקטיף תותים" },
+      { src: "photos/flower.jpg", caption: "הפרח הראשון שפרח" }
     ] },
-    { type: "notes", emoji: "🗒️", title: "מה הילדים רצו להגיד", sub: "(בעזרת ההורים, בכתב יד)", items: [
+    { type: "notes", icon: "note", title: "מה הילדים רצו להגיד", sub: "(בעזרת ההורים, בכתב יד)", items: [
       { text: "מירי, את הכי יפה בעולם", from: "נועם, 4" },
       { text: "תודה שעזרת לי לקשור שרוכים", from: "אלה" },
       { text: "אני אוהב את הסיפורים שלך", from: "יונתן" },
       { text: "את כמו אמא שנייה", from: "תמר" },
       { text: "את הכי טובה (וגם העוגיות)", from: "אורי" }
     ] },
-    { type: "final", variant: "card", emoji: "🌻", title: "תודה, מירי", text: ["על הסבלנות, החיבוקים והלב הענק.", "הילדים שלנו גדלו השנה בזכותך, ואנחנו לא נשכח את זה."], sign: "באהבה, כל ההורים של גן חבצלת" }
+    { type: "final", variant: "card", icon: "flower", title: "תודה, מירי", text: ["על הסבלנות, החיבוקים והלב הענק.", "הילדים שלנו גדלו השנה בזכותך, ואנחנו לא נשכח את זה."], sign: "באהבה, כל ההורים של גן חבצלת" }
   ]
 };
 </script>
+<script src="../icons.js"></script>
+<script src="../envelope.js"></script>
 <script src="engine.js"></script>
 </body>
 </html>

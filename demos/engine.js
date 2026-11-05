@@ -1,40 +1,51 @@
 /* =========================================================
    Matanot: מנוע ההפתעות
-   כל דוגמה מגדירה window.DEMO = { theme, deco, steps: [...] }
+   כל דוגמה מגדירה window.DEMO = { palette, theme, deco, mood, steps: [...] }
    סוגי שלבים: envelope, message, choice, runaway, checklist, quiz,
    scratch, photos, hold, candles, notes, countdown, final
+   אייקונים: שמות מתוך icons.js (למשל "heart", "plane")
    ========================================================= */
 (function () {
   "use strict";
   const D = window.DEMO;
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const SKETCH = D.mode === "sketch";
   const answers = {};
   let idx = 0;
 
   /* ---------- עזרים ---------- */
   const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-  const tpl = (s) => esc(s).replace(/\{(\w+)\}/g, (_, k) => esc(answers[k] || ""));
+  const tpl = (s) => esc(s).replace(/\{(\w+)\}/g, (_, k) => esc(answers[k] || (D.defaults && D.defaults[k]) || ""));
   const $ = (sel, el) => (el || document).querySelector(sel);
   const $$ = (sel, el) => Array.from((el || document).querySelectorAll(sel));
+  const ico = (n, cls) => window.MatanotIcons.svg(n, cls);
   const title = (s, extra) => `<h1 class="step__title" tabindex="-1">${tpl(s)}</h1>${extra || ""}`;
-  const emoji = (e, cls) => (e ? `<div class="step__emoji ${cls || "bob"}" aria-hidden="true">${esc(e)}</div>` : "");
+  const medal = (n, cls) => (n ? `<div class="medal ${cls == null ? "bob" : cls}" aria-hidden="true"><span class="medal__ring"></span>${ico(n)}</div>` : "");
   const sub = (s) => (s ? `<p class="step__sub">${tpl(s)}</p>` : "");
 
+  /* ---------- צבעים ---------- */
+  const P = (window.MatanotEnvelope && window.MatanotEnvelope.palettes) || {};
+  const pal = P[D.palette] || null;
+  const theme = Object.assign({}, pal ? pal.theme : {}, D.theme || {});
+  Object.entries(theme).forEach(([k, v]) => document.documentElement.style.setProperty("--" + k, v));
+
   /* ---------- תבנית העמוד ---------- */
-  Object.entries(D.theme || {}).forEach(([k, v]) => document.documentElement.style.setProperty("--" + k, v));
+  const flag = SKETCH
+    ? `<p class="demo-flag demo-flag--sketch">${ico("pencil")}סקיצה ראשונית, נבנתה מהפרטים שמילאתם</p>`
+    : `<p class="demo-flag">${ico("sparkle")}אתר לדוגמה · השמות והתמונות להמחשה</p>`;
   document.body.insertAdjacentHTML("afterbegin", `
     <div class="deco" aria-hidden="true"></div>
     <div class="app">
       <header>
         <div class="topbar">
-          <a class="back" href="../index.html#examples">→ חזרה ל-Matanot</a>
+          ${SKETCH ? `<span class="back back--sketch">${ico("eye")}תצוגה מקדימה</span>` : `<a class="back" href="../index.html#examples">${ico("arrow-right")}חזרה ל-Matanot</a>`}
           <div class="progress" aria-hidden="true"></div>
-          <button class="music" type="button" aria-pressed="false" aria-label="מוזיקת רקע">🎵</button>
+          <button class="music" type="button" aria-pressed="false" aria-label="מוזיקת רקע">${ico("music")}</button>
         </div>
-        <p class="demo-flag">✨ אתר לדוגמה · השמות והתמונות להמחשה</p>
+        ${flag}
       </header>
       <main class="stage" id="stage"></main>
-      <footer><p class="desk-hint">📱 הכי כיף לפתוח מהטלפון</p></footer>
+      <footer>${SKETCH ? "" : `<p class="desk-hint">${ico("phone")}הכי כיף לפתוח מהטלפון</p>`}</footer>
     </div>
     <div class="fx" aria-hidden="true"></div>
     <p class="sr-only" aria-live="polite" id="live"></p>`);
@@ -42,11 +53,11 @@
   const stage = $("#stage"), fx = $(".fx"), live = $("#live"), musicBtn = $(".music");
   const announce = (t) => { live.textContent = ""; setTimeout(() => { live.textContent = t; }, 60); };
 
-  // קישוטים מרחפים
-  if (!reduce && D.deco) {
-    $(".deco").innerHTML = Array.from({ length: 8 }, (_, i) => {
-      const e = D.deco[i % D.deco.length];
-      return `<span style="left:${Math.random() * 96}%;--s:${16 + Math.random() * 18}px;--t:${12 + Math.random() * 12}s;--dl:${-Math.random() * 20}s">${esc(e)}</span>`;
+  // קישוטים מרחפים: אייקונים בצבעי האתר
+  if (!reduce && D.deco && D.deco.length) {
+    $(".deco").innerHTML = Array.from({ length: 9 }, (_, i) => {
+      const n = D.deco[i % D.deco.length];
+      return `<span style="left:${(i * 11 + Math.random() * 8).toFixed(1)}%;--s:${18 + Math.random() * 20}px;--t:${14 + Math.random() * 12}s;--dl:${-Math.random() * 24}s;--c:${i % 3 === 0 ? "var(--accent-deep)" : i % 3 === 1 ? "var(--accent)" : "var(--ink)"}">${ico(n)}</span>`;
     }).join("");
   }
 
@@ -57,12 +68,18 @@
     dot.className = i < idx ? "is-done" : i === idx ? "is-current" : "";
   });
 
-  /* ---------- מוזיקה (תיבת נגינה, נוצרת בדפדפן) ---------- */
+  /* ---------- מוזיקה: תיבת נגינה שנוצרת בדפדפן ---------- */
+  const MOODS = {
+    romantic: { step: 0.3, melody: [0, 4, 7, 12, 11, 7, 4, 7, 2, 5, 9, 14, 12, 9, 5, 9, -3, 0, 4, 9, 7, 4, 0, 4, -1, 2, 7, 11, 9, 7, 2, 7] },
+    happy: { step: 0.2, melody: [0, 4, 7, 4, 9, 7, 4, 0, 2, 5, 9, 5, 7, 4, 0, 4, 0, 4, 7, 12, 11, 9, 7, 4, 5, 4, 2, 4, 0, 7, 0, 12] },
+    emotional: { step: 0.38, melody: [-3, 0, 4, 9, 7, 4, 0, 4, -7, -3, 0, 5, 4, 0, -3, 0, -5, -1, 2, 7, 5, 2, -1, 2, -3, 0, 4, 9, 12, 9, 4, 0] },
+  };
+  const mood = MOODS[D.mood] || MOODS.romantic;
   const Music = {
     ctx: null, on: false, timer: null, t: 0, n: 0,
-    melody: D.melody || [0, 4, 7, 12, 11, 7, 4, 7, 2, 5, 9, 14, 12, 9, 5, 9, -3, 0, 4, 9, 7, 4, 0, 4, -1, 2, 7, 11, 9, 7, 2, 7],
+    melody: D.melody || mood.melody,
     start() {
-      if (this.on) return;
+      if (this.on || D.music === false) return;
       try {
         const AC = window.AudioContext || window.webkitAudioContext;
         if (!AC) return;
@@ -73,22 +90,22 @@
         this.t = this.ctx.currentTime + 0.1;
         this.timer = setInterval(() => this.schedule(), 120);
         musicBtn.setAttribute("aria-pressed", "true");
-        musicBtn.textContent = "🔊";
+        musicBtn.innerHTML = ico("volume-on");
       } catch (e) { /* בלי מוזיקה, לא נורא */ }
     },
     stop() {
       this.on = false;
       clearInterval(this.timer);
       musicBtn.setAttribute("aria-pressed", "false");
-      musicBtn.textContent = "🔇";
+      musicBtn.innerHTML = ico("volume-off");
     },
     schedule() {
-      const step = 0.3, base = 523.25; // C5
+      const base = 523.25; // C5
       while (this.t < this.ctx.currentTime + 0.5) {
         const semi = this.melody[this.n % this.melody.length];
         this.note(base * Math.pow(2, semi / 12), this.t, 0.9);
-        if (this.n % 8 === 0) this.note(base / 4 * Math.pow(2, this.melody[this.n % this.melody.length] / 12), this.t, 0.5);
-        this.t += step; this.n++;
+        if (this.n % 8 === 0) this.note((base / 4) * Math.pow(2, semi / 12), this.t, 0.5);
+        this.t += mood.step; this.n++;
       }
     },
     note(freq, when, vol) {
@@ -103,19 +120,27 @@
       o.start(when); o2.start(when); o.stop(when + 1.4); o2.stop(when + 1.4);
     },
   };
+  if (D.music === false) musicBtn.hidden = true;
   musicBtn.addEventListener("click", () => (Music.on ? Music.stop() : Music.start()));
   document.addEventListener("visibilitychange", () => { if (document.hidden && Music.on) Music.stop(); });
 
-  /* ---------- קונפטי ---------- */
+  /* ---------- קונפטי: צורות, בלי אימוג'י ---------- */
+  const HEART = '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 21s-8-4.9-8-10.9A4.6 4.6 0 0 1 12 7.2a4.6 4.6 0 0 1 8 2.9C20 16.1 12 21 12 21z"/></svg>';
+  const STAR = '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2c.8 5.6 3 8.3 9 9.5-6 1.2-8.2 3.9-9 9.5-.8-5.6-3-8.3-9-9.5 6-1.2 8.2-3.9 9-9.5z"/></svg>';
   function burst(n) {
     if (reduce) return;
-    const colors = D.confetti || ["#E26D93", "#1F5BD1", "#FFD45C", "#F5A9C0", "#FFFFFF"];
-    const emojis = D.confettiEmoji || ["💖", "✨"];
+    const cs = getComputedStyle(document.documentElement);
+    const colors = D.confetti || [cs.getPropertyValue("--accent").trim(), cs.getPropertyValue("--accent-deep").trim(), "#FFD45C", cs.getPropertyValue("--ink").trim(), "#FFFFFF", cs.getPropertyValue("--soft").trim()];
     const frag = document.createDocumentFragment();
     for (let i = 0; i < (n || 60); i++) {
       const s = document.createElement("span");
-      if (i % 4 === 0) { s.className = "e"; s.textContent = emojis[i % emojis.length]; }
-      else s.style.background = colors[i % colors.length];
+      const kind = i % 7;
+      const c = colors[i % colors.length];
+      if (kind === 0) { s.className = "shape"; s.innerHTML = HEART; s.style.color = c; }
+      else if (kind === 3) { s.className = "shape"; s.innerHTML = STAR; s.style.color = c; }
+      else if (kind === 5) { s.className = "dot"; s.style.background = c; }
+      else if (kind === 6) { s.className = "ribbon"; s.style.background = c; }
+      else s.style.background = c;
       const a = Math.random() * Math.PI * 2, d = 120 + Math.random() * 220;
       s.style.setProperty("--x", Math.cos(a) * d + "px");
       s.style.setProperty("--y", Math.sin(a) * d - 80 + "px");
@@ -124,7 +149,7 @@
       frag.appendChild(s);
     }
     fx.appendChild(frag);
-    setTimeout(() => { fx.innerHTML = ""; }, 2000);
+    setTimeout(() => { fx.innerHTML = ""; }, 2100);
   }
 
   /* ---------- כפתור המשך ---------- */
@@ -132,7 +157,7 @@
     opts = opts || {};
     const wrap = document.createElement("div");
     wrap.className = "next";
-    wrap.innerHTML = `<button type="button" class="btn btn--primary is-ready"${opts.disabled ? " disabled" : ""}>${esc(label || "ממשיכים ←")}</button>`;
+    wrap.innerHTML = `<button type="button" class="btn btn--primary is-ready"${opts.disabled ? " disabled" : ""}>${esc(label || "ממשיכים")}${ico("arrow-left")}</button>`;
     el.appendChild(wrap);
     const b = $("button", wrap);
     b.addEventListener("click", () => next());
@@ -147,7 +172,7 @@
     const el = document.createElement("section");
     el.className = "step step--" + s.type;
     stage.appendChild(el);
-    TYPES[s.type](s, el);
+    (TYPES[s.type] || TYPES.message)(s, el);
     updateProgress();
     window.scrollTo(0, 0);
     if (focus) { const h = $(".step__title", el); h && h.focus({ preventScroll: true }); }
@@ -161,36 +186,40 @@
   }
   function restart() { idx = 0; Object.keys(answers).forEach((k) => delete answers[k]); render(true); }
 
+  const photo = (p, cls) => (p && p.src ? `<figure class="photo ${cls || ""}"><img src="${esc(p.src)}" alt="${esc(p.alt || "")}" width="${esc(p.w || 720)}" height="${esc(p.h || 540)}" decoding="async">${p.caption ? `<figcaption>${tpl(p.caption)}</figcaption>` : ""}</figure>` : "");
+
   /* =========================================================
      סוגי שלבים
      ========================================================= */
   const TYPES = {
     envelope(s, el) {
-      el.innerHTML = (s.to ? `<p class="env-to">${esc(s.to)}</p>` : "") + title(s.title) +
-        `<button class="envelope" type="button" aria-label="פתיחת המעטפה">
-          <span class="envelope__back"></span><span class="envelope__letter" aria-hidden="true">${esc(s.letter || "💌")}</span>
-          <span class="envelope__front"></span><span class="envelope__flap"></span><span class="envelope__seal" aria-hidden="true">♥</span>
-        </button><p class="hint">${esc(s.hint || "לחצו על המעטפה")}</p>`;
-      const env = $(".envelope", el);
+      const card = s.card || {};
+      el.innerHTML = (s.to ? `<p class="env-to">${tpl(s.to)}</p>` : "") + title(s.title) +
+        `<div class="env-stage">${window.MatanotEnvelope.html({
+          label: "פתיחת המעטפה", mark: s.mark || "", liner: s.liner || D.liner || "dots",
+          cardIcon: card.icon || "heart", cardTitle: card.title || "", cardText: card.text || "",
+        })}</div><p class="hint">${ico("tap")}${esc(s.hint || "הקישו על החותם כדי לפתוח")}</p>`;
+      const env = $(".env", el);
+      window.MatanotEnvelope.applyPalette(env, D.palette || "ink");
       env.addEventListener("click", () => {
-        if (env.classList.contains("is-open")) return;
-        env.classList.add("is-open");
-        if (D.music !== false) Music.start();
-        setTimeout(next, reduce ? 0 : 1250);
+        if (env.classList.contains("is-cracked")) return;
+        $(".hint", el).classList.add("is-hidden");
+        Music.start();
+        window.MatanotEnvelope.open(env, next);
       });
     },
 
     message(s, el) {
       const paras = [].concat(s.text || []).map((p) => `<p class="step__text">${tpl(p)}</p>`).join("");
-      el.innerHTML = emoji(s.emoji) + title(s.title) + paras;
+      el.innerHTML = (s.photo ? photo(s.photo, "photo--taped") : medal(s.icon)) + title(s.title) + paras;
       addNext(el, s.cta);
     },
 
     choice(s, el) {
       const two = s.options.length % 2 === 0 && s.options.length > 2;
-      el.innerHTML = emoji(s.emoji) + title(s.title) + sub(s.sub) +
+      el.innerHTML = medal(s.icon) + title(s.title) + sub(s.sub) +
         `<div class="options${two ? " options--2" : ""}" role="group" aria-label="${esc(s.title)}">` +
-        s.options.map((o, i) => `<button type="button" class="option" aria-pressed="false" data-i="${i}"><span class="option__emoji" aria-hidden="true">${esc(o.emoji)}</span><span>${esc(o.label)}</span></button>`).join("") +
+        s.options.map((o, i) => `<button type="button" class="option" aria-pressed="false" data-i="${i}"><span class="option__ico" aria-hidden="true">${ico(o.icon || "heart")}</span><span>${esc(o.label)}</span></button>`).join("") +
         `</div><div class="reply-wrap" aria-live="polite"></div>`;
       const group = $(".options", el), replyWrap = $(".reply-wrap", el);
       let nextBtn = null;
@@ -201,20 +230,20 @@
         $$(".option", group).forEach((x) => x.setAttribute("aria-pressed", x === b ? "true" : "false"));
         group.classList.add("has-choice");
         if (s.key) answers[s.key] = o.value || o.label;
-        replyWrap.innerHTML = o.reply ? `<p class="reply">${esc(o.reply)}</p>` : "";
+        replyWrap.innerHTML = o.reply ? `<p class="reply">${tpl(o.reply)}</p>` : "";
         if (!nextBtn) nextBtn = addNext(el, s.cta);
       });
     },
 
     runaway(s, el) {
-      el.innerHTML = emoji(s.emoji) + title(s.title) + sub(s.sub) +
+      el.innerHTML = medal(s.icon) + title(s.title) + sub(s.sub) +
         `<div class="run-area" role="group" aria-label="${esc(s.title)}">
           <button type="button" class="btn btn--primary run-yes">${esc(s.yes)}</button>
           <button type="button" class="btn btn--ghost run-no">${esc(s.no)}</button>
         </div><p class="hint">${esc(s.hint || "")}</p>`;
       const area = $(".run-area", el), yes = $(".run-yes", el), no = $(".run-no", el);
       let n = 0, last = -1;
-      const texts = s.noTexts || ["בטוח?", "נסו שוב 😏"];
+      const texts = s.noTexts && s.noTexts.length ? s.noTexts : ["בטוח?", "נסו שוב", "כמעט..."];
       // נקודות קבועות בשולי האזור, רק כאלה שלא נוגעות ב"כן" (כולל הגודל שאליו יגדל)
       function pick(yesScale) {
         const aw = area.clientWidth, ah = area.clientHeight, bw = no.offsetWidth, bh = no.offsetHeight;
@@ -244,11 +273,11 @@
       }
       no.addEventListener("pointerenter", (e) => { if (e.pointerType === "mouse") run(e); });
       no.addEventListener("pointerdown", run);
-      no.addEventListener("click", (e) => { run(e); announce("הכפתור ברח 😉"); });
+      no.addEventListener("click", (e) => { run(e); announce("הכפתור ברח. נשאר רק כן"); });
       yes.addEventListener("click", () => {
         burst(80);
         if (s.after) {
-          el.innerHTML = emoji(s.afterEmoji || "🥰", "") + title(s.after) + (s.afterText ? `<p class="step__text">${tpl(s.afterText)}</p>` : "");
+          el.innerHTML = medal(s.afterIcon || "smile-heart", "beat") + title(s.after) + (s.afterText ? `<p class="step__text">${tpl(s.afterText)}</p>` : "");
           $(".step__title", el).focus({ preventScroll: true });
           addNext(el, s.cta);
         } else next();
@@ -257,9 +286,9 @@
 
     checklist(s, el) {
       const check = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10.5l4 4 8-9" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-      el.innerHTML = emoji(s.emoji) + title(s.title) + sub(s.sub) +
+      el.innerHTML = medal(s.icon) + title(s.title) + sub(s.sub) +
         `<div class="checklist">` + s.items.map((it, i) => `
-          <div class="check"><input type="checkbox" id="ck${i}"><label for="ck${i}"><span class="check__box">${check}</span><span class="check__emoji" aria-hidden="true">${esc(it.emoji)}</span><span class="check__text">${esc(it.label)}</span></label></div>`).join("") +
+          <div class="check"><input type="checkbox" id="ck${i}"><label for="ck${i}"><span class="check__box">${check}</span><span class="check__ico" aria-hidden="true">${ico(it.icon || "check")}</span><span class="check__text">${esc(it.label)}</span></label></div>`).join("") +
         `</div><div class="meter" aria-hidden="true"><b></b></div><p class="sr-only" aria-live="polite" id="ckStatus"></p>`;
       const boxes = $$("input", el), meter = $(".meter b", el), status = $("#ckStatus", el);
       const btn = addNext(el, s.cta, { disabled: true });
@@ -278,10 +307,10 @@
       let q = 0, firstTry = 0, missed = false;
       function show() {
         const Q = s.questions[q];
-        el.innerHTML = emoji(s.emoji) + title(s.title) +
-          `<p class="quiz__count">שאלה ${q + 1} מתוך ${s.questions.length}</p><p class="quiz__q" id="qq${q}">${esc(Q.q)}</p>
+        el.innerHTML = medal(s.icon || "question") + title(s.title) +
+          `<p class="quiz__count">שאלה ${q + 1} מתוך ${s.questions.length}</p><p class="quiz__q" id="qq${q}">${tpl(Q.q)}</p>
            <div class="options" role="group" aria-labelledby="qq${q}">` +
-          Q.options.map((o, i) => `<button type="button" class="option" data-i="${i}">${esc(o)}</button>`).join("") +
+          Q.options.map((o, i) => `<button type="button" class="option option--plain" data-i="${i}">${esc(o)}</button>`).join("") +
           `</div><p class="feedback" aria-live="assertive"></p>`;
         missed = false;
         const fb = $(".feedback", el);
@@ -293,7 +322,7 @@
             if (!missed) firstTry++;
             b.classList.add("is-right");
             $$(".option", el).forEach((x) => { x.disabled = true; });
-            fb.textContent = Q.right || "נכון! 🎉";
+            fb.textContent = Q.right || "נכון!";
             burst(30);
             setTimeout(() => { q++; q < s.questions.length ? (show(), $(".quiz__q", el).setAttribute("tabindex", "-1"), $(".quiz__q", el).focus({ preventScroll: true })) : done(); }, reduce ? 600 : 1400);
           } else {
@@ -304,7 +333,8 @@
         });
       }
       function done() {
-        el.innerHTML = emoji(s.doneEmoji || "🏆", "") + title(firstTry === s.questions.length ? `${firstTry} מתוך ${firstTry}! 💯` : `צדקת ב-${firstTry} מתוך ${s.questions.length}`) + `<p class="step__text">${tpl(s.doneText || "")}</p>`;
+        const all = firstTry === s.questions.length;
+        el.innerHTML = medal(all ? "trophy" : "star", "beat") + title(all ? `${firstTry} מתוך ${firstTry}! ציון מושלם` : `צדקת ב-${firstTry} מתוך ${s.questions.length}`) + `<p class="step__text">${tpl(s.doneText || "")}</p>`;
         $(".step__title", el).focus({ preventScroll: true });
         addNext(el, s.cta);
       }
@@ -313,8 +343,8 @@
 
     scratch(s, el) {
       const r = s.reveal;
-      el.innerHTML = emoji(s.emoji) + title(s.title) + sub(s.sub) +
-        `<div class="scratch"><div class="scratch__reveal" aria-hidden="true"><span class="big">${esc(r.emoji)}</span><strong>${esc(r.text)}</strong>${r.small ? `<small>${esc(r.small)}</small>` : ""}</div><canvas aria-hidden="true"></canvas></div>
+      el.innerHTML = medal(s.icon) + title(s.title) + sub(s.sub) +
+        `<div class="scratch"><div class="scratch__reveal" aria-hidden="true">${medal(r.icon || "heart", "")}<strong>${tpl(r.text)}</strong>${r.small ? `<small>${tpl(r.small)}</small>` : ""}</div><canvas aria-hidden="true"></canvas></div>
          <button type="button" class="skip">לגלות בלי לגרד</button>`;
       const box = $(".scratch", el), cv = $("canvas", el), revealEl = $(".scratch__reveal", el), skip = $(".skip", el);
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -328,7 +358,7 @@
       for (let i = 0; i < 70; i++) { ctx.beginPath(); ctx.arc(Math.random() * cv.width, Math.random() * cv.height, (2 + Math.random() * 6) * dpr, 0, 7); ctx.fill(); }
       ctx.fillStyle = "rgba(40,50,80,.75)"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
       ctx.font = `700 ${22 * dpr}px Heebo, Arial, sans-serif`;
-      ctx.fillText(s.coverText || "גרדו כאן ✨", cv.width / 2, cv.height / 2);
+      ctx.fillText(s.coverText || "גרדו כאן", cv.width / 2, cv.height / 2);
       ctx.globalCompositeOperation = "destination-out";
       ctx.lineCap = "round"; ctx.lineJoin = "round"; ctx.lineWidth = 46 * dpr;
 
@@ -364,14 +394,16 @@
     },
 
     photos(s, el) {
-      const bgs = ["linear-gradient(135deg,#FDE6EE,#F5A9C0)", "linear-gradient(135deg,#E6EEFF,#AFC6FF)", "linear-gradient(135deg,#FFF6D9,#FFD98A)", "linear-gradient(135deg,#E3F7EF,#A9E3CB)", "linear-gradient(135deg,#EFE8FB,#CDB8EE)"];
+      const bgs = ["linear-gradient(135deg,var(--soft),var(--accent))", "linear-gradient(135deg,#E6EEFF,#AFC6FF)", "linear-gradient(135deg,#FFF6D9,#FFD98A)", "linear-gradient(135deg,#E3F7EF,#A9E3CB)", "linear-gradient(135deg,#EFE8FB,#CDB8EE)"];
       const rots = [-4, 3, -2, 5, -5];
       const items = s.items;
-      el.innerHTML = emoji(s.emoji) + title(s.title) + sub(s.sub || "לחצו על התמונה לתמונה הבאה") +
+      el.innerHTML = medal(s.icon) + title(s.title) + sub(s.sub || "הקישו על התמונה לתמונה הבאה") +
         `<div class="album">` + items.map((it, i) => ({ it, i })).reverse().map(({ it, i }) => `
-          <button type="button" class="polaroid" data-i="${i}" style="--rot:${rots[i % rots.length]}deg" aria-label="תמונה ${i + 1} מתוך ${items.length}: ${esc(it.caption)}. לחצו לתמונה הבאה">
-            <span class="polaroid__img" style="background:${it.bg || bgs[i % bgs.length]}" aria-hidden="true">${esc(it.emoji)}<small>📷 כאן תופיע התמונה שלכם</small></span>
-            <span class="polaroid__cap" aria-hidden="true">${esc(it.caption)}</span>
+          <button type="button" class="polaroid" data-i="${i}" style="--rot:${rots[i % rots.length]}deg" aria-label="תמונה ${i + 1} מתוך ${items.length}: ${esc(it.caption)}. הקישו לתמונה הבאה">
+            <span class="polaroid__img" style="${it.src ? "" : "background:" + bgs[i % bgs.length]}" aria-hidden="true">${it.src
+              ? `<img src="${esc(it.src)}" alt="" width="600" height="560" decoding="async"${i > 1 ? ' loading="lazy"' : ""}>`
+              : `${ico("image")}<small>כאן תופיע התמונה שלכם</small>`}</span>
+            <span class="polaroid__cap" aria-hidden="true">${tpl(it.caption)}</span>
           </button>`).join("") +
         `</div><p class="album__count" aria-live="polite">תמונה 1 מתוך ${items.length}</p>`;
       const cards = $$(".polaroid", el).reverse(); // לפי הסדר
@@ -388,7 +420,7 @@
           sync();
           cards[cur].focus({ preventScroll: true });
         } else {
-          count.textContent = s.doneText || "אלה הרגעים שלנו 💛";
+          count.textContent = s.doneText || "אלה הרגעים שלנו";
           addNext(el, s.cta, { focus: true });
         }
       }));
@@ -396,7 +428,7 @@
 
     hold(s, el) {
       const heart = "M50 88C22 68 4 52 4 30 4 14 16 4 30 4c9 0 16 5 20 12 4-7 11-12 20-12 14 0 26 10 26 26 0 22-18 38-46 58z";
-      el.innerHTML = emoji(s.emoji) + title(s.title) + sub(s.sub) +
+      el.innerHTML = medal(s.icon) + title(s.title) + sub(s.sub) +
         `<button type="button" class="hold" aria-label="לחצו והחזיקו כדי למלא את הלב">
           <svg viewBox="0 0 100 92" aria-hidden="true"><defs><clipPath id="hc"><path d="${heart}"/></clipPath></defs>
             <path class="h-bg" d="${heart}"/><rect class="h-fill" clip-path="url(#hc)" x="0" y="92" width="100" height="92"/></svg>
@@ -415,10 +447,10 @@
         if (p >= 1 && !full) {
           full = true; holding = false;
           btn.classList.remove("is-holding"); btn.classList.add("is-full");
-          pct.textContent = "♥";
+          pct.innerHTML = ico("heart");
           burst(70);
           announce(s.doneText || "הלב מלא!");
-          if (s.doneText) el.insertAdjacentHTML("beforeend", `<p class="reply">${esc(s.doneText)}</p>`);
+          if (s.doneText) el.insertAdjacentHTML("beforeend", `<p class="reply">${tpl(s.doneText)}</p>`);
           addNext(el, s.cta, { focus: true });
           return;
         }
@@ -435,7 +467,7 @@
 
     candles(s, el) {
       const n = s.count || 5;
-      el.innerHTML = emoji(s.emoji) + title(s.title) + sub(s.sub) +
+      el.innerHTML = medal(s.icon) + title(s.title) + sub(s.sub) +
         `<div class="cake"><div class="cake__candles">` +
         Array.from({ length: n }, (_, i) => `<button type="button" class="candle" aria-label="כיבוי נר ${i + 1}"><span class="flame"></span><span class="smoke"></span></button>`).join("") +
         `</div><div class="cake__body"></div><div class="cake__plate"></div></div><p class="album__count" aria-live="polite">נשארו ${n} נרות</p>`;
@@ -445,26 +477,26 @@
         if (c.classList.contains("is-out")) return;
         c.classList.add("is-out"); c.disabled = true; c.setAttribute("aria-label", "הנר כבוי");
         left--;
-        count.textContent = left ? `נשארו ${left} נרות` : (s.doneText || "🎉 המשאלה בדרך!");
+        count.textContent = left ? `נשארו ${left} נרות` : (s.doneText || "המשאלה בדרך!");
         if (!left) { burst(100); addNext(el, s.cta, { focus: true }); }
       }));
     },
 
     notes(s, el) {
-      const colors = ["#FFF3B0", "#FDE6EE", "#E6EEFF", "#E3F7EF", "#FFE4D1"];
-      const rots = [-3, 2.5, -1.5, 3, -2];
-      el.innerHTML = emoji(s.emoji) + title(s.title) + sub(s.sub) +
+      const colors = ["#FFF3B0", "#FDE6EE", "#E6EEFF", "#E3F7EF", "#FFE4D1", "#EFE8FB"];
+      const rots = [-3, 2.5, -1.5, 3, -2, 1.5];
+      el.innerHTML = medal(s.icon) + title(s.title) + sub(s.sub) +
         `<ul class="notes" role="list">` + s.items.map((it, i) =>
-          `<li class="note" style="--c:${colors[i % colors.length]};--rot:${rots[i % rots.length]}deg;--dl:${reduce ? 0 : 300 + i * 260}ms">${esc(it.text)}<small>${esc(it.from)}</small></li>`).join("") + `</ul>`;
-      setTimeout(() => addNext(el, s.cta), reduce ? 0 : 300 + s.items.length * 260);
+          `<li class="note" style="--c:${colors[i % colors.length]};--rot:${rots[i % rots.length]}deg;--dl:${reduce ? 0 : 300 + i * 240}ms">${tpl(it.text)}<small>${esc(it.from)}</small></li>`).join("") + `</ul>`;
+      setTimeout(() => addNext(el, s.cta), reduce ? 0 : 300 + s.items.length * 240);
     },
 
     countdown(s, el) {
-      el.innerHTML = emoji(s.emoji) + title(s.title) + sub(s.sub) +
+      el.innerHTML = medal(s.icon) + title(s.title) + sub(s.sub) +
         `<div class="countdown" role="timer" aria-live="off">
           <div><b data-u="d">0</b><span>ימים</span></div><div><b data-u="h">0</b><span>שעות</span></div>
           <div><b data-u="m">0</b><span>דקות</span></div><div><b data-u="s">0</b><span>שניות</span></div></div>` +
-        (s.note ? `<p class="reply">${esc(s.note)}</p>` : "");
+        (s.note ? `<p class="reply">${tpl(s.note)}</p>` : "");
       const target = s.date ? new Date(s.date).getTime() : Date.now() + (s.daysFromNow || 30) * 864e5 + 5 * 36e5;
       const out = { d: $('[data-u="d"]', el), h: $('[data-u="h"]', el), m: $('[data-u="m"]', el), s: $('[data-u="s"]', el) };
       function tick() {
@@ -484,31 +516,37 @@
       if (s.variant === "ticket") {
         const t = s.ticket;
         body = `<article class="ticket" aria-label="כרטיס עלייה למטוס">
-          <div class="ticket__head">${esc(t.airline || "Matanot Air ✈")}<span>BOARDING PASS</span></div>
-          <div class="ticket__route"><div><b>${esc(t.from.code)}</b><small>${esc(t.from.city)}</small></div><div class="ticket__plane" aria-hidden="true">✈️</div><div><b>${esc(t.to.code)}</b><small>${esc(t.to.city)}</small></div></div>
+          <div class="ticket__head"><span class="ticket__air">${ico("plane")}${esc(t.airline || "Matanot Air")}</span><span lang="en">BOARDING PASS</span></div>
+          <div class="ticket__route"><div><b>${esc(t.from.code)}</b><small>${tpl(t.from.city)}</small></div><div class="ticket__plane" aria-hidden="true">${ico("plane")}</div><div><b>${esc(t.to.code)}</b><small>${tpl(t.to.city)}</small></div></div>
           <dl class="ticket__grid">${t.fields.map((f) => `<div><dt>${esc(f.label)}</dt><dd>${tpl(f.value)}</dd></div>`).join("")}</dl>
           <div class="ticket__tear" aria-hidden="true"></div>
           <div class="ticket__foot"><p class="ticket__note">${tpl(t.note)}</p><div class="barcode" aria-hidden="true"></div></div></article>`;
       } else if (s.variant === "invite") {
-        body = `<article class="invite">${emoji(s.emoji, "")}<h1 class="step__title" tabindex="-1">${tpl(s.title)}</h1>
-          <dl class="invite__lines">${s.lines.map((l) => `<div style="--icon:'${esc(l.icon)}'"><dt>${esc(l.label)}</dt><dd>${tpl(l.value)}</dd></div>`).join("")}</dl>
+        body = `<article class="invite">${s.photo ? photo(s.photo, "photo--invite") : medal(s.icon, "")}<h1 class="step__title" tabindex="-1">${tpl(s.title)}</h1>
+          <dl class="invite__lines">${s.lines.map((l) => `<div><dt>${ico(l.icon || "sparkle")}${esc(l.label)}</dt><dd>${tpl(l.value)}</dd></div>`).join("")}</dl>
           ${s.note ? `<p class="sign">${tpl(s.note)}</p>` : ""}</article>`;
       } else {
-        body = `<article class="letter">${emoji(s.emoji, "")}<h1 class="step__title" tabindex="-1">${tpl(s.title)}</h1>
-          ${[].concat(s.text).map((p) => `<p class="letter__text">${tpl(p)}</p>`).join("")}
+        body = `<article class="letter">${s.photo ? photo(s.photo, "photo--invite") : medal(s.icon, "")}<h1 class="step__title" tabindex="-1">${tpl(s.title)}</h1>
+          ${[].concat(s.text || []).map((p) => `<p class="letter__text">${tpl(p)}</p>`).join("")}
           ${s.sign ? `<p class="sign">${tpl(s.sign)}</p>` : ""}</article>`;
       }
-      el.innerHTML = (s.variant === "ticket" ? title(s.title) : "") + body +
-        `<div class="outro">
-          <button type="button" class="btn btn--ghost replay">↺ לחוות שוב מההתחלה</button>
-          <a class="madeby" href="../index.html#pricing">
-            <img src="../images/favicon.png" alt="" width="52" height="52">
-            <span><b>רוצים הפתעה כזו?</b><small>Matanot · הפתעות בקישור, מוכן תוך 48 שעות</small></span>
-            <em>לפרטים ←</em></a></div>`;
+      const outro = SKETCH
+        ? `<div class="outro"><button type="button" class="btn btn--ghost replay">${ico("replay")}לצפות שוב</button>
+            <p class="sketch-note">${ico("pencil")}זו סקיצה ראשונית שנבנתה אוטומטית. את הגרסה הסופית שמואל מעצב ידנית, עם התמונות שלכם.</p></div>`
+        : `<div class="outro">
+            <button type="button" class="btn btn--ghost replay">${ico("replay")}לחוות שוב מההתחלה</button>
+            <a class="madeby" href="../order.html${D.orderType ? "?type=" + esc(D.orderType) : ""}">
+              <img src="../images/favicon.png" alt="" width="52" height="52">
+              <span><b>רוצים הפתעה כזו?</b><small>ממלאים פרטים, רואים סקיצה מיד, ומקבלים את ההפתעה תוך 24 שעות</small></span>
+              <em>לבנות סקיצה${ico("arrow-left")}</em></a></div>`;
+      el.innerHTML = (s.variant === "ticket" ? title(s.title) : "") + body + outro;
       $(".replay", el).addEventListener("click", restart);
       setTimeout(() => burst(120), reduce ? 0 : 500);
     },
   };
 
+  // ?step=3 פותח ישר בשלב מסוים (לצילומי מסך ולקישורים)
+  const startAt = parseInt(new URLSearchParams(location.search).get("step"), 10);
+  if (startAt > 0 && startAt < D.steps.length) idx = startAt;
   render(false);
 })();

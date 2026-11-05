@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>בונים את ההפתעה שלכם | Matanot</title>
+  <meta name="description" content="ממלאים כמה פרטים על מי שמקבל את ההפתעה, בוחרים צבעים ומוזיקה, ורואים סקיצה ראשונית מיד. הגרסה הסופית מוכנה תוך 24 שעות." />
+  <meta name="theme-color" content="#FFF9F4" />
+  <meta property="og:title" content="Matanot | בונים את ההפתעה שלכם" />
+  <meta property="og:description" content="3 דקות של פרטים, וסקיצה ראשונית מופיעה מיד." />
+  <meta property="og:image" content="images/og.jpg" />
+  <link rel="icon" type="image/png" href="images/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&family=Suez+One&family=Frank+Ruhl+Libre:wght@500;700&family=Playpen+Sans+Hebrew:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="envelope.css" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="order.css" />
+  <script src="a11y.js"></script>
+</head>
+<body class="order-page">
+  <a class="skip-link" href="#main">דילוג לתוכן הראשי</a>
+
+  <header class="header is-scrolled">
+    <div class="container header__inner">
+      <a href="index.html" class="brand" aria-label="Matanot, חזרה לעמוד הבית">
+        <img class="brand__mark" src="images/favicon.png" alt="" width="44" height="44" />
+        <span class="brand__text"><b lang="en">Matanot</b><small>הפתעות בקישור</small></span>
+      </a>
+      <div class="header__actions">
+        <a class="wa-icon" data-wa target="_blank" rel="noopener" aria-label="שאלה בווטסאפ (נפתח בחלון חדש)"><span data-icon="whatsapp"></span></a>
+        <a class="btn btn--ghost btn--sm" href="index.html"><span data-icon="arrow-right"></span>לאתר</a>
+      </div>
+    </div>
+    <div class="order-progress" aria-hidden="true"><b id="progressFill"></b></div>
+  </header>
+
+  <main id="main" class="order">
+    <section class="order__intro container" aria-labelledby="orderTitle">
+      <p class="kicker-pill"><span data-icon="wand"></span>בונים הפתעה</p>
+      <h1 id="orderTitle">ספרו לי על מי שמקבל, <span class="ink-mark">ותראו סקיצה מיד</span></h1>
+      <p class="order__lead">לכל סוג הפתעה יש שאלות משלו. כמה דקות של פרטים, ובסוף מחכה לכם סקיצה חיה של האתר. את הגרסה הסופית, עם התמונות שלכם, אני מעצב ידנית ושולח תוך 24 שעות.</p>
+      <p class="order-promo" id="orderPromo" hidden></p>
+      <p class="draft-note" id="draftNote" hidden><span data-icon="pencil"></span>שמרנו את מה שמילאתם בביקור הקודם. <button type="button" class="link-btn" id="restart">להתחיל מחדש</button></p>
+    </section>
+
+    <div class="container">
+      <nav aria-label="שלבי ההזמנה"><ol class="stepper" id="stepper"></ol></nav>
+    </div>
+
+    <div class="container order__grid">
+      <form class="wizard" id="wizard" novalidate data-step="type">
+
+        <!-- שלב 1 -->
+        <section class="wz-step" id="step-type" aria-labelledby="h-type">
+          <h2 id="h-type" tabindex="-1">למי ההפתעה?</h2>
+          <p class="wz-sub">בחרו את הסוג, והשאלות בשלב הבא יתאימו בדיוק אליו.</p>
+          <div class="wz-errors" role="alert" tabindex="-1" hidden></div>
+          <fieldset class="types-field"><legend class="sr-only">סוג ההפתעה</legend><div class="types"></div></fieldset>
+          <div class="wz-nav"><button type="button" class="btn btn--primary btn--lg" data-next>ממשיכים<span data-icon="arrow-left"></span></button></div>
+        </section>
+
+        <!-- שלב 2 -->
+        <section class="wz-step" id="step-story" aria-labelledby="h-story" hidden>
+          <p class="wz-type" id="storyType"></p>
+          <h2 id="h-story" tabindex="-1">ספרו לי עליהם</h2>
+          <p class="wz-sub">ככל שתכתבו יותר, ההפתעה תהיה אישית יותר. שדות עם <span aria-hidden="true">*</span><span class="sr-only">כוכבית</span> הם חובה, כל השאר רשות.</p>
+          <div class="wz-errors" role="alert" tabindex="-1" hidden></div>
+          <div class="fields"></div>
+          <div class="wz-nav"><button type="button" class="btn btn--ghost" data-back><span data-icon="arrow-right"></span>חזרה</button><button type="button" class="btn btn--primary btn--lg" data-next>לעיצוב<span data-icon="arrow-left"></span></button></div>
+        </section>
+
+        <!-- שלב 3 -->
+        <section class="wz-step" id="step-design" aria-labelledby="h-design" hidden>
+          <h2 id="h-design" tabindex="-1">צבעים, מעטפה ומוזיקה</h2>
+          <p class="wz-sub">כל בחירה מתעדכנת במעטפה שלכם בזמן אמת.</p>
+          <div class="wz-errors" role="alert" tabindex="-1" hidden></div>
+          <div class="fields"></div>
+          <p class="sr-only" id="photoStatus" aria-live="polite"></p>
+          <div class="wz-nav"><button type="button" class="btn btn--ghost" data-back><span data-icon="arrow-right"></span>חזרה</button><button type="button" class="btn btn--primary btn--lg" data-next>כמעט סיימנו<span data-icon="arrow-left"></span></button></div>
+        </section>
+
+        <!-- שלב 4 -->
+        <section class="wz-step" id="step-details" aria-labelledby="h-details" hidden>
+          <h2 id="h-details" tabindex="-1">חבילה ופרטים</h2>
+          <p class="wz-sub">משלמים רק אחרי שראיתם את הגרסה הסופית ואהבתם.</p>
+          <div class="wz-errors" role="alert" tabindex="-1" hidden></div>
+          <div class="fields"></div>
+          <div class="wz-nav"><button type="button" class="btn btn--ghost" data-back><span data-icon="arrow-right"></span>חזרה</button><button type="button" class="btn btn--primary btn--lg" data-next><span data-icon="eye"></span>לראות את הסקיצה</button></div>
+        </section>
+
+        <!-- שלב 5 -->
+        <section class="wz-step wz-step--sketch" id="step-sketch" aria-labelledby="h-sketch" hidden>
+          <h2 id="h-sketch" tabindex="-1">הסקיצה שלכם מוכנה</h2>
+          <p class="wz-sub">זו טיוטה שנבנתה אוטומטית מהפרטים. נסו אותה כמו מי שיקבל: פתחו את המעטפה ועברו על השלבים.</p>
+          <div class="wz-errors" role="alert" tabindex="-1" hidden></div>
+          <div class="sketch">
+            <div class="sketch__phone">
+              <div class="phone phone--sketch">
+                <div class="phone__notch" aria-hidden="true"></div>
+                <iframe id="sketchFrame" title="הסקיצה הראשונית של ההפתעה שלכם" loading="lazy"></iframe>
+              </div>
+              <a class="link-btn" href="demos/preview.html" id="fullPreview" target="_blank" rel="noopener"><span data-icon="eye"></span>פתיחה במסך מלא<span class="sr-only"> (נפתח בחלון חדש)</span></a>
+            </div>
+            <div class="sketch__side">
+              <h3>סיכום ההזמנה</h3>
+              <dl class="summary" id="summary"></dl>
+              <a class="btn btn--wa btn--lg btn--block" id="sendWa" target="_blank" rel="noopener"><span data-icon="whatsapp"></span>שליחה לשמואל בווטסאפ<span class="sr-only"> (נפתח בחלון חדש)</span></a>
+              <button type="button" class="btn btn--ghost btn--block" id="copyMsg"><span data-icon="copy"></span>העתקת הסיכום</button>
+              <p class="sr-only" id="copyStatus" aria-live="polite"></p>
+              <div class="sent-note" id="sentNote" hidden role="status">
+                <span data-icon="check"></span><p><b>מעולה!</b> ההודעה מוכנה בווטסאפ, רק ללחוץ "שליחה". אחר כך שלחו באותה שיחה את התמונות, ותוך 24 שעות תקבלו את הגרסה הסופית.</p>
+              </div>
+              <details class="msg-peek"><summary>מה בדיוק נשלח?</summary><pre id="msgPreview" dir="rtl"></pre></details>
+              <ol class="next-steps">
+                <li><b>שולחים</b> את הסיכום בווטסאפ, ואת התמונות באותה שיחה</li>
+                <li><b>תוך 24 שעות</b> מקבלים קישור לגרסה הסופית</li>
+                <li><b>אוהבים?</b> משלמים בביט או בפייבוקס ושולחים</li>
+              </ol>
+              <button type="button" class="btn btn--ghost btn--sm" data-back><span data-icon="pencil"></span>חזרה לעריכה</button>
+            </div>
+          </div>
+        </section>
+      </form>
+
+      <aside class="live" aria-label="המעטפה שלכם בזמן אמת">
+        <p class="live__label"><span data-icon="sparkle"></span>המעטפה שלכם, בזמן אמת</p>
+        <div class="live__screen" id="liveScreen">
+          <p class="live__to" id="liveTo">השם יופיע כאן</p>
+          <div class="live__env" id="liveEnv"></div>
+          <p class="live__hint"><span data-icon="tap"></span>הקישו על המעטפה לראות איך היא נפתחת</p>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="footer footer--slim">
+    <div class="container">
+      <p class="footer__copy">© 2026 Matanot · שמואל לוי · <a href="privacy.html">מדיניות פרטיות</a> · <a href="negishut.html">הצהרת נגישות</a></p>
+    </div>
+  </footer>
+
+  <aside aria-label="נגישות">
+    <div class="a11y" id="a11y">
+      <button class="a11y__toggle" id="a11yToggle" type="button" aria-expanded="false" aria-controls="a11yPanel" aria-label="תפריט נגישות"><span data-icon="accessibility"></span></button>
+      <div class="a11y__panel" id="a11yPanel" role="dialog" aria-modal="false" aria-labelledby="a11yTitle" hidden>
+        <div class="a11y__head">
+          <h2 id="a11yTitle">התאמות נגישות</h2>
+          <button type="button" class="a11y__close" id="a11yClose" aria-label="סגירת תפריט הנגישות"><span data-icon="x"></span></button>
+        </div>
+        <div class="a11y__grid">
+          <button type="button" data-a11y="text-lg" aria-pressed="false"><span data-icon="text-size"></span>גודל טקסט<span class="a11y__lvl"></span></button>
+          <button type="button" data-a11y="contrast" aria-pressed="false"><span data-icon="contrast"></span>ניגודיות גבוהה</button>
+          <button type="button" data-a11y="links" aria-pressed="false"><span data-icon="link"></span>הדגשת קישורים</button>
+          <button type="button" data-a11y="readable" aria-pressed="false"><span data-icon="type"></span>גופן קריא</button>
+          <button type="button" data-a11y="no-motion" aria-pressed="false"><span data-icon="pause"></span>עצירת אנימציות</button>
+          <button type="button" data-a11y="spacing" aria-pressed="false"><span data-icon="line-height"></span>ריווח שורות</button>
+          <button type="button" data-a11y="grayscale" aria-pressed="false"><span data-icon="grayscale"></span>גווני אפור</button>
+          <button type="button" data-a11y="cursor" aria-pressed="false"><span data-icon="cursor"></span>סמן גדול</button>
+          <button type="button" data-a11y="focus" aria-pressed="false"><span data-icon="focus"></span>הדגשת פוקוס</button>
+          <button type="button" data-a11y="headings" aria-pressed="false"><span data-icon="heading"></span>הדגשת כותרות</button>
+        </div>
+        <button type="button" class="a11y__reset" id="a11yReset"><span data-icon="replay"></span>איפוס הגדרות</button>
+        <a class="a11y__statement" href="negishut.html">להצהרת הנגישות</a>
+        <p class="sr-only" id="a11yStatus" aria-live="polite"></p>
+      </div>
+    </div>
+  </aside>
+
+  <script src="config.js"></script>
+  <script src="order-config.js"></script>
+  <script src="icons.js"></script>
+  <script src="envelope.js"></script>
+  <script>
+    document.querySelectorAll("[data-wa]").forEach(function (a) { a.href = "https://wa.me/" + SITE.contact.phoneIntl + "?text=" + encodeURIComponent("היי שמואל, יש לי שאלה לפני ההזמנה"); });
+  </script>
+  <script src="order.js"></script>
+</body>
+</html>

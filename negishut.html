@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&family=Suez+One&family=Playpen+Sans+Hebrew:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="envelope.css" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body class="legal-page">
@@ -17,15 +18,15 @@
     <div class="container header__inner">
       <a href="index.html" class="brand" aria-label="Matanot, חזרה לעמוד הבית">
         <img class="brand__mark" src="images/favicon.png" alt="" width="44" height="44" />
-        <span class="brand__text"><b>Matanot</b><small>הפתעות בקישור</small></span>
+        <span class="brand__text"><b lang="en">Matanot</b><small>הפתעות בקישור</small></span>
       </a>
-      <a class="btn btn--ghost btn--sm" href="index.html">→ חזרה לאתר</a>
+      <a class="btn btn--ghost btn--sm" href="index.html"><span data-icon="arrow-right"></span>חזרה לאתר</a>
     </div>
   </header>
 
   <main id="main" class="legal container container--narrow">
     <h1>הצהרת נגישות</h1>
-    <p class="legal__date">עודכן לאחרונה: 3 בנובמבר 2026</p>
+    <p class="legal__date">עודכן לאחרונה: 5 בנובמבר 2026</p>
 
     <p>ב-Matanot מאמינים שהפתעה טובה צריכה להגיע לכולם. לכן השקענו בהנגשת האתר לאנשים עם מוגבלות, כדי שכל מבקר יוכל לגלוש בו בקלות, בנוחות ובכבוד.</p>
 
@@ -41,19 +42,33 @@
       <li>ניגודיות צבעים שעומדת בדרישות התקן לטקסט ולכפתורים.</li>
       <li>כל האנימציות נעצרות אוטומטית אצל מי שהגדיר במכשיר "הפחתת תנועה".</li>
       <li>קישורים שנפתחים בחלון חדש מסומנים ככאלה לקוראי מסך.</li>
+      <li>לרצועה הנעה בעמוד הראשי יש כפתור עצירה.</li>
+      <li>אין באתר אימוג'י: כל האייקונים מוסתרים מקוראי מסך, והמשמעות תמיד כתובה גם בטקסט.</li>
     </ul>
 
     <h2>תפריט הנגישות</h2>
-    <p>בעמוד הראשי, בפינה הימנית התחתונה של המסך, יש כפתור נגישות שפותח תפריט עם ההתאמות האלה:</p>
+    <p>בעמוד הראשי ובטופס ההזמנה, בפינה הימנית התחתונה של המסך, יש כפתור נגישות שפותח תפריט עם ההתאמות האלה:</p>
     <ul>
-      <li>הגדלת טקסט</li>
+      <li>גודל טקסט, בשלוש רמות</li>
       <li>ניגודיות גבוהה</li>
       <li>הדגשת קישורים</li>
       <li>גופן קריא (פשוט וללא כתב יד)</li>
       <li>עצירת אנימציות</li>
       <li>ריווח שורות</li>
+      <li>גווני אפור</li>
+      <li>סמן עכבר גדול</li>
+      <li>הדגשת פוקוס חזקה לניווט במקלדת</li>
+      <li>הדגשת כותרות</li>
     </ul>
     <p>ההגדרות נשמרות בדפדפן שלכם ונשארות פעילות גם בביקור הבא.</p>
+
+    <h2>טופס ההזמנה</h2>
+    <ul>
+      <li>לכל שדה יש תווית כתובה, ושדות החובה מסומנים גם לקוראי מסך.</li>
+      <li>אם חסר משהו, מופיעה בראש השלב רשימת שגיאות עם קישור לכל שדה, וההודעה מוקראת אוטומטית.</li>
+      <li>אפשר לעבור בין השלבים במקלדת, והמיקוד עובר לכותרת של כל שלב חדש.</li>
+      <li>מה שמילאתם נשמר בדפדפן, כך שאפשר לחזור ולהמשיך בלי לאבד את הפרטים.</li>
+    </ul>
 
     <h2>אתרי הדוגמה</h2>
     <p>אתרי הדוגמה הם חוויות משחקיות. לכל אינטראקציה בהם יש חלופה נגישה:</p>
@@ -82,5 +97,6 @@
       <p class="footer__copy">© 2026 Matanot · שמואל לוי · <a href="privacy.html">מדיניות פרטיות</a></p>
     </div>
   </footer>
+  <script src="icons.js"></script>
 </body>
 </html>

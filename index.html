@@ -4,11 +4,11 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Matanot מתנות | הפתעה אישית שנפתחת בלחיצה</title>
-  <meta name="description" content="אתר הפתעה אישי ואינטראקטיבי שנשלח בווטסאפ: מעטפה שנפתחת, שאלות, תמונות ושיר. לבני זוג, למשפחה ולחברים. מוכן תוך 48 שעות." />
+  <meta name="description" content="אתר הפתעה אישי ואינטראקטיבי שנשלח בווטסאפ: מעטפה עם חותם שעווה, שאלות, תמונות ושיר. ממלאים טופס, רואים סקיצה מיד, ומקבלים את ההפתעה תוך 24 שעות." />
   <meta name="theme-color" content="#FFF9F4" />
 
-  <meta property="og:title" content="Matanot | הרגש שלך, בקישור אחד 💌" />
-  <meta property="og:description" content="אתר הפתעה אישי שנשלח בווטסאפ. מוכן תוך 48 שעות." />
+  <meta property="og:title" content="Matanot | הרגש שלך, בקישור אחד" />
+  <meta property="og:description" content="אתר הפתעה אישי שנשלח בווטסאפ. סקיצה מיד, הפתעה מוכנה תוך 24 שעות." />
   <meta property="og:type" content="website" />
   <meta property="og:locale" content="he_IL" />
   <meta property="og:image" content="images/og.jpg" />
@@ -17,8 +17,10 @@
   <link rel="apple-touch-icon" href="images/favicon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&family=Suez+One&family=Playpen+Sans+Hebrew:wght@500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&family=Suez+One&family=Frank+Ruhl+Libre:wght@500;700&family=Playpen+Sans+Hebrew:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="envelope.css" />
   <link rel="stylesheet" href="styles.css" />
+  <script src="a11y.js"></script>
   <!-- Meta Pixel / Google Analytics: להדביק כאן -->
 </head>
 <body>
@@ -30,26 +32,25 @@
       <symbol id="d-squiggle" viewBox="0 0 80 30"><path d="M4 18c7-10 13-10 18 0s11 10 17 0 12-10 18 0 11 9 19-2" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round"/></symbol>
       <symbol id="d-heart" viewBox="0 0 60 56"><path d="M30 50C14 39 5 30 6 19 7 10 14 5 21 6c4 .6 7 3 9 7 2-4 5-7 10-7 8 0 14 6 13 15-1 11-11 20-23 29z" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></symbol>
       <symbol id="d-spark" viewBox="0 0 40 40"><path d="M20 3c1 8 4 14 17 17-12 2-16 6-17 17-2-11-6-15-17-17 11-2 15-7 17-17z" fill="currentColor"/></symbol>
-      <symbol id="i-wa" viewBox="0 0 32 32"><path fill="currentColor" d="M16 3C8.8 3 3 8.7 3 15.8c0 2.5.7 4.9 2 7L3 29l6.4-2c2 1.1 4.3 1.7 6.6 1.7 7.2 0 13-5.7 13-12.8S23.2 3 16 3zm0 23.4c-2.1 0-4.1-.6-5.9-1.7l-.4-.3-3.8 1.2 1.2-3.7-.3-.4c-1.2-1.8-1.8-3.8-1.8-5.900C5 9.900 10 5.200 16 5.200s11 4.700 11 10.600-5 10.600-11 10.600zm6-7.900c-.3-.2-1.900-1-2.200-1.100-.3-.1-.5-.2-.7.2-.2.3-.8 1-1 1.200-.2.2-.4.2-.7.1-.3-.2-1.400-.5-2.600-1.600-1-.9-1.600-1.900-1.800-2.200-.2-.3 0-.5.1-.7l.5-.6c.2-.2.2-.4.3-.6.1-.2 0-.4 0-.6l-1-2.400c-.3-.6-.5-.5-.7-.5h-.6c-.2 0-.6.1-.9.4-.3.3-1.200 1.100-1.200 2.700s1.200 3.200 1.400 3.400c.2.2 2.400 3.600 5.700 5 .8.3 1.400.5 1.900.7.8.3 1.500.2 2.100.1.6-.1 1.900-.8 2.200-1.500.3-.7.3-1.400.2-1.500-.1-.1-.3-.2-.6-.4z"/></symbol>
       <symbol id="d-arrow" viewBox="0 0 90 70"><path d="M84 8C60 6 30 16 18 52M8 38c3 6 7 12 10 16 5-3 11-5 18-6" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="d-env" viewBox="0 0 64 44"><rect x="3" y="3" width="58" height="38" rx="6" fill="currentColor" opacity=".18"/><path d="M5 6l27 19L59 6" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/><rect x="3" y="3" width="58" height="38" rx="6" fill="none" stroke="currentColor" stroke-width="3.2"/></symbol>
     </defs>
   </svg>
 
   <a class="skip-link" href="#main">דילוג לתוכן הראשי</a>
+  <div class="scroll-progress" aria-hidden="true"><b id="scrollBar"></b></div>
 
-  <aside id="banner" class="banner" aria-label="הודעה" hidden></aside>
+  <aside id="banner" class="banner" aria-label="מבצע" hidden></aside>
 
   <header class="header" id="header">
     <div class="container header__inner">
       <a href="#top" class="brand" aria-label="Matanot מתנות, חזרה לראש העמוד">
         <img class="brand__mark" src="images/favicon.png" alt="" width="44" height="44" />
-        <span class="brand__text"><b data-t="brand.latin"></b><small data-t="brand.tagline"></small></span>
+        <span class="brand__text"><b data-t="brand.latin" lang="en"></b><small data-t="brand.tagline"></small></span>
       </a>
       <nav class="nav" aria-label="ניווט ראשי"><ul id="nav"></ul></nav>
       <div class="header__actions">
-        <a class="wa-icon" data-wa target="_blank" rel="noopener" aria-label="שליחת הודעה בווטסאפ (נפתח בחלון חדש)">
-          <svg aria-hidden="true"><use href="#i-wa"/></svg>
-        </a>
+        <a class="wa-icon" data-wa target="_blank" rel="noopener" aria-label="שליחת הודעה בווטסאפ (נפתח בחלון חדש)"><span data-icon="whatsapp"></span></a>
         <a class="btn btn--primary btn--sm" data-order>הזמנה</a>
       </div>
     </div>
@@ -59,11 +60,15 @@
     <!-- ============ HERO ============ -->
     <section class="hero" id="top" aria-labelledby="heroTitle">
       <div class="hero__bg" aria-hidden="true">
+        <span class="blob blob--a"></span><span class="blob blob--b"></span><span class="blob blob--c"></span>
         <svg class="doodle doodle--a"><use href="#d-plus"/></svg>
         <svg class="doodle doodle--b"><use href="#d-ring"/></svg>
         <svg class="doodle doodle--c"><use href="#d-squiggle"/></svg>
         <svg class="doodle doodle--d"><use href="#d-heart"/></svg>
         <svg class="doodle doodle--e"><use href="#d-spark"/></svg>
+        <svg class="flyer flyer--a"><use href="#d-env"/></svg>
+        <svg class="flyer flyer--b"><use href="#d-env"/></svg>
+        <svg class="flyer flyer--c"><use href="#d-env"/></svg>
       </div>
 
       <div class="container hero__grid">
@@ -80,7 +85,7 @@
 
         <div class="hero__ctas">
           <div class="hero__buttons">
-            <a class="btn btn--primary btn--lg" data-order data-t="hero.cta"></a>
+            <a class="btn btn--primary btn--lg btn--magnetic" data-order><span data-t="hero.cta"></span><span data-icon="arrow-left"></span></a>
             <a class="btn btn--ghost btn--lg" href="#examples" data-t="hero.secondaryCta"></a>
           </div>
           <ul class="proof" id="proof"></ul>
@@ -88,22 +93,18 @@
 
         <div class="demo-wrap">
           <p class="hand-note" aria-hidden="true">נסו אותי!<svg><use href="#d-arrow"/></svg></p>
+          <figure class="stamp" aria-hidden="true"><img src="images/favicon.png" alt="" width="96" height="96" /><figcaption>Matanot · 2026</figcaption></figure>
           <div class="phone" id="demo" role="region" aria-label="הדגמה חיה של הפתעה">
             <div class="phone__notch" aria-hidden="true"></div>
             <div class="screen is-active" data-screen="envelope">
-              <button class="envelope" id="envelope" type="button" aria-label="פתיחת המעטפה">
-                <span class="envelope__back"></span>
-                <span class="envelope__letter"><svg aria-hidden="true"><use href="#d-heart"/></svg></span>
-                <span class="envelope__front"></span>
-                <span class="envelope__flap"></span>
-                <span class="envelope__seal" aria-hidden="true">♥</span>
-              </button>
+              <p class="screen__to hand" data-t="hero.demo.to"></p>
+              <div class="screen__env" id="envHost"></div>
               <p class="screen__title" data-t="hero.demo.envelopeTitle"></p>
-              <p class="screen__hint" data-t="hero.demo.envelopeHint"></p>
+              <p class="screen__hint"><span data-icon="tap"></span><span data-t="hero.demo.envelopeHint"></span></p>
             </div>
 
             <div class="screen" data-screen="question" aria-hidden="true">
-              <div class="screen__emoji bob" aria-hidden="true">🧸</div>
+              <div class="medal bob" aria-hidden="true"><span class="medal__ring"></span><span data-icon="bear"></span></div>
               <p class="screen__question" id="demoQuestion" data-t="hero.demo.question"></p>
               <div class="choice-area" id="choiceArea" role="group" aria-labelledby="demoQuestion">
                 <button class="btn btn--primary choice-yes" id="yesBtn" type="button" data-t="hero.demo.yes"></button>
@@ -113,11 +114,11 @@
             </div>
 
             <div class="screen" data-screen="success" aria-hidden="true">
-              <div class="screen__emoji beat" aria-hidden="true">💖</div>
+              <div class="medal beat" aria-hidden="true"><span class="medal__ring"></span><span data-icon="hearts"></span></div>
               <p class="screen__title" data-t="hero.demo.successTitle"></p>
               <p class="screen__text" data-t="hero.demo.successText"></p>
-              <a class="btn btn--primary" data-order data-t="hero.demo.successCta"></a>
-              <button class="link-btn" id="replayBtn" type="button" data-t="hero.demo.replay"></button>
+              <a class="btn btn--primary" data-order><span data-t="hero.demo.successCta"></span><span data-icon="arrow-left"></span></a>
+              <button class="link-btn" id="replayBtn" type="button"><span data-icon="replay"></span><span data-t="hero.demo.replay"></span></button>
             </div>
             <div class="confetti" id="confetti" aria-hidden="true"></div>
           </div>
@@ -131,16 +132,45 @@
       <div class="marquee" role="region" aria-label="אירועים שמתאימים להפתעה">
         <div class="marquee__track" id="marquee"></div>
       </div>
+      <button type="button" class="marquee__pause" id="marqueePause" aria-pressed="false" aria-label="עצירת הרצועה הנעה"><span data-icon="pause"></span></button>
     </div>
 
     <!-- ============ איך זה עובד ============ -->
     <section class="section" id="how" aria-labelledby="howTitle">
       <div class="container">
         <header class="section__head reveal">
+          <span data-kicker="steps.kicker"></span>
           <h2 class="section__title" id="howTitle"><span data-t="steps.title"></span></h2>
           <p class="section__subtitle" data-t="steps.subtitle"></p>
         </header>
-        <ol class="steps" id="steps"></ol>
+        <div class="steps-wrap reveal">
+          <svg class="steps__path" viewBox="0 0 1000 60" preserveAspectRatio="none" aria-hidden="true"><path d="M20 30C180 -10 320 70 500 30S820 -10 980 30" fill="none" stroke="currentColor" stroke-width="3" stroke-dasharray="8 10" stroke-linecap="round"/></svg>
+          <ol class="steps" id="steps"></ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ בונה הסקיצות ============ -->
+    <section class="section section--builder" id="builder" aria-labelledby="builderTitle">
+      <div class="container builder">
+        <div class="builder__text reveal">
+          <span data-kicker="builder.kicker"></span>
+          <h2 class="section__title builder__title" id="builderTitle" data-t="builder.title"></h2>
+          <p data-t="builder.text"></p>
+          <ul class="builder__points" id="builderPoints"></ul>
+          <a class="btn btn--primary btn--lg btn--magnetic" href="order.html"><span data-t="builder.cta"></span><span data-icon="arrow-left"></span></a>
+        </div>
+        <div class="mock reveal" id="mock" aria-hidden="true">
+          <div class="mock__form">
+            <div class="mock__bar"><i></i><i></i><i></i><em>order.html</em></div>
+            <div class="mock__row"><span>סוג ההפתעה</span><b id="mockKind"></b></div>
+            <div class="mock__row"><span>למי?</span><b class="mock__typing"><span id="mockTo"></span><i class="caret"></i></b></div>
+            <div class="mock__row"><span>פלטה</span><span class="mock__sw" id="mockSw"></span></div>
+            <div class="mock__cta"><span data-icon="eye"></span>לראות את הסקיצה</div>
+          </div>
+          <svg class="mock__arrow"><use href="#d-arrow"/></svg>
+          <div class="mock__phone"><div class="mock__screen" id="mockScreen"><p class="mock__to hand" id="mockTo2"></p><div class="mock__env" id="mockEnv"></div></div></div>
+        </div>
       </div>
     </section>
 
@@ -148,12 +178,14 @@
     <section class="section section--tint" id="examples" aria-labelledby="exTitle">
       <div class="container">
         <header class="section__head reveal">
+          <span data-kicker="examples.kicker"></span>
           <h2 class="section__title" id="exTitle"><span data-t="examples.title"></span></h2>
           <p class="section__subtitle" data-t="examples.subtitle"></p>
         </header>
-        <div class="tabs reveal" role="tablist" aria-label="סינון לפי קטגוריה" id="tabs"></div>
-        <div class="examples" id="examplesList" aria-live="polite"></div>
-        <p class="swipe-hint" aria-hidden="true">החליקו לעוד דוגמאות ←</p>
+        <div class="tabs reveal" aria-label="סינון לפי קטגוריה" id="tabs"></div>
+        <p class="sr-only" id="exStatus" aria-live="polite"></p>
+        <div class="examples" id="examplesList"></div>
+        <p class="swipe-hint" aria-hidden="true">החליקו לעוד דוגמאות</p>
       </div>
     </section>
 
@@ -161,6 +193,7 @@
     <section class="section" id="toolbox" aria-labelledby="tbTitle">
       <div class="container">
         <header class="section__head reveal">
+          <span data-kicker="toolbox.kicker"></span>
           <h2 class="section__title" id="tbTitle"><span data-t="toolbox.title"></span></h2>
           <p class="section__subtitle" data-t="toolbox.subtitle"></p>
         </header>
@@ -170,6 +203,7 @@
 
     <!-- ============ עליי ============ -->
     <section class="section section--ink" id="about" aria-labelledby="aboutTitle">
+      <svg class="wave wave--top" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true"><path d="M0 60V22C240 0 480 44 720 30S1200 0 1440 18V60z" fill="currentColor"/></svg>
       <div class="container about">
         <div class="profile" id="profile">
           <div class="profile__window">
@@ -185,7 +219,7 @@
           <ul class="profile__chips" id="chips" aria-label="טכנולוגיות"></ul>
           <figure class="profile__sticker" aria-hidden="true">
             <img src="images/favicon.png" alt="" width="96" height="96" loading="lazy" />
-            <figcaption>גם זה אני ✏️</figcaption>
+            <figcaption>גם זה אני</figcaption>
           </figure>
           <svg class="profile__heart" viewBox="0 0 60 56" aria-hidden="true"><path d="M30 50C14 39 5 30 6 19 7 10 14 5 21 6c4 .6 7 3 9 7 2-4 5-7 10-7 8 0 14 6 13 15-1 11-11 20-23 29z" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </div>
@@ -202,14 +236,15 @@
       <div class="container">
         <h3 class="projects__title reveal" data-t="about.projectsTitle"></h3>
         <ul class="projects" id="projects"></ul>
-        <p class="about__links" id="aboutLinks"></p>
       </div>
+      <svg class="wave wave--bottom" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true"><path d="M0 0V30C260 58 520 14 760 28S1220 58 1440 34V0z" fill="currentColor"/></svg>
     </section>
 
     <!-- ============ למה ============ -->
     <section class="section" id="why" aria-labelledby="whyTitle">
       <div class="container">
         <header class="section__head reveal">
+          <span data-kicker="why.kicker"></span>
           <h2 class="section__title" id="whyTitle"><span data-t="why.title"></span></h2>
         </header>
         <ul class="why" id="whyList"></ul>
@@ -220,6 +255,7 @@
     <section class="section section--tint" id="testimonials" aria-labelledby="tTitle">
       <div class="container">
         <header class="section__head reveal">
+          <span data-kicker="testimonials.kicker"></span>
           <h2 class="section__title" id="tTitle"><span data-t="testimonials.title"></span></h2>
           <p class="section__subtitle" data-t="testimonials.subtitle"></p>
         </header>
@@ -228,7 +264,7 @@
     </section>
 
     <dialog class="lightbox" id="lightbox" aria-label="צילום מסך מוגדל">
-      <button type="button" class="lightbox__close" id="lightboxClose" aria-label="סגירה">✕</button>
+      <button type="button" class="lightbox__close" id="lightboxClose" aria-label="סגירה"><span data-icon="x"></span></button>
       <img id="lightboxImg" alt="" />
     </dialog>
 
@@ -236,15 +272,17 @@
     <section class="section" id="pricing" aria-labelledby="pTitle">
       <div class="container">
         <header class="section__head reveal">
+          <span data-kicker="pricing.kicker"></span>
           <h2 class="section__title" id="pTitle"><span data-t="pricing.title"></span></h2>
           <p class="section__subtitle" data-t="pricing.subtitle"></p>
         </header>
+        <p class="promo reveal" id="promoStrip" hidden></p>
         <div class="plans" id="plans"></div>
         <div class="addons reveal">
           <h3 data-t="pricing.addonsTitle"></h3>
           <ul id="addons"></ul>
         </div>
-        <p class="pay-note reveal">💳 משלמים בביט או בפייבוקס, רק אחרי שראיתם ואהבתם</p>
+        <p class="pay-note reveal" id="payNote"></p>
       </div>
     </section>
 
@@ -252,6 +290,7 @@
     <section class="section section--tint" id="faq" aria-labelledby="fTitle">
       <div class="container container--narrow">
         <header class="section__head reveal">
+          <span data-kicker="faq.kicker"></span>
           <h2 class="section__title" id="fTitle"><span data-t="faq.title"></span></h2>
         </header>
         <div class="faq" id="faqList"></div>
@@ -267,8 +306,8 @@
           <h2 id="ctaTitle" data-t="finalCta.title"></h2>
           <p data-t="finalCta.text"></p>
           <div class="final-cta__buttons">
-            <a class="btn btn--primary btn--lg" data-order data-t="finalCta.cta"></a>
-            <a class="btn btn--ghost btn--lg" id="callBtn">📞 <span id="callText"></span></a>
+            <a class="btn btn--primary btn--lg btn--magnetic" data-order><span data-t="finalCta.cta"></span><span data-icon="arrow-left"></span></a>
+            <a class="btn btn--ghost btn--lg" id="callBtn"><span data-icon="call"></span><span id="callText" dir="ltr"></span></a>
           </div>
         </div>
       </div>
@@ -284,42 +323,42 @@
         <a href="negishut.html">הצהרת נגישות</a>
         <a href="privacy.html">מדיניות פרטיות</a>
       </nav>
-      <p class="footer__copy">© <span id="year"></span> Matanot · שמואל לוי</p>
+      <p class="footer__copy">© <span id="year"></span> <span lang="en">Matanot</span> · שמואל לוי</p>
     </div>
   </footer>
 
   <aside aria-label="יצירת קשר ונגישות">
-  <!-- ווטסאפ צף -->
-  <a class="wa-float" id="waFloat" target="_blank" rel="noopener" aria-label="שליחת הודעה בווטסאפ (נפתח בחלון חדש)">
-    <svg viewBox="0 0 32 32" width="30" height="30" aria-hidden="true"><path fill="currentColor" d="M16 3C8.8 3 3 8.7 3 15.8c0 2.5.7 4.9 2 7L3 29l6.4-2c2 1.1 4.3 1.7 6.6 1.7 7.2 0 13-5.7 13-12.8S23.2 3 16 3zm0 23.4c-2.1 0-4.1-.6-5.9-1.7l-.4-.3-3.8 1.2 1.2-3.7-.3-.4c-1.2-1.8-1.8-3.8-1.8-5.9C5 9.900 10 5.200 16 5.200s11 4.700 11 10.600-5 10.600-11 10.600zm6-7.900c-.3-.2-1.900-1-2.200-1.100-.3-.1-.5-.2-.7.2-.2.3-.8 1-1 1.200-.2.2-.4.2-.7.1-.3-.2-1.400-.5-2.600-1.600-1-.9-1.600-1.900-1.800-2.200-.2-.3 0-.5.1-.7l.5-.6c.2-.2.2-.4.3-.6.1-.2 0-.4 0-.6l-1-2.400c-.3-.6-.5-.5-.7-.5h-.6c-.2 0-.6.1-.9.4-.3.3-1.200 1.100-1.200 2.700s1.200 3.200 1.400 3.400c.2.2 2.400 3.600 5.700 5 .8.3 1.400.5 1.900.7.8.3 1.500.2 2.100.1.6-.1 1.900-.8 2.200-1.500.3-.7.3-1.400.2-1.500-.1-.1-.3-.2-.6-.4z"/></svg>
-  </a>
+    <a class="wa-float" id="waFloat" target="_blank" rel="noopener" aria-label="שליחת הודעה בווטסאפ (נפתח בחלון חדש)"><span data-icon="whatsapp"></span></a>
 
-  <!-- תפריט נגישות -->
-  <div class="a11y" id="a11y">
-    <button class="a11y__toggle" id="a11yToggle" type="button" aria-expanded="false" aria-controls="a11yPanel" aria-label="תפריט נגישות">
-      <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true"><circle cx="12" cy="4.2" r="2.2" fill="currentColor"/><path d="M4 8.2c2.7.8 5.3 1.1 8 1.1s5.3-.3 8-1.1M12 9.3v5.2m0 0-3.2 7M12 14.5l3.2 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
-    </button>
-    <div class="a11y__panel" id="a11yPanel" role="dialog" aria-modal="false" aria-labelledby="a11yTitle" hidden>
-      <div class="a11y__head">
-        <h2 id="a11yTitle">התאמות נגישות</h2>
-        <button type="button" class="a11y__close" id="a11yClose" aria-label="סגירת תפריט הנגישות">✕</button>
+    <div class="a11y" id="a11y">
+      <button class="a11y__toggle" id="a11yToggle" type="button" aria-expanded="false" aria-controls="a11yPanel" aria-label="תפריט נגישות"><span data-icon="accessibility"></span></button>
+      <div class="a11y__panel" id="a11yPanel" role="dialog" aria-modal="false" aria-labelledby="a11yTitle" hidden>
+        <div class="a11y__head">
+          <h2 id="a11yTitle">התאמות נגישות</h2>
+          <button type="button" class="a11y__close" id="a11yClose" aria-label="סגירת תפריט הנגישות"><span data-icon="x"></span></button>
+        </div>
+        <div class="a11y__grid">
+          <button type="button" data-a11y="text-lg" aria-pressed="false"><span data-icon="text-size"></span>גודל טקסט<span class="a11y__lvl"></span></button>
+          <button type="button" data-a11y="contrast" aria-pressed="false"><span data-icon="contrast"></span>ניגודיות גבוהה</button>
+          <button type="button" data-a11y="links" aria-pressed="false"><span data-icon="link"></span>הדגשת קישורים</button>
+          <button type="button" data-a11y="readable" aria-pressed="false"><span data-icon="type"></span>גופן קריא</button>
+          <button type="button" data-a11y="no-motion" aria-pressed="false"><span data-icon="pause"></span>עצירת אנימציות</button>
+          <button type="button" data-a11y="spacing" aria-pressed="false"><span data-icon="line-height"></span>ריווח שורות</button>
+          <button type="button" data-a11y="grayscale" aria-pressed="false"><span data-icon="grayscale"></span>גווני אפור</button>
+          <button type="button" data-a11y="cursor" aria-pressed="false"><span data-icon="cursor"></span>סמן גדול</button>
+          <button type="button" data-a11y="focus" aria-pressed="false"><span data-icon="focus"></span>הדגשת פוקוס</button>
+          <button type="button" data-a11y="headings" aria-pressed="false"><span data-icon="heading"></span>הדגשת כותרות</button>
+        </div>
+        <button type="button" class="a11y__reset" id="a11yReset"><span data-icon="replay"></span>איפוס הגדרות</button>
+        <a class="a11y__statement" href="negishut.html">להצהרת הנגישות</a>
+        <p class="sr-only" id="a11yStatus" aria-live="polite"></p>
       </div>
-      <div class="a11y__grid">
-        <button type="button" data-a11y="text-lg" aria-pressed="false"><span aria-hidden="true">A+</span>הגדלת טקסט</button>
-        <button type="button" data-a11y="contrast" aria-pressed="false"><span aria-hidden="true">◐</span>ניגודיות גבוהה</button>
-        <button type="button" data-a11y="links" aria-pressed="false"><span aria-hidden="true">🔗</span>הדגשת קישורים</button>
-        <button type="button" data-a11y="readable" aria-pressed="false"><span aria-hidden="true">Aa</span>גופן קריא</button>
-        <button type="button" data-a11y="no-motion" aria-pressed="false"><span aria-hidden="true">⏸</span>עצירת אנימציות</button>
-        <button type="button" data-a11y="spacing" aria-pressed="false"><span aria-hidden="true">↕</span>ריווח שורות</button>
-      </div>
-      <button type="button" class="a11y__reset" id="a11yReset">איפוס הגדרות</button>
-      <a class="a11y__statement" href="negishut.html">להצהרת הנגישות</a>
     </div>
-  </div>
   </aside>
 
   <script src="config.js"></script>
-  <script src="a11y.js"></script>
+  <script src="icons.js"></script>
+  <script src="envelope.js"></script>
   <script src="main.js"></script>
 </body>
 </html>

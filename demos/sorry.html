@@ -3,36 +3,39 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>🥺 סליחה... | דוגמה מ-Matanot</title>
+  <title>סליחה... | דוגמה מ-Matanot</title>
   <meta name="description" content="דוגמה להפתעה בקישור: התנצלות שאי אפשר להישאר כועסים עליה." />
+  <meta name="theme-color" content="#FFF9F4" />
   <link rel="icon" type="image/png" href="../images/favicon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&family=Suez+One&family=Playpen+Sans+Hebrew:wght@500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&family=Suez+One&family=Frank+Ruhl+Libre:wght@500;700&family=Playpen+Sans+Hebrew:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../envelope.css" />
   <link rel="stylesheet" href="engine.css" />
 </head>
 <body>
 <script>
 window.DEMO = {
-  theme: { bg: "linear-gradient(170deg,#FFF7F0,#FFD9C2)", accent: "#F08A5D", "accent-deep": "#A8441A", ink: "#5A2410", soft: "#FFEDE1", "env-a": "#F08A5D", "env-b": "#C25A2C" },
-  deco: ["🧡", "🌷", "🥺", "✨"],
-  confettiEmoji: ["🧡", "🌷", "🍕"],
+  palette: "peach", liner: "confetti", mood: "romantic", orderType: "sorry",
+  deco: ["heart", "flower", "sparkle", "flag"],
   steps: [
-    { type: "envelope", to: "למאיה 🧡", title: "אפשר רגע?", letter: "🥺", hint: "בבקשה תפתחי 🥺" },
-    { type: "message", emoji: "😔", title: "אני יודע שפישלתי", text: ["שכחתי את הדייט שלנו. שוב.", "אין לי תירוץ טוב, אז במקום תירוץ הכנתי לך את זה."], cta: "טוב, נראה ←" },
-    { type: "choice", emoji: "🌡️", title: "כמה את כועסת?", options: [
-      { emoji: "😤", label: "מאוד", reply: "הוגן. תמשיכי, יש לי תוכנית." },
-      { emoji: "😒", label: "קצת", reply: "קצת זה כבר התחלה 🙏" },
-      { emoji: "😏", label: "תלוי מה יש בסוף", reply: "אז כדאי לך להמשיך 😅" }
+    { type: "envelope", to: "למאיה", title: "אפשר רגע?", mark: "מ", card: { icon: "flag", title: "דגל לבן", text: "מגיע בשלום" }, hint: "בבקשה תפתחי" },
+    { type: "message", photo: { src: "photos/pug.jpg", alt: "כלבלב פאג עטוף בשמיכה מסתכל במבט מתחנן", caption: "אני, כרגע" }, title: "אני יודע שפישלתי", text: ["שכחתי את הדייט שלנו. שוב.", "אין לי תירוץ טוב, אז במקום תירוץ הכנתי לך את זה."], cta: "טוב, נראה" },
+    { type: "choice", icon: "heart-crack", title: "כמה את כועסת?", options: [
+      { icon: "bolt", label: "מאוד", reply: "הוגן. תמשיכי, יש לי תוכנית." },
+      { icon: "sad", label: "קצת", reply: "קצת זה כבר התחלה." },
+      { icon: "gift", label: "תלוי מה יש בסוף", reply: "אז כדאי לך להמשיך." }
     ] },
-    { type: "scratch", emoji: "🎁", title: "גרדי לגלות את הפיצוי", sub: "עם האצבע, על כל הכרטיס", cover1: "#F3C7A9", cover2: "#FFE9DA",
-      reveal: { emoji: "🍕💐", text: "ערב פיצה, פרחים, ואני שוטף כלים שבוע שלם", small: "בתוקף מיידי" }, cta: "עסקה טובה ←" },
-    { type: "runaway", emoji: "🤗", title: "סולחת לי?", yes: "סולחת 🧡", no: "לא סולחת",
-      noTexts: ["עוד קצת כועסת", "רגע...", "הכפתור לא מסכים", "נו מאיהההה", "בבקשהה 🥺"] },
-    { type: "final", variant: "card", emoji: "🤗", title: "תודה שאת כזו", text: ["מבטיח לשים תזכורת. שלוש תזכורות.", "ולהגיע עם פרחים."], sign: "שלך, שלמד את הלקח" }
+    { type: "scratch", icon: "gift", title: "גרדי לגלות את הפיצוי", sub: "עם האצבע, על כל הכרטיס", cover1: "#F3C7A9", cover2: "#FFE9DA",
+      reveal: { icon: "pizza", text: "ערב פיצה, פרחים, ואני שוטף כלים שבוע שלם", small: "בתוקף מיידי" }, cta: "עסקה טובה" },
+    { type: "runaway", icon: "hand-heart", title: "סולחת לי?", yes: "סולחת", no: "לא סולחת",
+      noTexts: ["עוד קצת כועסת", "רגע...", "הכפתור לא מסכים", "נו מאיהההה", "בבקשהה"] },
+    { type: "final", variant: "card", icon: "flower", title: "תודה שאת כזו", text: ["מבטיח לשים תזכורת. שלוש תזכורות.", "ולהגיע עם פרחים."], sign: "שלך, שלמד את הלקח" }
   ]
 };
 </script>
+<script src="../icons.js"></script>
+<script src="../envelope.js"></script>
 <script src="engine.js"></script>
 </body>
 </html>
