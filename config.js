@@ -88,6 +88,43 @@ window.SITE = {
     ],
   },
 
+  // סקשן שמדבר ישר אל מי שרוצה לכתוב לבת הזוג ולא יודע איך
+  him: {
+    kicker: "לא צריך להיות משורר",
+    title: "רוצה לכתוב לה, ולא יודע מאיפה להתחיל?",
+    text: "זה בסדר גמור. רוב האנשים לא כותבים מכתבים. אתה נותן לי כמה נקודות: איך הכרתם, מה הכי מצחיק אותה, מה אתה רוצה שהיא תדע. אני הופך את זה למכתב שנשמע בדיוק כמוך, רק במילים הכי טובות שלך.",
+    points: [
+      { icon: "pencil", title: "כותבים בנקודות", text: "אפילו 3 משפטים. אני מנסח" },
+      { icon: "eye", title: "מאשר כל מילה", text: "היא רואה רק מה שאישרת" },
+      { icon: "lock", title: "דיסקרטי לגמרי", text: "אף אחד לא יודע שעזרתי" },
+    ],
+    cta: "לכתוב לה מכתב",
+    demo: "לראות מכתב לדוגמה",
+  },
+
+  // מחולל רעיונות: כל לחיצה מציגה רעיון אחר
+  ideas: {
+    title: "אין לך רעיון? בוא נגריל אחד",
+    button: "רעיון אחר",
+    want: "אני רוצה את זה",
+    items: [
+      { icon: "hearts", title: "6 סיבות למה דווקא היא", text: "קלפים שהיא הופכת אחד אחד, ובכל אחד סיבה שאתה אוהב אותה.", type: "partner" },
+      { icon: "mail-open", title: "מעטפות 'תפתחי כש...'", text: "מכתבים קטנים לימים שאתה לא לידה: כשהיא עצובה, מתגעגעת או צריכה לצחוק.", type: "partner" },
+      { icon: "sparkle", title: "גלגל הדייט", text: "היא מסובבת גלגל, והגלגל בוחר את הדייט הבא שלכם. אתה רק מארגן.", type: "partner" },
+      { icon: "ticket", title: "פנקס שוברי אהבה", text: "שובר לעיסוי, שובר לבחירת הסרט, ושובר אחד ל'את צודקת'.", type: "partner" },
+      { icon: "plane", title: "כרטיס טיסה בהפתעה", text: "רשימת אריזה לסימון, ובסוף כרטיס עלייה למטוס עם היעד בסוד.", type: "partner" },
+      { icon: "question", title: "חידון זוגי", text: "כמה היא באמת מכירה אותך? עם פרס למי שעונה נכון.", type: "partner" },
+      { icon: "calendar", title: "סתם יום שלישי", text: "הודעה בלי סיבה מיוחדת. בדיוק בגלל זה היא תתרגש.", type: "partner" },
+      { icon: "ring", title: "השאלה הגדולה", text: "אלבום של כל השנים, לב שמתמלא, ובסוף: תתחתני איתי?", type: "proposal" },
+      { icon: "flag", title: "דגל לבן", text: "התנצלות עם כפתור 'לא סולחת' שבורח, ופיצוי שנחשף בגירוד.", type: "sorry" },
+      { icon: "cake", title: "יום הולדת לחברה", text: "טריוויה, ארכיון התמונות המביכות ונרות לכיבוי.", type: "birthday" },
+      { icon: "baby", title: "חשיפת הריון לסבא וסבתא", text: "חידון משפחתי, כרטיס גירוד, וספירה לאחור עד הלידה.", type: "baby" },
+      { icon: "home", title: "מכתב לאמא", text: "זיכרונות מהבית, ומה שאף פעם לא יצא לך להגיד לה.", type: "family" },
+      { icon: "hand-heart", title: "תודה לגננת", text: "קיר פתקים מכל הילדים, ותמונות מהשנה.", type: "thanks" },
+      { icon: "briefcase", title: "פרידה מעמית", text: "פתקים מכל הצוות, ושובר לקפה בכל פעם שהוא חוזר לבקר.", type: "thanks" },
+    ],
+  },
+
   builder: {
     kicker: "חדש",
     title: "סקיצה לפני שמשלמים שקל",
@@ -97,7 +134,7 @@ window.SITE = {
   },
 
   examples: {
-    kicker: "7 דוגמאות חיות",
+    kicker: "9 דוגמאות חיות",
     title: "הפתעה לכל אחד שחשוב לכם",
     subtitle: "לא רק לבני זוג. פתחו דוגמה מהטלפון ותרגישו בעצמכם",
     categories: [
@@ -109,6 +146,8 @@ window.SITE = {
     ],
     // shot = צילום מסך אמיתי של הדוגמה (images/examples)
     items: [
+      { cat: "love", icon: "letter", title: "מכתב אהבה ממנו", text: "קלפי 'למה דווקא את', מעטפות 'תפתחי כש...', ופנקס שוברי אהבה. בשביל מי שלא טוב במילים.", url: "demos/love.html", order: "partner", shot: "images/examples/love.webp", tone: "rose", features: ["קלפי סיבות", "תפתחי כש...", "שוברים"] },
+      { cat: "love", icon: "ring", title: "יום נישואין עם גלגל", text: "חידון זוגי, גלגל שבוחר את הדייט, וספירה לאחור עד הערב שלכם.", url: "demos/anniversary.html", order: "partner", shot: "images/examples/anniversary.webp", tone: "lilac", features: ["חידון", "גלגל", "ספירה לאחור"] },
       { cat: "love", icon: "plane", title: "מסע הפתעה", text: "\"באיזה מוד אתה מגיע?\", רשימת אריזה לסימון, ובסוף כרטיס טיסה עם שעת היציאה.", url: "demos/trip.html", order: "partner", shot: "images/examples/trip.webp", tone: "sky", features: ["בחירה", "רשימת אריזה", "כרטיס טיסה"] },
       { cat: "love", icon: "glass", title: "נצא לדייט?", text: "כפתור \"לא\" שבורח, בחירת אוכל, והזמנה רשמית לערב שלכם.", url: "demos/date.html", order: "partner", shot: "images/examples/date.webp", tone: "rose", features: ["כפתור בורח", "בחירה", "הזמנה"] },
       { cat: "love", icon: "ring", title: "הצעת נישואין", text: "אלבום הרגעים שלכם, לב שצריך להחזיק עד שהוא מתמלא, והשאלה הגדולה.", url: "demos/proposal.html", order: "proposal", shot: "images/examples/proposal.webp", tone: "lilac", features: ["אלבום", "לב מתמלא", "השאלה"] },
@@ -120,7 +159,7 @@ window.SITE = {
   },
 
   toolbox: {
-    kicker: "12 חלקים",
+    kicker: "16 חלקים",
     title: "מה אפשר להכניס להפתעה?",
     subtitle: "בוחרים את החלקים, ואני מחבר אותם לסיפור שלכם",
     items: [
@@ -136,6 +175,10 @@ window.SITE = {
       { icon: "candle", title: "נרות לכיבוי" },
       { icon: "heart", title: "לב שמתמלא" },
       { icon: "note", title: "קיר פתקים" },
+      { icon: "hearts", title: "קלפי סיבות" },
+      { icon: "mail-open", title: "תפתחי כש..." },
+      { icon: "sparkle", title: "גלגל מזל" },
+      { icon: "tag", title: "שוברי אהבה" },
     ],
   },
 

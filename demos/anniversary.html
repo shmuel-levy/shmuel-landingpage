@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>יום נישואין עם גלגל | דוגמה מ-Matanot</title>
+  <meta name="description" content="דוגמה להפתעה בקישור: יום נישואין עם חידון זוגי, גלגל שבוחר את הדייט, וספירה לאחור." />
+  <meta name="theme-color" content="#FFF9F4" />
+  <link rel="icon" type="image/png" href="../images/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&family=Suez+One&family=Frank+Ruhl+Libre:wght@500;700&family=Playpen+Sans+Hebrew:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../envelope.css" />
+  <link rel="stylesheet" href="engine.css" />
+</head>
+<body>
+<script>
+window.DEMO = {
+  palette: "lilac", liner: "stripes", mood: "romantic", orderType: "partner",
+  defaults: { date: "פיקניק בשקיעה" },
+  deco: ["heart", "star", "sparkle", "ring"],
+  steps: [
+    { type: "envelope", to: "לאשתי", title: "שנה שלישית. אותה התרגשות.", mark: "ש", card: { icon: "ring", title: "3 שנים", text: "וזה רק ההתחלה" }, hint: "הקישי על החותם" },
+    { type: "quiz", icon: "question", title: "חידון זוגי", doneText: "ציון מושלם או לא, את זוכה בדייט.", cta: "לפרס", questions: [
+      { q: "איפה היה הדייט הראשון שלנו?", options: ["בבית קפה", "בים", "בהופעה"], correct: 0, right: "ברור. ואני הזמנתי שוקו", wrong: "נסי שוב, מאמי" },
+      { q: "מי אמר \"אני אוהב אותך\" ראשון?", options: ["אני", "את", "שנינו ביחד"], correct: 0, right: "ולא התחרטתי לשנייה" }
+    ] },
+    { type: "wheel", key: "date", title: "סובבי את הגלגל", sub: "מה שיוצא, זה הדייט שלנו השבוע", spin: "לסובב!", reply: "סגור. אני מארגן הכל", cta: "מתי?", options: ["פיקניק בשקיעה", "מסעדה איטלקית", "סרט ופופקורן", "ספא זוגי", "טיול לצפון", "הפתעה"] },
+    { type: "countdown", icon: "hourglass", title: "הספירה התחילה", sub: "עד הדייט שלנו", daysFromNow: 4, note: "תתכונני להיות מפונקת" },
+    { type: "final", variant: "invite", icon: "glass", title: "זה רשמי!", lines: [
+      { icon: "sparkle", label: "מה", value: "{date}" },
+      { icon: "calendar", label: "מתי", value: "חמישי הקרוב, 19:00" },
+      { icon: "heart", label: "מי מארגן", value: "אני. את רק מגיעה" }
+    ], note: "3 שנים, ואני עדיין מתרגש" }
+  ]
+};
+</script>
+<script src="../icons.js"></script>
+<script src="../envelope.js"></script>
+<script src="engine.js"></script>
+</body>
+</html>

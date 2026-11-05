@@ -9,12 +9,15 @@
      quiz    ← שאלות טריוויה: שאלה, תשובה נכונה ושתי תשובות שגויות (count)
      notes   ← פתקים: טקסט + ממי (count)
    required: true = חובה.  hint = הסבר קטן מתחת לשאלה.
+   more: true = השאלה מופיעה בתוך "עוד רעיונות" (מקופל), כדי שהטופס יהיה קצר.
+   starters = משפטי פתיחה שהלקוח יכול להוסיף בלחיצה (רק ל-textarea).
    ========================================================= */
 window.ORDER = {
   types: [
     {
       id: "partner", icon: "hearts", label: "בן / בת זוג", desc: "הזמנה לדייט, יום נישואין, סתם כי בא לך",
-      elements: ["envelope", "runaway", "photos", "notes", "final"],
+      elements: ["envelope", "runaway", "photos", "reasons", "final"],
+      moreLabel: "רוצים עוד? קלפי סיבות, מעטפות 'תפתחי כש...' ושוברי אהבה",
       fields: [
         { id: "nickname", type: "text", label: "כינוי חיבה (אם יש)", placeholder: "למשל: מותק, נונו" },
         { id: "together", type: "text", label: "כמה זמן אתם ביחד?", placeholder: "למשל: 4 שנים" },
@@ -26,7 +29,13 @@ window.ORDER = {
         { id: "finale", type: "chips", label: "מה מחכה בסוף?", required: true, options: ["דייט", "חופשה או טיסה", "מתנה", "רק מכתב אהבה"] },
         { id: "finaleWhen", type: "text", label: "מתי?", placeholder: "למשל: חמישי, 20:00" },
         { id: "finaleWhere", type: "text", label: "איפה? (או רמז)", placeholder: "למשל: מסעדה איטלקית בנמל / יעד: הפתעה" },
-        { id: "letter", type: "textarea", label: "המכתב בסוף", hint: "כתבו חופשי, גם בנקודות. אני עוזר לנסח.", placeholder: "מה שבא לכם להגיד לו/לה..." },
+        { id: "letter", type: "textarea", label: "המכתב בסוף", hint: "לא חייב להיות מושלם. אפשר לכתוב בנקודות, או להתחיל מאחד המשפטים:", placeholder: "מה שבא לך להגיד לה / לו...",
+          starters: ["את הדבר הכי טוב שקרה לי", "אני לא תמיד אומר את זה, אבל...", "מהרגע הראשון ידעתי ש...", "תודה שאת סובלת את ה... שלי", "אני הכי אוהב כשאת...", "אני מחכה ל... שלנו"] },
+        { id: "letterHelp", type: "multi", label: "עזרה בכתיבה", options: ["תנסח לי את המכתב מהנקודות שכתבתי"] },
+        { id: "reasons", type: "list", count: 6, more: true, label: "קלפי \"למה דווקא את/ה\"", hint: "כל שורה היא קלף שהיא הופכת. אפילו 3 זה מושלם.", placeholder: "למשל: איך שאת שרה באוטו" },
+        { id: "openWhen", type: "notes", count: 3, more: true, label: "מעטפות \"תפתחי כש...\"", hint: "מתי לפתוח, ומה כתוב בפנים.", parts: ["when", "text"], ph: ["כש... (למשל: את עצובה)", "מה כתוב בפנים"], partLabels: ["מתי לפתוח", "מה כתוב"] },
+        { id: "coupons", type: "list", count: 4, more: true, label: "שוברי אהבה", hint: "שובר שהיא יכולה לממש מתי שבא לה.", placeholder: "למשל: עיסוי של 20 דקות" },
+        { id: "wheel", type: "list", count: 5, more: true, label: "גלגל הדייט: אפשרויות על הגלגל", hint: "היא מסובבת, והגלגל בוחר. קצר, עד 3 מילים.", placeholder: "למשל: פיקניק בשקיעה" },
       ],
     },
     {
@@ -140,6 +149,10 @@ window.ORDER = {
     { id: "hold", icon: "heart", label: "לב שמתמלא" },
     { id: "candles", icon: "candle", label: "נרות לכיבוי" },
     { id: "notes", icon: "note", label: "קיר פתקים" },
+    { id: "reasons", icon: "hearts", label: "קלפי סיבות" },
+    { id: "openwhen", icon: "mail-open", label: "תפתחי כש..." },
+    { id: "wheel", icon: "sparkle", label: "גלגל מזל" },
+    { id: "coupons", icon: "tag", label: "שוברי אהבה" },
     { id: "final", icon: "ticket", label: "כרטיס / הזמנה בסוף" },
   ],
 

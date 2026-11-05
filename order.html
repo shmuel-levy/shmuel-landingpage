@@ -105,7 +105,7 @@
             <div class="sketch__side">
               <h3>סיכום ההזמנה</h3>
               <dl class="summary" id="summary"></dl>
-              <a class="btn btn--wa btn--lg btn--block" id="sendWa" target="_blank" rel="noopener"><span data-icon="whatsapp"></span>שליחה לשמואל בווטסאפ<span class="sr-only"> (נפתח בחלון חדש)</span></a>
+              <div class="sketch__send"><a class="btn btn--wa btn--lg btn--block" id="sendWa" data-send target="_blank" rel="noopener"><span data-icon="whatsapp"></span>שליחה לשמואל בווטסאפ<span class="sr-only"> (נפתח בחלון חדש)</span></a></div>
               <button type="button" class="btn btn--ghost btn--block" id="copyMsg"><span data-icon="copy"></span>העתקת הסיכום</button>
               <p class="sr-only" id="copyStatus" aria-live="polite"></p>
               <div class="sent-note" id="sentNote" hidden role="status">
@@ -120,6 +120,7 @@
               <button type="button" class="btn btn--ghost btn--sm" data-back><span data-icon="pencil"></span>חזרה לעריכה</button>
             </div>
           </div>
+          <div class="sketch-bar"><a class="btn btn--wa btn--block" id="sendWa2" data-send target="_blank" rel="noopener"><span data-icon="whatsapp"></span>אהבתי! שליחה בווטסאפ<span class="sr-only"> (נפתח בחלון חדש)</span></a></div>
         </section>
       </form>
 
@@ -175,5 +176,6 @@
     document.querySelectorAll("[data-wa]").forEach(function (a) { a.href = "https://wa.me/" + SITE.contact.phoneIntl + "?text=" + encodeURIComponent("היי שמואל, יש לי שאלה לפני ההזמנה"); });
   </script>
   <script src="order.js"></script>
+  <script src="menu.js"></script>
 </body>
 </html>

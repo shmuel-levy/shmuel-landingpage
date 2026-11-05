@@ -76,7 +76,10 @@
     }
     if (f.type === "textarea") {
       return '<div class="field" data-field="' + f.id + '"><label class="field__label" for="' + id + '">' + esc(f.label) + req + "</label>" + hint +
-        '<textarea class="input input--area" id="' + id + '" rows="4" maxlength="1200"' + common + ph + ">" + esc(v || "") + "</textarea>" + err + "</div>";
+        '<textarea class="input input--area" id="' + id + '" rows="4" maxlength="1200"' + common + ph + ">" + esc(v || "") + "</textarea>" +
+        (f.starters ? '<div class="starters" role="group" aria-label="משפטים שאפשר להוסיף למכתב">' + f.starters.map(function (t) {
+          return '<button type="button" class="starter" data-starter="' + esc(t) + '" data-for="' + id + '">' + ico("plus") + esc(t) + "</button>";
+        }).join("") + "</div>" : "") + err + "</div>";
     }
     if (f.type === "chips" || f.type === "multi") {
       var multi = f.type === "multi";
@@ -116,9 +119,11 @@
       var nrows = "";
       for (var k = 0; k < f.count; k++) {
         var N = ns[k] || {};
-        nrows += '<div class="note-row"><span class="list-row__n" aria-hidden="true">' + (k + 1) + "</span>" +
-          '<input class="input" id="' + id + "-" + k + '-t" data-key="' + f.id + '" data-i="' + k + '" data-part="text" aria-label="פתק ' + (k + 1) + ', הטקסט" placeholder="מה כתוב בפתק" value="' + esc(N.text || "") + '" maxlength="120">' +
-          '<input class="input input--from" id="' + id + "-" + k + '-f" data-key="' + f.id + '" data-i="' + k + '" data-part="from" aria-label="פתק ' + (k + 1) + ', ממי" placeholder="ממי" value="' + esc(N.from || "") + '" maxlength="40"></div>';
+        var parts = f.parts || ["text", "from"], phs = f.ph || ["מה כתוב בפתק", "ממי"], labs = f.partLabels || ["הטקסט", "ממי"];
+        var wideFirst = !f.parts;
+        nrows += '<div class="note-row' + (wideFirst ? "" : " note-row--pair") + '"><span class="list-row__n" aria-hidden="true">' + (k + 1) + "</span>" +
+          '<input class="input' + (wideFirst ? "" : " input--from") + '" id="' + id + "-" + k + '-a" data-key="' + f.id + '" data-i="' + k + '" data-part="' + parts[0] + '" aria-label="' + (k + 1) + ", " + esc(labs[0]) + '" placeholder="' + esc(phs[0]) + '" value="' + esc(N[parts[0]] || "") + '" maxlength="120">' +
+          '<input class="input' + (wideFirst ? " input--from" : "") + '" id="' + id + "-" + k + '-b" data-key="' + f.id + '" data-i="' + k + '" data-part="' + parts[1] + '" aria-label="' + (k + 1) + ", " + esc(labs[1]) + '" placeholder="' + esc(phs[1]) + '" value="' + esc(N[parts[1]] || "") + '" maxlength="160"></div>';
       }
       return '<fieldset class="field field--group" data-field="' + f.id + '"><legend class="field__label">' + esc(f.label) + "</legend>" + hint + '<div class="list">' + nrows + "</div></fieldset>";
     }
@@ -140,7 +145,11 @@
     var T = typeDef();
     if (!T) return;
     $("#storyType").innerHTML = ico(T.icon) + esc(T.label);
-    $("#step-story .fields").innerHTML = COMMON_TOP.concat(T.fields, COMMON_BOTTOM).map(field).join("");
+    var main = T.fields.filter(function (f) { return !f.more; }), more = T.fields.filter(function (f) { return f.more; });
+    var moreOpen = more.some(function (f) { var v = state.data[f.id]; return v && (Array.isArray(v) ? v.some(Boolean) : true); });
+    $("#step-story .fields").innerHTML = COMMON_TOP.concat(main).map(field).join("") +
+      (more.length ? '<details class="more-fields"' + (moreOpen ? " open" : "") + "><summary>" + ico("wand") + "<span>" + esc(T.moreLabel || "עוד רעיונות (רשות)") + '</span><span class="more-fields__plus" aria-hidden="true">' + ico("plus") + '</span></summary><div class="fields">' + more.map(field).join("") + "</div></details>" : "") +
+      COMMON_BOTTOM.map(field).join("");
   }
 
   /* ---------- שלב 3: עיצוב ---------- */
@@ -426,7 +435,12 @@
       push({ type: "message", icon: "hearts", title: nick + ", " + (d.together ? d.together + " ביחד" : "יש לי משהו בשבילך"),
         text: filled([d.howMet, d.insideJoke ? "ו... \"" + d.insideJoke + "\"" : ""]).concat(d.howMet || d.insideJoke ? [] : ["הכנתי לך משהו קטן. " + G("מוכנה?", "מוכן?", "מוכנים?")]) });
       if (has("photos")) push(album("הרגעים שלנו"));
-      if (has("notes")) push({ type: "notes", icon: "heart", title: G("למה דווקא את?", "למה דווקא אתה?", "למה דווקא אתם?"), items: (filled(d.loves).length ? filled(d.loves) : ["הצחוק", "החיבוקים", "הכל"]).map(function (x) { return { text: x, from: "" }; }) });
+      var whys = filled(d.loves).concat(filled(d.reasons));
+      if (has("reasons") || whys.length) push({ type: "reasons", title: G("למה דווקא את?", "למה דווקא אתה?", "למה דווקא אתם?"), sub: G("הקישי", "הקש", "הקישו") + " על כל קלף", items: whys.length ? whys.slice(0, 8) : ["הצחוק שלך", "החיבוקים", "שאת" + G("", "ה", "ם") + " תמיד שם", "הכל"] });
+      var ows = (d.openWhen || []).filter(function (o) { return o && o.when; });
+      if (has("openwhen") || ows.length) push({ type: "openwhen", title: "מעטפות לימים שאני לא לידך", prefix: G("תפתחי כש...", "תפתח כש...", "תפתחו כש..."), items: ows.length ? ows.map(function (o) { return { when: o.when, text: o.text || "..." }; }) : [{ when: G("את עצובה", "אתה עצוב", "אתם עצובים"), text: "אני בדרך עם שוקולד." }, { when: G("את מתגעגעת", "אתה מתגעגע", "אתם מתגעגעים"), text: "גם אני. תתקשר" + G("י", "", "ו") + "." }] });
+      if (has("coupons") || filled(d.coupons).length) push({ type: "coupons", title: "פנקס שוברים", items: filled(d.coupons).length ? filled(d.coupons) : ["עיסוי של 20 דקות", "בחירת הסרט", "ארוחת בוקר במיטה"] });
+      if (has("wheel") || filled(d.wheel).length > 1) push({ type: "wheel", key: "date", title: G("סובבי את הגלגל", "סובב את הגלגל", "סובבו את הגלגל"), sub: "מה שיוצא, זה הדייט שלנו", reply: "סגור. אני מארגן", options: filled(d.wheel).length > 1 ? filled(d.wheel).slice(0, 8) : ["פיקניק", "מסעדה", "סרט", "ים בשקיעה", "הפתעה"] });
       if (has("runaway")) push({ type: "runaway", icon: "smile-heart", title: d.question || "נצא לדייט?", yes: "כן!", no: "לא", hint: "רמז: יש רק תשובה אחת נכונה",
         noTexts: [G("בטוחה?", "בטוח?", "בטוחים?"), G("תחשבי שוב", "תחשוב שוב", "תחשבו שוב"), "כמעט...", "אין מצב", "נו באמת"],
         after: "ידעתי!!!", afterIcon: "hearts", afterText: "עכשיו רק נשאר לסגור פרטים...", cta: "לפרטים" });
@@ -492,6 +506,10 @@
       hold: { type: "hold", title: "החזיקו את הלב", sub: "עד שהוא מתמלא", cta: "ממשיכים" },
       candles: { type: "candles", title: "כבו את הנרות!", count: 5, cta: "ממשיכים" },
       notes: { type: "notes", icon: "note", title: "קיר פתקים", items: [{ text: "פתק ראשון", from: "" }, { text: "פתק שני", from: "" }] },
+      reasons: { type: "reasons", title: "כמה סיבות קטנות", items: ["סיבה ראשונה", "סיבה שנייה", "סיבה שלישית", "ועוד אחת"] },
+      openwhen: { type: "openwhen", title: "מעטפות לרגעים מיוחדים", prefix: "פתחו כש...", items: [{ when: "צריך חיוך", text: "הנה הוא." }, { when: "מתגעגעים", text: "גם אני." }] },
+      wheel: { type: "wheel", key: "date", title: "סובבו את הגלגל", options: ["פרס 1", "פרס 2", "פרס 3", "הפתעה"] },
+      coupons: { type: "coupons", title: "פנקס שוברים", items: ["שובר ראשון", "שובר שני"] },
     };
     if (t === "proposal") used.runaway = true; // מגיע בסוף, לפני השאלה
     if (t === "partner" && d.finale === "מתנה") used.scratch = true;
@@ -501,7 +519,7 @@
     var fin;
     if (t === "partner") {
       var f = d.finale || "";
-      if (f === "דייט") fin = { type: "final", variant: "invite", icon: "glass", title: "זה רשמי!", lines: [{ icon: "calendar", label: "מתי", value: d.finaleWhen || "בקרוב מאוד" }, { icon: "pin", label: "איפה", value: d.finaleWhere || "הפתעה" }, { icon: "sparkle", label: "דרס קוד", value: "מה שמרגיש הכי טוב" }], note: sign || "מחכה לזה" };
+      if (f === "דייט") fin = { type: "final", variant: "invite", icon: "glass", title: "זה רשמי!", lines: (used.wheel ? [{ icon: "sparkle", label: "מה", value: "{date}" }] : []).concat([{ icon: "calendar", label: "מתי", value: d.finaleWhen || "בקרוב מאוד" }]).concat([, { icon: "pin", label: "איפה", value: d.finaleWhere || "הפתעה" }, { icon: "sparkle", label: "דרס קוד", value: "מה שמרגיש הכי טוב" }]), note: sign || "מחכה לזה" };
       else if (f.indexOf("טיסה") > -1) fin = { type: "final", variant: "ticket", title: "הכרטיס שלך", ticket: { from: { code: "TLV", city: "תל אביב" }, to: { code: "???", city: d.finaleWhere || "יעד: הפתעה" }, fields: [{ label: G("נוסעת", "נוסע", "נוסעים"), value: nick }, { label: "מתי", value: d.finaleWhen || "בקרוב" }, { label: "שער", value: "7" }, { label: "מושב", value: "ליד שלי" }], note: letter[0] || "את השאר " + G("תגלי", "תגלה", "תגלו") + " בשדה." } };
       else {
         if (f === "מתנה") push({ type: "scratch", icon: "gift", title: G("גרדי", "גרד", "גרדו") + " לגלות את המתנה", reveal: { icon: "gift", text: d.finaleWhere || "המתנה שלך", small: d.finaleWhen || "" }, cta: "ועוד משהו" });
@@ -546,7 +564,7 @@
       var v = d[f.id];
       if (f.type === "list" || f.type === "multi") { v = filled(v); if (v.length) out.push("• " + f.label + ": " + v.join(" / ")); }
       else if (f.type === "quiz") { (v || []).filter(function (q) { return q && q.q; }).forEach(function (q, i) { out.push("• שאלה " + (i + 1) + ": " + q.q + " | נכונה: " + (q.a || "-") + " | שגויות: " + filled([q.w1, q.w2]).join(", ")); }); }
-      else if (f.type === "notes") { (v || []).filter(function (n) { return n && n.text; }).forEach(function (n) { out.push("• פתק: " + n.text + (n.from ? " (" + n.from + ")" : "")); }); }
+      else if (f.type === "notes") { var pp = f.parts || ["text", "from"]; (v || []).filter(function (n) { return n && n[pp[0]]; }).forEach(function (n) { out.push("• " + f.label.replace(/"/g, "") + ": " + n[pp[0]] + (n[pp[1]] ? " | " + n[pp[1]] : "")); }); }
       else if (v && String(v).trim()) out.push("• " + f.label + ": " + String(v).trim().replace(/\n+/g, " / "));
     });
     if (filled(d.tone).length) out.push("• טון: " + d.tone.join(", "));
@@ -583,7 +601,7 @@
     $("#summary").innerHTML = rows.filter(function (r) { return r[1]; }).map(function (r) { return "<div><dt>" + esc(r[0]) + "</dt><dd>" + esc(r[1]) + "</dd></div>"; }).join("") +
       '<div class="summary__total"><dt>סה"כ משוער</dt><dd>' + t.sum + " ₪" + (promo && t.full > t.sum ? " <small>(חסכתם " + (t.full - t.sum) + " ₪)</small>" : "") + "</dd></div>";
     var msg = message();
-    $("#sendWa").href = "https://wa.me/" + S.contact.phoneIntl + "?text=" + encodeURIComponent(msg);
+    $$("[data-send]").forEach(function (a) { a.href = "https://wa.me/" + S.contact.phoneIntl + "?text=" + encodeURIComponent(msg); });
     $("#msgPreview").textContent = msg;
   }
 
@@ -662,6 +680,16 @@
         if (tg) { tg.focus(); tg.scrollIntoView({ block: "center", behavior: reduced() ? "auto" : "smooth" }); }
       }
       if (e.target.closest("#listenBtn")) playSample();
+      var st = e.target.closest("[data-starter]");
+      if (st) {
+        var ta = $("#" + st.getAttribute("data-for"));
+        var add = st.getAttribute("data-starter");
+        ta.value = (ta.value.trim() ? ta.value.replace(/\s+$/, "") + "\n" : "") + add + " ";
+        ta.dispatchEvent(new Event("input", { bubbles: true }));
+        ta.focus();
+        ta.setSelectionRange(ta.value.length, ta.value.length);
+        st.classList.add("is-used");
+      }
     });
     $("#stepper").addEventListener("click", function (e) {
       var b = e.target.closest("[data-go]");
@@ -687,10 +715,10 @@
       if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done, fallback); else fallback();
       function fallback() { var ta = document.createElement("textarea"); ta.value = txt; ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0"; document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); done(); } catch (er) { /* */ } ta.remove(); }
     });
-    $("#sendWa").addEventListener("click", function () {
+    $$("[data-send]").forEach(function (a) { a.addEventListener("click", function () {
       $("#sentNote").hidden = false;
       store(DRAFT, null);
-    });
+    }); });
     $("#fullPreview").addEventListener("click", function (e) {
       e.preventDefault();
       window.open("demos/preview.html", "_blank");

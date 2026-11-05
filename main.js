@@ -4,7 +4,7 @@
 /* בחירת מקום לכפתור "לא" שבורח: נקודות קבועות בשולי האזור,
    רק כאלה שלא נוגעות בכפתור "כן" (כולל הגודל שאליו הוא יגדל) */
 window.MatanotRun = {
-  pick: function (area, no, yes, yesScale, last) {
+  pick: function (area, no, yes, yesScale, last, noScale) {
     var aw = area.clientWidth, ah = area.clientHeight;
     var bw = no.offsetWidth, bh = no.offsetHeight;
     var yw = yes.offsetWidth * yesScale, yh = yes.offsetHeight * yesScale;
@@ -14,7 +14,8 @@ window.MatanotRun = {
     var spots = [[0, 0], [mx, 0], [0, my], [mx, my], [mx / 2, 0], [mx / 2, my], [0, my / 2], [mx, my / 2]];
     var ok = [];
     spots.forEach(function (s, i) {
-      var hit = s[0] < Y.r && s[0] + bw > Y.l && s[1] < Y.b && s[1] + bh > Y.t;
+      var ix = (bw * (1 - (noScale || 1))) / 2, iy = (bh * (1 - (noScale || 1))) / 2;
+      var hit = s[0] + ix < Y.r && s[0] + bw - ix > Y.l && s[1] + iy < Y.b && s[1] + bh - iy > Y.t;
       if (!hit && i !== last) ok.push(i);
     });
     if (!ok.length) ok = [last === 0 ? 3 : 0];
@@ -133,10 +134,25 @@ window.MatanotRun = {
   /* ---------- איך זה עובד ---------- */
   $("#steps").innerHTML = S.steps.items.map(function (s, i) {
     return '<li class="step reveal"' + stagger(i, 140) + ">" +
-      '<span class="step__num" aria-hidden="true">0' + (i + 1) + "</span>" +
+      '<span class="step__num" aria-hidden="true" data-n="0' + (i + 1) + '"></span>' +
       '<span class="tile tile--' + (i + 1) + '" aria-hidden="true">' + ico(s.icon) + "</span>" +
       "<h3>" + esc(s.title) + "</h3><p>" + esc(s.text) + "</p></li>";
   }).join("");
+
+  /* ---------- בשבילו + מחולל רעיונות ---------- */
+  $("#himPoints").innerHTML = S.him.points.map(function (p, i) {
+    return '<li><span class="tile tile--' + [1, 6, 2][i % 3] + '" aria-hidden="true">' + ico(p.icon) + "</span><span><b>" + esc(p.title) + "</b><small>" + esc(p.text) + "</small></span></li>";
+  }).join("");
+  var IDEAS = S.ideas.items, ideaI = Math.floor(Math.random() * IDEAS.length);
+  function showIdea(animate) {
+    var it = IDEAS[ideaI % IDEAS.length];
+    var card = $("#ideaCard");
+    card.innerHTML = '<span class="tile tile--' + ((ideaI % 6) + 1) + '" aria-hidden="true">' + ico(it.icon) + '</span><div><p class="idea__n">רעיון ' + ((ideaI % IDEAS.length) + 1) + " מתוך " + IDEAS.length + '</p><h3 class="idea__title">' + esc(it.title) + "</h3><p>" + esc(it.text) + "</p></div>";
+    $("#ideaWant").href = "order.html?type=" + it.type;
+    if (animate && !motionOff()) { card.classList.remove("is-new"); void card.offsetWidth; card.classList.add("is-new"); }
+  }
+  showIdea(false);
+  $("#ideaNext").addEventListener("click", function () { ideaI++; showIdea(true); });
 
   /* ---------- בונה הסקיצות (הדגמה) ---------- */
   var B = S.builder;
@@ -203,6 +219,23 @@ window.MatanotRun = {
       '<a class="example__want" href="order.html?type=' + esc(e.order) + '">רוצה כזה<span class="sr-only">: ' + esc(e.title) + "</span></a></div></div></article>";
   }).join("");
 
+  // בטלפון: 4 דוגמאות ראשונות, והשאר בלחיצה (בלי גלילה הצידה)
+  var exList = $("#examplesList"), exMore = $("#exMore"), FEW = 4;
+  function syncMore(cat) {
+    var total = E.items.length;
+    var collapsed = cat === "all" && exMore.getAttribute("aria-expanded") !== "true";
+    exList.classList.toggle("is-collapsed", collapsed);
+    exMore.hidden = cat !== "all" || total <= FEW;
+    $("#exMoreText").textContent = exMore.getAttribute("aria-expanded") === "true" ? "להציג פחות" : "עוד " + (total - FEW) + " דוגמאות";
+  }
+  exMore.addEventListener("click", function () {
+    var open = exMore.getAttribute("aria-expanded") !== "true";
+    exMore.setAttribute("aria-expanded", open ? "true" : "false");
+    syncMore("all");
+    if (open) { var first = exList.querySelectorAll(".example")[FEW]; if (first) first.querySelector("a").focus({ preventScroll: false }); }
+  });
+  syncMore("all");
+
   tabs.addEventListener("click", function (ev) {
     var btn = ev.target.closest(".tab");
     if (!btn) return;
@@ -215,7 +248,7 @@ window.MatanotRun = {
       if (show) { shown++; card.classList.remove("pop"); void card.offsetWidth; card.classList.add("pop", "is-visible"); }
     });
     $("#exStatus").textContent = "מוצגות " + shown + " דוגמאות";
-    $("#examplesList").scrollTo({ left: 0, behavior: motionOff() ? "auto" : "smooth" });
+    syncMore(cat);
   });
 
   // הטיה תלת-ממדית לכרטיסים (רק בעכבר)
@@ -247,7 +280,14 @@ window.MatanotRun = {
 
   /* ---------- עליי ---------- */
   var A = S.about;
-  $("#aboutParas").innerHTML = A.paragraphs.map(function (p) { return "<p>" + esc(p) + "</p>"; }).join("");
+  var paras = A.paragraphs.map(function (p) { return "<p>" + esc(p) + "</p>"; });
+  $("#aboutParas").innerHTML = paras.slice(0, 2).join("") + '<div class="about__more" id="aboutMoreText">' + paras.slice(2).join("") + "</div>";
+  $("#aboutMore").addEventListener("click", function () {
+    var b = this, open = b.getAttribute("aria-expanded") !== "true";
+    b.setAttribute("aria-expanded", open ? "true" : "false");
+    $("#aboutParas").classList.toggle("is-open", open);
+    b.innerHTML = ico(open ? "x" : "plus") + (open ? "לקצר" : "להמשך הסיפור");
+  });
   $("#stats").innerHTML = A.stats.map(function (s) {
     return '<div class="stat"><dt>' + esc(s.label) + '</dt><dd><span class="stat__num" data-count="' + esc(s.num) + '">' + esc(s.num) + "</span> " + esc(s.unit) + "</dd></div>";
   }).join("");
@@ -300,7 +340,7 @@ window.MatanotRun = {
   }
   $("#plans").innerHTML = PR.plans.map(function (p, i) {
     var now = planPrice(p);
-    return '<article class="plan reveal' + (p.popular ? " plan--popular" : "") + '"' + stagger(i, 120) + ">" +
+    return '<article class="plan reveal plan--' + esc(p.id) + (p.popular ? " plan--popular" : "") + '" id="plan-' + esc(p.id) + '"' + stagger(i, 120) + ">" +
       (p.popular ? '<span class="plan__badge">' + ico("star") + esc(p.popularLabel) + "</span>" : "") +
       "<h3>" + esc(p.name) + "</h3>" +
       '<p class="plan__price">' + (promo ? '<del class="plan__old"><span class="sr-only">במקום </span>' + p.price + " " + esc(PR.currency) + "</del>" : "") +
@@ -310,6 +350,18 @@ window.MatanotRun = {
       "<ul>" + p.features.map(function (f) { return "<li>" + ico("check") + esc(f) + "</li>"; }).join("") + "</ul>" +
       '<a class="btn ' + (p.popular ? "btn--primary" : "btn--outline") + ' btn--block" href="order.html?plan=' + esc(p.id) + '">' + esc(p.cta) + ico("arrow-left") + "</a></article>";
   }).join("");
+  // בטלפון: מתג בין החבילות, כדי שלא יהיה צריך לגלול על שתיהן
+  var plansEl = $("#plans"), pop = (PR.plans.filter(function (p) { return p.popular; })[0] || PR.plans[0]).id;
+  plansEl.setAttribute("data-show", pop);
+  plansEl.insertAdjacentHTML("beforebegin", '<div class="plan-switch" role="group" aria-label="איזו חבילה להציג">' + PR.plans.map(function (p) {
+    return '<button type="button" data-plan="' + esc(p.id) + '" aria-pressed="' + (p.id === pop) + '" aria-controls="plan-' + esc(p.id) + '">' + esc(p.name) + " · " + planPrice(p) + " " + esc(PR.currency) + "</button>";
+  }).join("") + "</div>");
+  document.querySelector(".plan-switch").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-plan]");
+    if (!b) return;
+    plansEl.setAttribute("data-show", b.dataset.plan);
+    this.querySelectorAll("button").forEach(function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); });
+  });
   $("#addons").innerHTML = PR.addons.map(function (a) {
     return "<li>" + ico(a.icon, "addons__ico") + "<span>" + esc(a.name) + "</span><strong>+" + a.price + " " + esc(PR.currency) + "</strong></li>";
   }).join("");
@@ -346,7 +398,9 @@ window.MatanotRun = {
     ticking = false;
     var y = window.scrollY;
     header.classList.toggle("is-scrolled", y > 8);
-    wa.classList.toggle("is-shown", y > hero.offsetHeight * 0.7);
+    var past = y > hero.offsetHeight * 0.7;
+    wa.classList.toggle("is-shown", past);
+    document.body.classList.toggle("cta-on", past && y < document.documentElement.scrollHeight - window.innerHeight - 260);
     var max = document.documentElement.scrollHeight - window.innerHeight;
     bar.style.transform = "scaleX(" + (max > 0 ? Math.min(1, y / max) : 0).toFixed(4) + ")";
     if (!motionOff()) root.style.setProperty("--hero-y", Math.min(y, 900).toFixed(0));
@@ -437,7 +491,7 @@ window.MatanotRun = {
     envHost.innerHTML = ENV.html({ label: "פתיחת המעטפה", mark: "M", liner: "hearts", cardIcon: "hearts", cardTitle: D.cardTitle, cardText: D.cardText });
     var env = envHost.firstChild;
     env.id = "envelope";
-    ENV.applyPalette(env, "ink");
+    ENV.applyPalette(env, "blush");
     env.addEventListener("click", function () {
       if (env.classList.contains("is-cracked")) return;
       status.textContent = "המעטפה נפתחת";
@@ -465,11 +519,12 @@ window.MatanotRun = {
     var yesScale = Math.min(1.3, 1 + escapes * 0.05);
     noBtn.classList.add("is-running"); // קודם יוצא מהזרימה, כדי ש"כן" יתמקם במרכז
     noBtn.textContent = D.noTexts[(escapes - 1) % D.noTexts.length];
-    var spot = window.MatanotRun.pick(area, noBtn, yesBtn, yesScale, lastSpot);
+    var noScale = Math.max(0.6, 1 - escapes * 0.06);
+    var spot = window.MatanotRun.pick(area, noBtn, yesBtn, yesScale, lastSpot, noScale);
     lastSpot = spot.i;
     noBtn.style.left = spot.x + "px";
     noBtn.style.top = spot.y + "px";
-    noBtn.style.transform = "scale(" + Math.max(0.6, 1 - escapes * 0.06) + ")";
+    noBtn.style.transform = "scale(" + noScale + ")";
     yesBtn.style.transform = "scale(" + yesScale + ")";
   }
   noBtn.addEventListener("pointerenter", function (e) { if (e.pointerType === "mouse") runAway(e); });

@@ -12,12 +12,16 @@
 | `envelope.js` + `envelope.css` | המעטפה (חותם שעווה, בטנה, כרטיס) ו-6 פלטות הצבע |
 | `icons.js` | ספריית האייקונים (במקום אימוג'י) |
 | `a11y.js` | תפריט הנגישות (10 התאמות) |
+| `menu.js` | תפריט ההמבורגר, בכל העמודים ובכל גודל מסך |
 | `negishut.html` / `privacy.html` | הצהרת נגישות ומדיניות פרטיות |
 | `demos/engine.js` + `engine.css` | **מנוע ההפתעות**, משותף לכל הדוגמאות ולסקיצות |
-| `demos/*.html` | 7 אתרי דוגמה. כל אחד הוא רק רשימת שלבים |
+| `demos/*.html` | 9 אתרי דוגמה. כל אחד הוא רק רשימת שלבים |
 | `demos/preview.html` | הדף שמציג את הסקיצה מהטופס |
 | `demos/photos/` | תמונות לדוגמאות |
 | `images/examples/` | צילומי מסך של הדוגמאות לכרטיסים בדף הבית |
+
+## רעיונות וסקשן "בשבילו"
+ב-`config.js`: `him` (הסקשן למי שרוצה לכתוב לבת הזוג) ו-`ideas` (מחולל הרעיונות). רעיון חדש = עוד שורה ב-`items`, עם `type` שפותח את הטופס המתאים.
 
 ## מבצע
 ב-`config.js` → `promo`: אחוז, תאריך סיום וטקסט. אחרי התאריך המבצע נעלם לבד מהבאנר, מהמחירים ומהטופס.
@@ -36,7 +40,7 @@
 `palette` (blush / ink / lilac / peach / mint / gold), `liner` (dots / stripes / hearts / confetti), `mood` (romantic / happy / emotional) ו-`steps`.
 
 סוגי השלבים שהמנוע מכיר:
-`envelope` (מעטפה) · `message` (הודעה, אפשר עם `photo`) · `choice` (בחירה) · `runaway` (כפתור לא שבורח) · `checklist` (רשימה לסימון) · `quiz` (טריוויה) · `scratch` (כרטיס גירוד) · `photos` (אלבום פולרואיד, עם `src` לכל תמונה) · `hold` (לב שמתמלא) · `candles` (נרות לכיבוי) · `notes` (קיר פתקים) · `countdown` (ספירה לאחור) · `final` (סיום: `ticket` / `invite` / `card`)
+`envelope` (מעטפה) · `message` (הודעה, אפשר עם `photo`) · `choice` (בחירה) · `runaway` (כפתור לא שבורח) · `checklist` (רשימה לסימון) · `quiz` (טריוויה) · `scratch` (כרטיס גירוד) · `photos` (אלבום פולרואיד, עם `src` לכל תמונה) · `hold` (לב שמתמלא) · `candles` (נרות לכיבוי) · `notes` (קיר פתקים) · `countdown` (ספירה לאחור) · `reasons` (קלפי סיבות שמתהפכים) · `openwhen` (מעטפות "תפתחי כש...") · `wheel` (גלגל מזל, עם `key`) · `coupons` (פנקס שוברים) · `final` (סיום: `ticket` / `invite` / `card`)
 
 אייקונים: בשדה `icon` שמים שם מתוך `icons.js` (למשל `heart`, `plane`, `gift`).
 תשובה בשלב `choice` עם `key` אפשר להציג בהמשך כ-`{key}`. קישור עם `?step=3` פותח ישר בשלב מסוים.

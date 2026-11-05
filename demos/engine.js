@@ -245,7 +245,7 @@
       let n = 0, last = -1;
       const texts = s.noTexts && s.noTexts.length ? s.noTexts : ["בטוח?", "נסו שוב", "כמעט..."];
       // נקודות קבועות בשולי האזור, רק כאלה שלא נוגעות ב"כן" (כולל הגודל שאליו יגדל)
-      function pick(yesScale) {
+      function pick(yesScale, noScale) {
         const aw = area.clientWidth, ah = area.clientHeight, bw = no.offsetWidth, bh = no.offsetHeight;
         const yw = yes.offsetWidth * yesScale, yh = yes.offsetHeight * yesScale;
         const cx = yes.offsetLeft + yes.offsetWidth / 2, cy = yes.offsetTop + yes.offsetHeight / 2;
@@ -254,7 +254,8 @@
         const spots = [[0, 0], [mx, 0], [0, my], [mx, my], [mx / 2, 0], [mx / 2, my], [0, my / 2], [mx, my / 2]];
         let ok = spots.map((p, i) => i).filter((i) => {
           const [x, y] = spots[i];
-          return i !== last && !(x < Y.r && x + bw > Y.l && y < Y.b && y + bh > Y.t);
+          const ix = (bw * (1 - noScale)) / 2, iy = (bh * (1 - noScale)) / 2; // הכפתור מתכווץ סביב המרכז
+          return i !== last && !(x + ix < Y.r && x + bw - ix > Y.l && y + iy < Y.b && y + bh - iy > Y.t);
         });
         if (!ok.length) ok = [last === 0 ? 3 : 0];
         last = ok[Math.floor(Math.random() * ok.length)];
@@ -266,9 +267,10 @@
         const ys = Math.min(1.35, 1 + n * 0.06);
         no.classList.add("is-running");
         no.textContent = texts[(n - 1) % texts.length];
-        const [x, t] = pick(ys);
+        const ns = Math.max(0.6, 1 - n * 0.06);
+        const [x, t] = pick(ys, ns);
         no.style.left = x + "px"; no.style.top = t + "px";
-        no.style.transform = `scale(${Math.max(0.6, 1 - n * 0.06)})`;
+        no.style.transform = `scale(${ns})`;
         yes.style.transform = `scale(${ys})`;
       }
       no.addEventListener("pointerenter", (e) => { if (e.pointerType === "mouse") run(e); });
@@ -508,6 +510,109 @@
         out.s.textContent = Math.floor(ms / 1e3) % 60;
       }
       const timer = setInterval(tick, 1000); tick();
+      addNext(el, s.cta);
+    },
+
+    // קלפים שהופכים: "סיבות שאני אוהב אותך"
+    reasons(s, el) {
+      const items = s.items.slice(0, 8);
+      el.innerHTML = medal(s.icon || "hearts", "beat") + title(s.title) + sub(s.sub || "הקישו על כל קלף") +
+        `<ul class="reasons${items.length > 6 ? " reasons--3" : ""}" role="list">` + items.map((t, i) =>
+          `<li><button type="button" class="reason" data-i="${i}" aria-label="קלף ${i + 1} מתוך ${items.length}, הקישו לחשיפה">
+            <span class="reason__in"><span class="reason__front" aria-hidden="true">${ico("heart")}<b>${i + 1}</b></span>
+            <span class="reason__back" aria-hidden="true">${tpl(t)}</span></span></button></li>`).join("") +
+        `</ul><p class="album__count" aria-live="polite">נחשפו 0 מתוך ${items.length}</p>`;
+      let open = 0, nb = null;
+      const count = $(".album__count", el);
+      $$(".reason", el).forEach((b) => b.addEventListener("click", () => {
+        if (b.classList.contains("is-flipped")) return;
+        b.classList.add("is-flipped");
+        b.removeAttribute("aria-label");
+        $(".reason__back", b).setAttribute("aria-hidden", "false");
+        open++;
+        count.textContent = open < items.length ? `נחשפו ${open} מתוך ${items.length}` : (s.doneText || "ויש עוד אלף כאלה");
+        if (open === items.length) burst(60);
+        if (!nb) nb = addNext(el, s.cta);
+      }));
+    },
+
+    // "תפתחי כש...": מעטפות קטנות לרגעים שונים
+    openwhen(s, el) {
+      el.innerHTML = medal(s.icon || "mail-open") + title(s.title) + sub(s.sub || "מעטפה לכל רגע. הקישו כדי לפתוח") +
+        `<ul class="ow" role="list">` + s.items.map((it, i) =>
+          `<li><button type="button" class="ow__env" data-i="${i}">${ico("envelope", "ow__ico")}<span class="ow__label"><small>${esc(s.prefix || "פתחו כש...")}</small><b>${tpl(it.when)}</b></span><span class="ow__seen" aria-hidden="true">${ico("check")}</span></button></li>`).join("") +
+        `</ul><div class="ow__letter" hidden><p class="ow__when" tabindex="-1"></p><p class="ow__text"></p><button type="button" class="btn btn--ghost ow__close">${ico("arrow-right")}חזרה למעטפות</button></div>`;
+      const list = $(".ow", el), letter = $(".ow__letter", el);
+      let last = null, nb = null;
+      list.addEventListener("click", (e) => {
+        const b = e.target.closest(".ow__env");
+        if (!b) return;
+        const it = s.items[+b.dataset.i];
+        last = b;
+        b.classList.add("is-seen");
+        $(".ow__when", letter).textContent = (s.prefix || "פתחו כש...").replace("...", " ") + it.when;
+        $(".ow__text", letter).innerHTML = tpl(it.text);
+        letter.hidden = false; list.hidden = true;
+        $(".ow__when", letter).focus({ preventScroll: true });
+        if (!nb) nb = addNext(el, s.cta);
+      });
+      $(".ow__close", letter).addEventListener("click", () => {
+        letter.hidden = true; list.hidden = false;
+        if (last) last.focus({ preventScroll: true });
+      });
+    },
+
+    // גלגל מסתובב שבוחר משהו (דייט, פרס, יעד)
+    wheel(s, el) {
+      const opts = s.options, n = opts.length, seg = 360 / n;
+      const cs = getComputedStyle(document.documentElement);
+      const fills = [cs.getPropertyValue("--accent-deep").trim(), "#FFFFFF", cs.getPropertyValue("--accent").trim(), cs.getPropertyValue("--soft").trim()];
+      const inks = ["#FFFFFF", cs.getPropertyValue("--ink").trim(), "#FFFFFF", cs.getPropertyValue("--ink").trim()];
+      const P = (a) => [Math.cos((a * Math.PI) / 180) * 96, Math.sin((a * Math.PI) / 180) * 96].map((v) => v.toFixed(2)).join(" ");
+      const segs = opts.map((o, i) => {
+        const a0 = -90 + i * seg, a1 = a0 + seg, mid = a0 + seg / 2, k = n % 2 && i === n - 1 ? 1 : i % 4;
+        return `<path d="M0 0L${P(a0)}A96 96 0 0 1 ${P(a1)}Z" fill="${fills[k]}" stroke="rgba(0,0,0,.08)"/>` +
+          `<text transform="rotate(${mid}) translate(58 0)" fill="${inks[k]}" font-size="${o.length > 9 ? 9 : 11}" font-weight="700" text-anchor="middle" dominant-baseline="middle" font-family="Heebo, Arial, sans-serif">${esc(o)}</text>`;
+      }).join("");
+      el.innerHTML = medal(s.icon || "sparkle", "") + title(s.title) + sub(s.sub) +
+        `<div class="wheel"><span class="wheel__pointer" aria-hidden="true"></span><svg class="wheel__svg" viewBox="-100 -100 200 200" aria-hidden="true" focusable="false"><g class="wheel__rot">${segs}</g><circle r="18" fill="#fff" stroke="rgba(0,0,0,.1)"/><circle r="7" fill="${fills[0]}"/></svg></div>
+         <button type="button" class="btn btn--primary wheel__spin">${ico("replay")}${esc(s.spin || "לסובב!")}</button>
+         <div class="reply-wrap" aria-live="polite"></div>`;
+      const rot = $(".wheel__rot", el), btn = $(".wheel__spin", el), out = $(".reply-wrap", el);
+      let cur = 0, busy = false, nb = null;
+      btn.addEventListener("click", () => {
+        if (busy) return;
+        busy = true; btn.disabled = true;
+        const i = Math.floor(Math.random() * n);
+        const target = (360 - (i * seg + seg / 2)) % 360;
+        cur = cur - (cur % 360) + 360 * 5 + target;
+        rot.style.transition = reduce ? "none" : "transform 3.6s cubic-bezier(.17,.67,.21,1)";
+        rot.style.transform = `rotate(${cur}deg)`;
+        setTimeout(() => {
+          busy = false; btn.disabled = false;
+          btn.innerHTML = ico("replay") + "לסובב שוב";
+          if (s.key) answers[s.key] = opts[i];
+          out.innerHTML = `<p class="reply"><b>${esc(opts[i])}</b>${s.reply ? " · " + tpl(s.reply) : ""}</p>`;
+          burst(50);
+          if (!nb) nb = addNext(el, s.cta);
+        }, reduce ? 50 : 3700);
+      });
+    },
+
+    // פנקס שוברים: מממשים בלחיצה
+    coupons(s, el) {
+      const items = s.items.map((c) => (typeof c === "string" ? { title: c } : c));
+      el.innerHTML = medal(s.icon || "ticket") + title(s.title) + sub(s.sub || "הקישו על שובר כדי לממש אותו") +
+        `<ul class="coupons" role="list">` + items.map((c, i) =>
+          `<li><button type="button" class="coupon" aria-pressed="false" data-i="${i}"><span class="coupon__ico" aria-hidden="true">${ico(c.icon || "gift")}</span>
+            <span class="coupon__t"><b>${tpl(c.title)}</b><small>${c.note ? tpl(c.note) : "בתוקף לתמיד"}</small></span>
+            <span class="coupon__stamp" aria-hidden="true">מומש!</span></button></li>`).join("") + `</ul>`;
+      $$(".coupon", el).forEach((b) => b.addEventListener("click", () => {
+        const on = b.getAttribute("aria-pressed") !== "true";
+        b.setAttribute("aria-pressed", on ? "true" : "false");
+        b.classList.toggle("is-used", on);
+        if (on) { announce("השובר מומש: " + items[+b.dataset.i].title); burst(30); }
+      }));
       addNext(el, s.cta);
     },
 

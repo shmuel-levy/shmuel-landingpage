@@ -271,3 +271,82 @@ body[data-step="design"] .live { display: block; order: -1; }
   body[data-step="design"] .live { position: static; max-width: 420px; margin: 0 auto; width: 100%; }
 }
 html.a11y-contrast .wz-step, html.a11y-contrast .type-card, html.a11y-contrast .input, html.a11y-contrast .chip span { border: 2px solid #000; }
+
+/* =========================================================
+   גרסה נוחה לטלפון: כפתורי המעבר תמיד נראים, הסקיצה נכנסת במסך
+   ========================================================= */
+.stepper li.is-current .stepper__n { background: var(--rose-deep); border-color: var(--rose-deep); box-shadow: 0 8px 18px -8px var(--rose-deep); }
+.stepper li.is-current button { color: var(--rose-deep); }
+.order-progress b { background: linear-gradient(90deg, var(--pink), var(--rose), var(--rose-deep)); }
+
+/* עוד רעיונות (מקופל) */
+.more-fields { border: 2px dashed var(--pink); border-radius: 20px; background: linear-gradient(180deg, #FFF6F9, #fff); }
+.more-fields summary {
+  list-style: none; display: flex; align-items: center; gap: 10px; min-height: 56px; padding: 12px 16px; cursor: pointer;
+  font-weight: 700; color: var(--rose-deep); line-height: 1.4;
+}
+.more-fields summary::-webkit-details-marker { display: none; }
+.more-fields summary > .ico { width: 22px; height: 22px; flex-shrink: 0; }
+.more-fields__plus { margin-inline-start: auto; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--blush); flex-shrink: 0; transition: transform .3s var(--ease-bounce); }
+.more-fields__plus .ico { width: 16px; height: 16px; }
+.more-fields[open] .more-fields__plus { transform: rotate(45deg); }
+.more-fields > .fields { padding: 4px 16px 18px; }
+
+/* משפטי פתיחה למכתב */
+.starters { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.starter {
+  display: inline-flex; align-items: center; gap: 4px; min-height: 40px; padding: 6px 12px; border-radius: 99px; cursor: pointer;
+  border: 1.5px dashed var(--rose); background: #fff; color: var(--rose-deep); font: 500 .88rem/1.3 var(--font-body); text-align: right;
+}
+.starter .ico { width: 14px; height: 14px; }
+.starter:hover { background: var(--blush); }
+.starter.is-used { border-style: solid; background: var(--blush); }
+.note-row--pair { flex-wrap: wrap; }
+.note-row--pair .input--from { max-width: none; flex: 1 1 40%; }
+.note-row--pair .input:not(.input--from) { flex: 1 1 100%; margin-right: 38px; }
+
+@media (max-width: 979px) {
+  html { scroll-padding-bottom: 100px; }
+  .order__intro { padding-top: 18px; }
+  .order__intro h1 { font-size: clamp(1.6rem, 7vw, 2.2rem); margin-bottom: 8px; }
+  .order__lead { font-size: .95rem; line-height: 1.55; margin-bottom: 10px; }
+  .order-promo { font-size: .86rem; padding: 8px 12px; }
+  .stepper { margin: 14px auto 14px; }
+  .stepper__n { width: 36px; height: 36px; font-size: .9rem; }
+  .stepper::before { top: 18px; }
+  .stepper button { min-height: 56px; font-size: .76rem; }
+  .wz-step { padding: 20px 16px 0; border-radius: 24px; }
+  .wz-sub { margin-bottom: 16px; font-size: .95rem; }
+  .fields { gap: 18px; }
+  .types { gap: 8px; }
+  .type-card { min-height: 64px; padding: 10px 12px; }
+  .type-card__ico { width: 42px; height: 42px; border-radius: 13px; }
+
+  /* כפתורי "חזרה" ו"ממשיכים" נדבקים לתחתית המסך */
+  .wz-nav {
+    position: sticky; bottom: 0; z-index: 30; margin: 22px -16px 0; padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+    background: rgba(255,255,255,.96); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    border-top: 1px solid rgba(184,53,99,.14); border-radius: 0 0 24px 24px; box-shadow: 0 -12px 22px -18px rgba(184,53,99,.6);
+  }
+  .wz-nav .btn--lg { padding: .85em 1.2em; font-size: 1rem; }
+  .wz-nav .btn--primary { max-width: none; }
+
+  /* הסקיצה: הטלפון בגובה המסך, הכפתור לווטסאפ תמיד בהישג יד */
+  .wz-step--sketch { padding-bottom: 16px; }
+  .wz-step--sketch .wz-sub { margin-bottom: 10px; }
+  .phone--sketch { height: min(640px, calc(100svh - 150px)); min-height: 460px; width: min(100%, 360px); }
+  .sketch { gap: 18px; }
+  .sketch__send { display: none; }
+  .sketch-bar {
+    position: sticky; bottom: 0; z-index: 30; margin: 0 -16px; padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+    background: rgba(255,255,255,.96); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border-top: 1px solid rgba(14,122,62,.18);
+  }
+  .sketch__send .btn { margin: 0; }
+
+  /* כפתור הנגישות לא מסתיר את הכפתורים הדביקים */
+  .order-page .a11y { bottom: calc(86px + env(safe-area-inset-bottom)); right: 10px; }
+  .order-page .a11y__toggle { width: 44px; height: 44px; }
+}
+
+.sketch-bar { display: none; }
+@media (max-width: 979px) { .sketch-bar { display: block; } .sketch-bar .btn { min-height: 54px; font-size: 1.05rem; } }

@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>מכתב אהבה ממנו | דוגמה מ-Matanot</title>
+  <meta name="description" content="דוגמה להפתעה בקישור: מכתב אהבה מבן זוג, עם קלפי סיבות, מעטפות 'תפתחי כש...' ושוברי אהבה." />
+  <meta name="theme-color" content="#FFF9F4" />
+  <link rel="icon" type="image/png" href="../images/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&family=Suez+One&family=Frank+Ruhl+Libre:wght@500;700&family=Playpen+Sans+Hebrew:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../envelope.css" />
+  <link rel="stylesheet" href="engine.css" />
+</head>
+<body>
+<script>
+window.DEMO = {
+  palette: "blush", liner: "hearts", mood: "romantic", orderType: "partner",
+  theme: { bg: "linear-gradient(170deg,#FFF6F8,#FBD6E2)", ink: "#6B1838" },
+  deco: ["heart", "letter", "sparkle", "hearts"],
+  steps: [
+    { type: "envelope", to: "לנועה שלי", title: "כתבתי לך משהו", mark: "נ", card: { icon: "letter", title: "מכתב ממני", text: "לא בהודעה הפעם" }, hint: "הקישי על החותם" },
+    { type: "message", photo: { src: "photos/couple-bench.jpg", alt: "זוג יושב על ספסל מול שקיעה", caption: "השקיעה ההיא" }, title: "אני לא טוב במילים", text: ["אז ביקשתי עזרה. אבל כל מה שכתוב כאן, הוא שלי."], cta: "תמשיך" },
+    { type: "reasons", title: "6 סיבות למה דווקא את", sub: "הקישי על כל קלף", doneText: "ויש עוד אלף כאלה", cta: "ועוד משהו", items: [
+      "הצחוק שלך, שמדבק את כל החדר", "שאת מבינה אותי בלי מילים", "איך שאת שרה באוטו כשאת חושבת שאף אחד לא שומע",
+      "שאת תמיד שם, גם כשאני קשה", "הפרצוף שלך בבוקר, לפני הקפה", "שאיתך הכל מרגיש כמו בית"
+    ] },
+    { type: "openwhen", icon: "mail-open", title: "מעטפות לימים שאני לא לידך", prefix: "תפתחי כש...", cta: "יש עוד", items: [
+      { when: "את עצובה", text: "תזכרי שיש מישהו שחושב שאת הדבר הכי טוב שקרה לו. אני בדרך עם שוקולד." },
+      { when: "את מתגעגעת", text: "גם אני. כבר עכשיו. תתקשרי, לא משנה מה השעה." },
+      { when: "את צריכה לצחוק", text: "תיזכרי בי מנסה להרכיב את הארון מאיקאה. בלי הוראות." }
+    ] },
+    { type: "coupons", title: "פנקס שוברים, רק בשבילך", sub: "הקישי כדי לממש. אין תאריך תפוגה", cta: "ולסיום", items: [
+      { icon: "hand-heart", title: "עיסוי של 20 דקות", note: "בלי להתלונן שכואבות לי הידיים" },
+      { icon: "film", title: "את בוחרת את הסרט", note: "גם אם זו קומדיה רומנטית" },
+      { icon: "coffee", title: "ארוחת בוקר במיטה", note: "כולל לנקות אחרי" },
+      { icon: "crown", title: "\"את צודקת\"", note: "שימוש אחד בוויכוח לבחירתך" }
+    ] },
+    { type: "final", variant: "card", icon: "hearts", title: "נועה,", text: ["אני לא תמיד אומר את זה, אבל כל יום איתך הוא הדבר הכי טוב שלי.", "תודה שבחרת בי."], sign: "שלך, דני" }
+  ]
+};
+</script>
+<script src="../icons.js"></script>
+<script src="../envelope.js"></script>
+<script src="engine.js"></script>
+</body>
+</html>

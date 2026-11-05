@@ -150,6 +150,45 @@
       </div>
     </section>
 
+    <!-- ============ דוגמאות ============ -->
+    <section class="section section--tint" id="examples" aria-labelledby="exTitle">
+      <div class="container">
+        <header class="section__head reveal">
+          <span data-kicker="examples.kicker"></span>
+          <h2 class="section__title" id="exTitle"><span data-t="examples.title"></span></h2>
+          <p class="section__subtitle" data-t="examples.subtitle"></p>
+        </header>
+        <div class="tabs reveal" aria-label="סינון לפי קטגוריה" id="tabs"></div>
+        <p class="sr-only" id="exStatus" aria-live="polite"></p>
+        <div class="examples" id="examplesList"></div>
+        <button type="button" class="btn btn--ghost more-btn" id="exMore" aria-expanded="false" aria-controls="examplesList" hidden><span data-icon="plus"></span><span id="exMoreText"></span></button>
+      </div>
+    </section>
+
+    <!-- ============ בשבילו ============ -->
+    <section class="section section--him" id="him" aria-labelledby="himTitle">
+      <div class="container him">
+        <div class="him__text reveal">
+          <span data-kicker="him.kicker"></span>
+          <h2 class="section__title him__title" id="himTitle" data-t="him.title"></h2>
+          <p class="him__lead" data-t="him.text"></p>
+          <ul class="him__points" id="himPoints"></ul>
+          <div class="him__ctas">
+            <a class="btn btn--primary btn--lg" href="order.html?type=partner"><span data-t="him.cta"></span><span data-icon="arrow-left"></span></a>
+            <a class="link-btn" href="demos/love.html"><span data-icon="eye"></span><span data-t="him.demo"></span></a>
+          </div>
+        </div>
+        <div class="idea reveal" id="idea">
+          <p class="idea__label"><span data-icon="wand"></span><span data-t="ideas.title"></span></p>
+          <div class="idea__card" id="ideaCard" aria-live="polite" aria-atomic="true"></div>
+          <div class="idea__actions">
+            <button type="button" class="btn btn--ghost" id="ideaNext"><span data-icon="replay"></span><span data-t="ideas.button"></span></button>
+            <a class="btn btn--primary" id="ideaWant" href="order.html"><span data-t="ideas.want"></span><span data-icon="arrow-left"></span></a>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- ============ בונה הסקיצות ============ -->
     <section class="section section--builder" id="builder" aria-labelledby="builderTitle">
       <div class="container builder">
@@ -171,21 +210,6 @@
           <svg class="mock__arrow"><use href="#d-arrow"/></svg>
           <div class="mock__phone"><div class="mock__screen" id="mockScreen"><p class="mock__to hand" id="mockTo2"></p><div class="mock__env" id="mockEnv"></div></div></div>
         </div>
-      </div>
-    </section>
-
-    <!-- ============ דוגמאות ============ -->
-    <section class="section section--tint" id="examples" aria-labelledby="exTitle">
-      <div class="container">
-        <header class="section__head reveal">
-          <span data-kicker="examples.kicker"></span>
-          <h2 class="section__title" id="exTitle"><span data-t="examples.title"></span></h2>
-          <p class="section__subtitle" data-t="examples.subtitle"></p>
-        </header>
-        <div class="tabs reveal" aria-label="סינון לפי קטגוריה" id="tabs"></div>
-        <p class="sr-only" id="exStatus" aria-live="polite"></p>
-        <div class="examples" id="examplesList"></div>
-        <p class="swipe-hint" aria-hidden="true">החליקו לעוד דוגמאות</p>
       </div>
     </section>
 
@@ -228,6 +252,7 @@
           <p class="kicker" data-t="about.kicker"></p>
           <h2 class="about__title" id="aboutTitle" data-t="about.title"></h2>
           <div id="aboutParas"></div>
+          <button type="button" class="link-btn about__more-btn" id="aboutMore" aria-expanded="false" aria-controls="aboutMoreText"><span data-icon="plus"></span>להמשך הסיפור</button>
           <p class="about__sign" data-t="about.signature"></p>
           <dl class="stats" id="stats"></dl>
         </div>
@@ -328,6 +353,10 @@
   </footer>
 
   <aside aria-label="יצירת קשר ונגישות">
+    <div class="cta-bar" id="ctaBar">
+      <a class="btn btn--primary cta-bar__main" href="order.html"><span data-icon="wand"></span>לבנות סקיצה, 3 דקות</a>
+      <a class="wa-icon cta-bar__wa" data-wa target="_blank" rel="noopener" aria-label="שליחת הודעה בווטסאפ (נפתח בחלון חדש)"><span data-icon="whatsapp"></span></a>
+    </div>
     <a class="wa-float" id="waFloat" target="_blank" rel="noopener" aria-label="שליחת הודעה בווטסאפ (נפתח בחלון חדש)"><span data-icon="whatsapp"></span></a>
 
     <div class="a11y" id="a11y">
@@ -360,5 +389,6 @@
   <script src="icons.js"></script>
   <script src="envelope.js"></script>
   <script src="main.js"></script>
+  <script src="menu.js"></script>
 </body>
 </html>

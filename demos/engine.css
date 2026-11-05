@@ -97,7 +97,12 @@ img { max-width: 100%; display: block; }
 .btn--ghost { background: rgba(255,255,255,.88); color: var(--ink); border-color: currentColor; }
 .btn[disabled] { opacity: .45; cursor: not-allowed; box-shadow: none; }
 .btn.is-ready { animation: popIn .5s var(--ease-bounce); }
-.next { margin-top: 22px; }
+/* כפתור ההמשך תמיד נראה: נדבק לתחתית המסך גם כשהתוכן ארוך */
+.next {
+  position: sticky; bottom: 0; z-index: 20; margin: 18px -16px 0; padding: 14px 16px calc(14px + env(safe-area-inset-bottom));
+  background: linear-gradient(to top, var(--soft) 55%, transparent);
+}
+.next .btn { width: min(100%, 320px); }
 
 /* ---------- מעטפה ---------- */
 .env-to { font-family: var(--font-hand); font-weight: 700; color: var(--accent-deep); font-size: 1.2rem; margin-bottom: 4px; }
@@ -303,3 +308,77 @@ img { max-width: 100%; display: block; }
 }
 .desk-hint { display: none; align-items: center; justify-content: center; gap: 6px; font-size: .82rem; color: var(--text-soft); margin: 10px 0 0; }
 .desk-hint .ico { width: 16px; height: 16px; }
+
+/* ---------- קלפי סיבות ---------- */
+.reasons { list-style: none; padding: 0; margin: 6px 0 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.reasons--3 { grid-template-columns: repeat(3, 1fr); }
+.reason { position: relative; width: 100%; height: 100px; padding: 0; border: 0; background: none; cursor: pointer; perspective: 700px; font: inherit; }
+.reason__in { position: absolute; inset: 0; transform-style: preserve-3d; transition: transform .7s var(--ease-out); }
+.reason.is-flipped .reason__in { transform: rotateY(180deg); }
+.reason__front, .reason__back { position: absolute; inset: 0; border-radius: 18px; -webkit-backface-visibility: hidden; backface-visibility: hidden; display: flex; align-items: center; justify-content: center; padding: 10px; box-shadow: var(--shadow); }
+.reason__front { background: linear-gradient(140deg, var(--accent), var(--accent-deep)); color: #fff; flex-direction: column; gap: 2px; }
+.reason__front .ico { width: 26px; height: 26px; fill: rgba(255,255,255,.25); }
+.reason__front b { font-family: var(--font-display); font-weight: 400; font-size: 1.3rem; line-height: 1; }
+.reason__back { background: var(--paper-tex), var(--card); transform: rotateY(180deg); font-family: var(--font-hand); font-weight: 700; font-size: .92rem; line-height: 1.35; color: var(--ink); border: 1.5px solid var(--soft); overflow: hidden; }
+.reason:hover:not(.is-flipped) .reason__in { transform: rotateY(12deg) translateY(-3px); }
+
+/* ---------- תפתחי כש... ---------- */
+.ow { list-style: none; padding: 0; margin: 6px 0 0; display: grid; gap: 10px; }
+.ow__env {
+  position: relative; display: flex; align-items: center; gap: 12px; width: 100%; min-height: 64px; padding: 12px 16px; text-align: right;
+  background: var(--paper-tex), var(--card); border: 2px solid transparent; border-radius: 18px; box-shadow: var(--shadow); cursor: pointer; color: var(--text); font: inherit;
+  transition: transform .25s var(--ease-bounce), border-color .2s;
+}
+.ow__env:hover { transform: translateY(-2px) rotate(-.5deg); border-color: var(--accent); }
+.ow__ico { width: 34px; height: 34px; color: var(--accent-deep); flex-shrink: 0; }
+.ow__label small { display: block; font-size: .8rem; color: var(--text-soft); font-weight: 500; }
+.ow__label b { font-size: 1.05rem; color: var(--ink); }
+.ow__seen { margin-inline-start: auto; display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--soft); color: transparent; }
+.ow__seen .ico { width: 15px; height: 15px; }
+.ow__env.is-seen .ow__seen { background: var(--accent-deep); color: #fff; }
+.ow__letter { background: var(--paper-tex), var(--card); border-radius: 22px; padding: 22px 20px 18px; box-shadow: 0 24px 40px -22px rgba(0,0,0,.4); animation: ticketIn .6s var(--ease-bounce) both; position: relative; }
+.ow__letter::before { content: ""; position: absolute; inset: 7px; border: 1.5px solid var(--accent); border-radius: 16px; opacity: .4; pointer-events: none; }
+.ow__when { font-family: var(--font-display); color: var(--accent-deep); font-size: 1.2rem; outline: none; margin-bottom: 8px; }
+.ow__text { font-family: var(--font-serif); font-size: 1.1rem; line-height: 1.7; }
+
+/* ---------- גלגל ---------- */
+.wheel { position: relative; width: min(250px, 66vw); aspect-ratio: 1; margin: 4px auto 16px; }
+.wheel__svg { width: 100%; height: 100%; filter: drop-shadow(0 16px 20px rgba(0,0,0,.2)); border-radius: 50%; }
+.wheel__rot { transform-origin: 0 0; }
+.wheel__pointer { position: absolute; z-index: 2; top: -8px; left: 50%; width: 26px; height: 30px; margin-left: -13px; background: var(--ink); clip-path: polygon(0 0, 100% 0, 50% 100%); filter: drop-shadow(0 2px 2px rgba(0,0,0,.3)); }
+.wheel__spin[disabled] { opacity: .6; }
+.wheel + .wheel__spin { margin-bottom: 4px; }
+
+/* ---------- שוברים ---------- */
+.coupons { list-style: none; padding: 0; margin: 6px 0 0; display: grid; gap: 10px; }
+.coupon {
+  position: relative; display: flex; align-items: center; gap: 12px; width: 100%; min-height: 66px; padding: 12px 16px; text-align: right; cursor: pointer; overflow: hidden; font: inherit; color: var(--text);
+  background: radial-gradient(circle at 0 50%, transparent 10px, var(--card) 10.5px) left / 51% 100% no-repeat, radial-gradient(circle at 100% 50%, transparent 10px, var(--card) 10.5px) right / 51% 100% no-repeat;
+  border: 0; border-radius: 14px; filter: drop-shadow(0 8px 12px rgba(0,0,0,.12)); transition: transform .25s var(--ease-bounce);
+}
+.coupon:hover { transform: translateY(-2px); }
+.coupon__ico { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 12px; background: var(--soft); color: var(--accent-deep); flex-shrink: 0; border-left: 2px dashed var(--accent); }
+.coupon__ico .ico { width: 22px; height: 22px; }
+.coupon__t b { display: block; color: var(--ink); }
+.coupon__t small { color: var(--text-soft); font-size: .8rem; }
+.coupon__stamp { position: absolute; left: 16px; top: 50%; font: 400 1.1rem/1 var(--font-display); color: var(--accent-deep); border: 2.5px solid currentColor; border-radius: 8px; padding: 4px 8px; transform: translateY(-50%) rotate(-14deg) scale(2); opacity: 0; transition: transform .35s var(--ease-bounce), opacity .2s; }
+.coupon.is-used .coupon__stamp { opacity: .9; transform: translateY(-50%) rotate(-14deg) scale(1); }
+.coupon.is-used .coupon__t { opacity: .55; }
+
+/* ---------- מסכים נמוכים: הכל נכנס במסך אחד ---------- */
+@media (max-height: 760px) {
+  .medal { width: 66px; height: 66px; margin-bottom: 8px; }
+  .medal .ico { width: 32px; height: 32px; }
+  .step__title { font-size: clamp(1.45rem, 7vw, 1.9rem); }
+  .step__sub { margin-bottom: 12px; }
+  .stage { padding-top: 8px; }
+  .album { height: 270px; width: 230px; }
+  .photo { width: min(76%, 260px); margin-bottom: 12px; }
+  .env-stage { padding: 46px 0 26px; }
+  .option { min-height: 56px; padding: 10px 14px; }
+  .reason { height: 88px; }
+}
+@media (max-height: 640px) {
+  .medal { display: none; }
+  .step--envelope .env { --w: min(230px, 64vw); }
+}
