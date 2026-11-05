@@ -519,7 +519,7 @@
     var fin;
     if (t === "partner") {
       var f = d.finale || "";
-      if (f === "דייט") fin = { type: "final", variant: "invite", icon: "glass", title: "זה רשמי!", lines: (used.wheel ? [{ icon: "sparkle", label: "מה", value: "{date}" }] : []).concat([{ icon: "calendar", label: "מתי", value: d.finaleWhen || "בקרוב מאוד" }]).concat([, { icon: "pin", label: "איפה", value: d.finaleWhere || "הפתעה" }, { icon: "sparkle", label: "דרס קוד", value: "מה שמרגיש הכי טוב" }]), note: sign || "מחכה לזה" };
+      if (f === "דייט") fin = { type: "final", variant: "invite", icon: "glass", title: "זה רשמי!", lines: (used.wheel ? [{ icon: "sparkle", label: "מה", value: "{date}" }] : []).concat([{ icon: "calendar", label: "מתי", value: d.finaleWhen || "בקרוב מאוד" }, { icon: "pin", label: "איפה", value: d.finaleWhere || "הפתעה" }, { icon: "sparkle", label: "דרס קוד", value: "מה שמרגיש הכי טוב" }]), note: sign || "מחכה לזה" };
       else if (f.indexOf("טיסה") > -1) fin = { type: "final", variant: "ticket", title: "הכרטיס שלך", ticket: { from: { code: "TLV", city: "תל אביב" }, to: { code: "???", city: d.finaleWhere || "יעד: הפתעה" }, fields: [{ label: G("נוסעת", "נוסע", "נוסעים"), value: nick }, { label: "מתי", value: d.finaleWhen || "בקרוב" }, { label: "שער", value: "7" }, { label: "מושב", value: "ליד שלי" }], note: letter[0] || "את השאר " + G("תגלי", "תגלה", "תגלו") + " בשדה." } };
       else {
         if (f === "מתנה") push({ type: "scratch", icon: "gift", title: G("גרדי", "גרד", "גרדו") + " לגלות את המתנה", reveal: { icon: "gift", text: d.finaleWhere || "המתנה שלך", small: d.finaleWhen || "" }, cta: "ועוד משהו" });

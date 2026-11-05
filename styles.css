@@ -1079,3 +1079,5 @@ html.a11y-no-motion .drawer[open], html.a11y-no-motion .drawer__nav a { animatio
 
 .idea__actions .btn { white-space: nowrap; font-size: .95rem; padding-inline: .9em; min-height: 48px; }
 .step__num::before { content: attr(data-n); }
+
+.choice-no { white-space: nowrap; }

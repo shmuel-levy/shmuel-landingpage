@@ -222,7 +222,7 @@ img { max-width: 100%; display: block; }
 .note:last-child:nth-child(odd) { grid-column: 1 / -1; }
 
 /* ---------- ספירה לאחור ---------- */
-.countdown { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 10px 0 0; direction: rtl; }
+.countdown { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 10px 0 0; direction: ltr; }
 .countdown div { background: var(--card); border-radius: 18px; padding: 14px 4px 10px; box-shadow: var(--shadow); }
 .countdown b { display: block; font-family: var(--font-display); font-weight: 400; font-size: 2rem; color: var(--ink); line-height: 1; font-variant-numeric: tabular-nums; }
 .countdown span { font-size: .8rem; color: var(--text-soft); font-weight: 500; }
@@ -382,3 +382,7 @@ img { max-width: 100%; display: block; }
   .medal { display: none; }
   .step--envelope .env { --w: min(230px, 64vw); }
 }
+
+.run-no { white-space: nowrap; }
+
+.wheel { width: min(250px, 66vw, 36vh); }
