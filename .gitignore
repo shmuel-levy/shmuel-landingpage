@@ -5,3 +5,6 @@
 .DS_Store
 Thumbs.db
 .vscode/
+
+# חומרים לפרסומת (לא לפרסום באתר)
+ad-kit/

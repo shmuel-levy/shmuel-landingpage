@@ -386,3 +386,6 @@ img { max-width: 100%; display: block; }
 .run-no { white-space: nowrap; }
 
 .wheel { width: min(250px, 66vw, 36vh); }
+
+/* מצב צילום: בלי "חזרה" ובלי תווית "אתר לדוגמה" */
+.is-clean .back, .is-clean .demo-flag, .is-clean .desk-hint { visibility: hidden; }

@@ -650,6 +650,8 @@
     },
   };
 
+  // ?clean=1 מסתיר את "חזרה" ואת התווית "אתר לדוגמה" (לצילומי וידאו, כמו שהלקוח מקבל)
+  if (new URLSearchParams(location.search).has("clean")) document.body.classList.add("is-clean");
   // ?step=3 פותח ישר בשלב מסוים (לצילומי מסך ולקישורים)
   const startAt = parseInt(new URLSearchParams(location.search).get("step"), 10);
   if (startAt > 0 && startAt < D.steps.length) idx = startAt;
