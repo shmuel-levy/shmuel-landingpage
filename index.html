@@ -22,8 +22,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&family=Suez+One&family=Frank+Ruhl+Libre:wght@500;700&family=Playpen+Sans+Hebrew:wght@500;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="envelope.css" />
   <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="fx.css" />
   <script src="a11y.js"></script>
-  <!-- Meta Pixel / Google Analytics: להדביק כאן -->
+  <!-- Google Analytics / Meta Pixel: מדביקים את המזהים ב-config.js (analytics), וזה נטען לבד דרך track.js -->
 </head>
 <body>
   <!-- ספריית ציורי-יד (Doodles) לשימוש חוזר -->
@@ -42,7 +43,6 @@
   <a class="skip-link" href="#main">דילוג לתוכן הראשי</a>
   <div class="scroll-progress" aria-hidden="true"><b id="scrollBar"></b></div>
 
-  <aside id="banner" class="banner" aria-label="מבצע" hidden></aside>
 
   <header class="header" id="header">
     <div class="container header__inner">
@@ -98,31 +98,16 @@
           <figure class="stamp" aria-hidden="true"><img src="images/favicon.png" alt="" width="96" height="96" /><figcaption>Matanot · 2026</figcaption></figure>
           <div class="phone" id="demo" role="region" aria-label="הדגמה חיה של הפתעה">
             <div class="phone__notch" aria-hidden="true"></div>
-            <div class="screen is-active" data-screen="envelope">
-              <p class="screen__to hand" data-t="hero.demo.to"></p>
-              <div class="screen__env" id="envHost"></div>
-              <p class="screen__title" data-t="hero.demo.envelopeTitle"></p>
-              <p class="screen__hint"><span data-icon="tap"></span><span data-t="hero.demo.envelopeHint"></span></p>
+            <div class="phone__screen" id="demoScreen">
+              <iframe id="demoFrame" title="הדגמה חיה של הפתעה בקישור" src="demos/date.html?embed=1"></iframe>
+              <div class="phone__loading" aria-hidden="true"><span></span></div>
             </div>
-
-            <div class="screen" data-screen="question" aria-hidden="true">
-              <div class="medal bob" aria-hidden="true"><span class="medal__ring"></span><span data-icon="bear"></span></div>
-              <p class="screen__question" id="demoQuestion" data-t="hero.demo.question"></p>
-              <div class="choice-area" id="choiceArea" role="group" aria-labelledby="demoQuestion">
-                <button class="btn btn--primary choice-yes" id="yesBtn" type="button" data-t="hero.demo.yes"></button>
-                <button class="btn btn--outline choice-no" id="noBtn" type="button" data-t="hero.demo.no"></button>
-              </div>
-              <p class="screen__hint hand" data-t="hero.demo.hint"></p>
-            </div>
-
-            <div class="screen" data-screen="success" aria-hidden="true">
-              <div class="medal beat" aria-hidden="true"><span class="medal__ring"></span><span data-icon="hearts"></span></div>
-              <p class="screen__title" data-t="hero.demo.successTitle"></p>
-              <p class="screen__text" data-t="hero.demo.successText"></p>
-              <a class="btn btn--primary" data-order><span data-t="hero.demo.successCta"></span><span data-icon="arrow-left"></span></a>
-              <button class="link-btn" id="replayBtn" type="button"><span data-icon="replay"></span><span data-t="hero.demo.replay"></span></button>
-            </div>
-            <div class="confetti" id="confetti" aria-hidden="true"></div>
+          </div>
+          <div class="demo-ctl">
+            <button type="button" class="demo-shuffle" id="demoShuffle"><span class="demo-shuffle__ico" data-icon="replay"></span><span>הגרלת דוגמה אחרת</span></button>
+            <p class="demo-now"><span>עכשיו בטלפון:</span> <b id="demoNow">נצא לדייט?</b></p>
+            <ul class="demo-feat" id="demoFeat" aria-label="מה יש בדוגמה הזו"></ul>
+            <p class="demo-links"><a id="demoFull" href="demos/date.html" target="_blank" rel="noopener"><span data-icon="eye"></span>מסך מלא<span class="sr-only"> (נפתח בחלון חדש)</span></a><a id="demoOrder" href="order.html?type=partner"><span data-icon="wand"></span>לבנות כזו בדיוק</a></p>
           </div>
           <p class="sr-only" id="demoStatus" aria-live="polite"></p>
         </div>
@@ -290,6 +275,17 @@
       </div>
     </section>
 
+    <dialog class="ppop" id="promoPop" aria-labelledby="ppopTitle" aria-describedby="ppopText">
+      <div class="ppop__card" tabindex="-1" autofocus>
+        <button type="button" class="ppop__x" data-pop-close aria-label="סגירה"><span data-icon="x"></span></button>
+        <div class="ppop__env" id="ppopEnv" aria-hidden="true"></div>
+        <h2 class="ppop__title" id="ppopTitle"></h2>
+        <p class="ppop__text" id="ppopText"></p>
+        <a class="btn btn--primary btn--lg ppop__cta" href="order.html?src=promo-pop"><span data-icon="wand"></span>לבנות סקיצה עם ההנחה</a>
+        <button type="button" class="link-btn ppop__later" data-pop-close>אולי אחר כך</button>
+      </div>
+    </dialog>
+
     <dialog class="lightbox" id="lightbox" aria-label="צילום מסך מוגדל">
       <button type="button" class="lightbox__close" id="lightboxClose" aria-label="סגירה"><span data-icon="x"></span></button>
       <img id="lightboxImg" alt="" />
@@ -346,9 +342,19 @@
       <img class="footer__logo" src="images/logo.jpg" width="640" height="575" loading="lazy" alt="הלוגו של Matanot: איור של שמואל רוקד עם מעטפה" />
       <p data-t="footer.text"></p>
       <ul class="footer__contact" id="footerContact"></ul>
+      <p class="ev-more__title">רעיונות לפי אירוע</p>
+      <nav class="ev-more" aria-label="רעיונות לפי אירוע">
+        <a href="michtav-ahava.html">מכתב אהבה לבת הזוג</a>
+        <a href="matana-leganenet.html">מתנה לגננת</a>
+        <a href="yom-huledet.html">ברכה ליום הולדת</a>
+        <a href="hatzaat-nisuim.html">הצעת נישואין</a>
+        <a href="hodaa-al-herayon.html">הודעה על הריון</a>
+        <a href="valentine.html">ולנטיין וט"ו באב</a>
+      </nav>
       <nav class="footer__links" aria-label="מידע משפטי">
         <a href="negishut.html">הצהרת נגישות</a>
         <a href="privacy.html">מדיניות פרטיות</a>
+        <a href="terms.html">תנאי שירות</a>
       </nav>
       <p class="footer__copy">© <span id="year"></span> <span lang="en">Matanot</span> · שמואל לוי</p>
     </div>
@@ -388,8 +394,10 @@
   </aside>
 
   <script src="config.js"></script>
+  <script src="track.js"></script>
   <script src="icons.js"></script>
   <script src="envelope.js"></script>
+  <script src="fx.js"></script>
   <script src="main.js"></script>
   <script src="menu.js"></script>
 </body>

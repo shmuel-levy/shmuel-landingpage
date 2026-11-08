@@ -105,9 +105,13 @@ img { max-width: 100%; display: block; }
 .next .btn { width: min(100%, 320px); }
 
 /* ---------- מעטפה ---------- */
-.env-to { font-family: var(--font-hand); font-weight: 700; color: var(--accent-deep); font-size: 1.2rem; margin-bottom: 4px; }
-.env-stage { padding: 54px 0 34px; }
-.step--envelope .env { --w: min(270px, 74vw); }
+.env-stage { padding: 58px 0 40px; }
+.step--envelope .env { --w: min(300px, 78vw); --lift: 1.3; }
+/* בזמן הפתיחה הכותרת מפנה מקום לדש ולכרטיס */
+.step--envelope .step__title { transition: opacity .45s ease, transform .6s var(--ease-out); }
+.step--envelope.is-opening .step__title { opacity: 0; transform: translateY(-14px); }
+.step--envelope.is-opening .hint { opacity: 0; }
+.step--envelope .next { margin-top: 0; }
 .hint { display: inline-flex; align-items: center; gap: 6px; font-size: .92rem; color: var(--text-soft); font-family: var(--font-hand); transition: opacity .3s; }
 .hint .ico { width: 18px; height: 18px; color: var(--accent-deep); }
 .hint.is-hidden { opacity: 0; }
@@ -374,13 +378,13 @@ img { max-width: 100%; display: block; }
   .stage { padding-top: 8px; }
   .album { height: 270px; width: 230px; }
   .photo { width: min(76%, 260px); margin-bottom: 12px; }
-  .env-stage { padding: 46px 0 26px; }
+  .env-stage { padding: 50px 0 30px; }
   .option { min-height: 56px; padding: 10px 14px; }
   .reason { height: 88px; }
 }
 @media (max-height: 640px) {
   .medal { display: none; }
-  .step--envelope .env { --w: min(230px, 64vw); }
+  .step--envelope .env { --w: min(250px, 66vw); }
 }
 
 .run-no { white-space: nowrap; }
@@ -389,3 +393,94 @@ img { max-width: 100%; display: block; }
 
 /* מצב צילום: בלי "חזרה" ובלי תווית "אתר לדוגמה" */
 .is-clean .back, .is-clean .demo-flag, .is-clean .desk-hint { visibility: hidden; }
+
+/* ---------- הודעה קולית ---------- */
+.voice {
+  display: flex; align-items: center; gap: 14px; width: min(100%, 340px); margin: 6px auto 0; padding: 14px 16px 14px 18px;
+  background: var(--card); border-radius: 26px 26px 26px 8px; box-shadow: var(--shadow); text-align: right; animation: popIn .5s var(--ease-bounce);
+}
+.voice__play {
+  position: relative; flex-shrink: 0; display: grid; place-items: center; width: 62px; height: 62px; border: 0; border-radius: 50%;
+  background: var(--accent-deep); color: #fff; cursor: pointer; box-shadow: 0 12px 22px -10px var(--accent-deep); transition: transform .2s var(--ease-bounce);
+}
+.voice__play .ico { width: 26px; height: 26px; fill: currentColor; position: relative; z-index: 1; }
+.voice__play:hover { transform: scale(1.06); }
+.voice__play:active { transform: scale(.95); }
+.voice__play[disabled] { opacity: .45; cursor: default; box-shadow: none; }
+.voice__ring { position: absolute; inset: -6px; border-radius: 50%; border: 2px solid var(--accent); opacity: 0; }
+.voice:not(.voice--empty):not(.is-playing) .voice__ring { animation: voiceCall 2s ease-out infinite; }
+@keyframes voiceCall { 0% { transform: scale(.9); opacity: .8; } 100% { transform: scale(1.35); opacity: 0; } }
+.voice__body { flex: 1; min-width: 0; }
+.voice__from { display: block; font-size: .85rem; color: var(--accent-deep); margin-bottom: 4px; }
+.voice__wave { display: flex; align-items: center; gap: 2px; height: 36px; direction: ltr; }
+.voice__wave i { flex: 1; height: var(--h); min-height: 4px; border-radius: 3px; background: var(--accent); opacity: .35; transition: opacity .15s, background .15s; }
+.voice__wave i.is-on { opacity: 1; background: var(--accent-deep); }
+.voice__time { display: flex; justify-content: space-between; margin: 6px 0 0; font-size: .8rem; font-weight: 700; color: var(--text-soft); font-variant-numeric: tabular-nums; direction: ltr; }
+.voice--empty .voice__wave i { opacity: .25; }
+.voice__ph { display: flex; gap: 8px; align-items: flex-start; justify-content: center; max-width: 34ch; margin: 14px auto 0; font-size: .88rem; color: var(--text-soft); }
+.voice__ph .ico { width: 18px; height: 18px; color: var(--accent-deep); flex-shrink: 0; margin-top: 2px; }
+.voice__caption { display: flex; gap: 8px; align-items: flex-start; max-width: 34ch; margin: 14px auto 0; padding: 10px 14px; background: rgba(255,255,255,.75); border-radius: 14px; font-size: .95rem; text-align: right; }
+.voice__caption .ico { width: 18px; height: 18px; color: var(--accent-deep); flex-shrink: 0; margin-top: 3px; }
+
+/* ---------- סוף ההפתעה: תגובה וקרדיט ---------- */
+.replybox { width: 100%; background: var(--card); border-radius: 22px; padding: 16px; box-shadow: var(--shadow); text-align: center; }
+.replybox__t { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 0 0 10px; font-weight: 800; color: var(--ink); }
+.replybox__t .ico { width: 20px; height: 20px; color: var(--accent-deep); }
+.replybox__chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 12px; }
+.replybox__chip {
+  min-height: 44px; padding: 8px 14px; border-radius: 99px; border: 2px solid var(--accent); background: transparent; color: var(--text);
+  font: 700 .92rem var(--font-body, inherit); cursor: pointer; transition: background .2s, color .2s, transform .2s var(--ease-bounce);
+}
+.replybox__chip[aria-pressed="true"] { background: var(--accent-deep); border-color: var(--accent-deep); color: #fff; transform: scale(1.04); }
+.replybox__send { width: min(100%, 320px); }
+.credit { display: inline-flex; align-items: center; gap: 8px; margin-top: 4px; padding: 8px 12px; border-radius: 99px; background: rgba(255,255,255,.7); color: var(--text-soft); font-size: .8rem; text-decoration: none; }
+.credit img { width: 28px; height: 28px; border-radius: 50%; border: 1.5px solid #12297A; }
+.credit b { color: #12297A; }
+.credit:hover span { text-decoration: underline; }
+.back--gift { visibility: hidden; }
+
+/* ---------- סקיצה: סימן מים, הסתרה ושלב נעול ---------- */
+body.is-sketch { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+body.is-sketch img { -webkit-user-drag: none; }
+.sketch-wm { position: fixed; inset: 0; z-index: 60; pointer-events: none; background: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22250%22%20height%3D%22170%22%3E%3Cg%20transform%3D%22rotate(-22%20125%2085)%22%20fill%3D%22rgba(70%2C20%2C50%2C.13)%22%20font-family%3D%22Heebo%2CArial%2Csans-serif%22%20font-weight%3D%22800%22%20text-anchor%3D%22middle%22%3E%3Ctext%20x%3D%22125%22%20y%3D%2280%22%20font-size%3D%2217%22%3E%D7%A1%D7%A7%D7%99%D7%A6%D7%94%20%C2%B7%20Matanot%3C%2Ftext%3E%3Ctext%20x%3D%22125%22%20y%3D%22102%22%20font-size%3D%2212%22%3E%D7%9C%D7%90%20%D7%94%D7%92%D7%A8%D7%A1%D7%94%20%D7%94%D7%A1%D7%95%D7%A4%D7%99%D7%AA%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fsvg%3E") 0 0 / 250px 170px repeat; mix-blend-mode: multiply; }
+.sketch-veil {
+  position: fixed; inset: 0; z-index: 70; display: grid; place-items: center; padding: 24px; text-align: center;
+  background: rgba(255,255,255,.55); -webkit-backdrop-filter: blur(22px); backdrop-filter: blur(22px);
+  opacity: 0; visibility: hidden; transition: opacity .15s ease, visibility 0s .15s;
+}
+.sketch-veil p { display: grid; justify-items: center; gap: 6px; margin: 0; color: var(--ink); }
+.sketch-veil .ico { width: 34px; height: 34px; color: var(--accent-deep); }
+.sketch-veil small { color: var(--text-soft); }
+body.is-veiled .sketch-veil { opacity: 1; visibility: visible; transition: none; }
+body.is-veiled .app { filter: blur(18px); }
+@media print { body.is-sketch .app, body.is-sketch .deco { display: none !important; } body.is-sketch .sketch-veil { opacity: 1; visibility: visible; position: static; } }
+
+.locked { display: grid; gap: 8px; width: min(100%, 340px); margin: 4px auto 0; text-align: right; }
+.locked li {
+  display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 16px; background: rgba(255,255,255,.82); box-shadow: var(--shadow);
+  font-weight: 700; color: var(--ink); animation: stepIn .5s var(--ease-out) both; animation-delay: calc(var(--i) * 90ms + 150ms);
+}
+.locked__ico { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 12px; background: var(--soft); color: var(--accent-deep); flex-shrink: 0; }
+.locked__ico .ico { width: 20px; height: 20px; }
+.locked__lock { width: 18px; height: 18px; margin-inline-start: auto; color: var(--text-soft); opacity: .7; }
+.locked__final { position: relative; width: min(100%, 300px); margin: 18px auto 0; }
+.locked__card {
+  display: grid; justify-items: center; gap: 9px; padding: 22px 26px; border-radius: 18px; background: var(--card); box-shadow: var(--shadow);
+  filter: blur(5px); transform: rotate(-2deg); opacity: .9;
+}
+.locked__card b { font: 700 1.4rem/1.2 var(--font-display, serif); color: var(--ink); }
+.locked__card i { display: block; height: 9px; width: 100%; border-radius: 9px; background: var(--soft); }
+.locked__card i:nth-of-type(2) { width: 82%; } .locked__card i:nth-of-type(4) { width: 60%; }
+.locked__card em { font-family: var(--font-hand); font-style: normal; color: var(--accent-deep); font-weight: 700; }
+.locked__cap {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); margin: 0; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+  background: var(--ink); color: #fff; font-weight: 700; font-size: .88rem; padding: 9px 14px; border-radius: 99px; box-shadow: 0 10px 20px -10px rgba(0,0,0,.5);
+}
+.locked__cap .ico { width: 16px; height: 16px; }
+
+
+/* ---------- בתוך הטלפון בדף הבית (?embed=1) ---------- */
+body.is-embed .app { padding-top: 30px; }
+body.is-embed .demo-flag, body.is-embed .desk-hint { display: none; }
+body.is-embed::-webkit-scrollbar { width: 0; height: 0; }
+body.is-embed { scrollbar-width: none; }

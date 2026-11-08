@@ -52,6 +52,7 @@
 
     <div class="container order__grid">
       <form class="wizard" id="wizard" novalidate data-step="type">
+        <p class="sr-only" id="helpStatus" aria-live="polite"></p>
 
         <!-- שלב 1 -->
         <section class="wz-step" id="step-type" aria-labelledby="h-type">
@@ -94,7 +95,7 @@
         <!-- שלב 5 -->
         <section class="wz-step wz-step--sketch" id="step-sketch" aria-labelledby="h-sketch" hidden>
           <h2 id="h-sketch" tabindex="-1">הסקיצה שלכם מוכנה</h2>
-          <p class="wz-sub">זו טיוטה שנבנתה אוטומטית מהפרטים. נסו אותה כמו מי שיקבל: פתחו את המעטפה ועברו על השלבים.</p>
+          <p class="wz-sub">טעימה מהכיוון: פתחו את המעטפה כמו מי שיקבל. את הגרסה המלאה אני בונה ביד, עם המילים והתמונות שלכם.</p>
           <div class="wz-errors" role="alert" tabindex="-1" hidden></div>
           <div class="sketch">
             <div class="sketch__phone">
@@ -108,10 +109,14 @@
               <h3>סיכום ההזמנה</h3>
               <dl class="summary" id="summary"></dl>
               <div class="sketch__send"><a class="btn btn--wa btn--lg btn--block" id="sendWa" data-send target="_blank" rel="noopener"><span data-icon="whatsapp"></span>שליחה לשמואל בווטסאפ<span class="sr-only"> (נפתח בחלון חדש)</span></a></div>
+              <div class="voice-send" id="voiceSend" hidden>
+                <p><span data-icon="mic"></span><span>יש לכם הקלטה (<span id="voiceSendLen"></span>). אחרי הסיכום, שלחו לי גם אותה:</span></p>
+                <button type="button" class="btn btn--ghost btn--block" id="shareVoice"><span data-icon="send"></span>שליחת ההקלטה</button>
+              </div>
               <button type="button" class="btn btn--ghost btn--block" id="copyMsg"><span data-icon="copy"></span>העתקת הסיכום</button>
               <p class="sr-only" id="copyStatus" aria-live="polite"></p>
               <div class="sent-note" id="sentNote" hidden role="status">
-                <span data-icon="check"></span><p><b>מעולה!</b> ההודעה מוכנה בווטסאפ, רק ללחוץ "שליחה". אחר כך שלחו באותה שיחה את התמונות, ותוך 24 שעות תקבלו את הגרסה הסופית.</p>
+                <span data-icon="check"></span><p><b>מעולה!</b> ההודעה מוכנה בווטסאפ, רק ללחוץ "שליחה". אחר כך שלחו באותה שיחה את התמונות<span id="sentVoice" hidden> ואת ההקלטה (בכפתור "שליחת ההקלטה")</span>, ותוך 24 שעות תקבלו את הגרסה הסופית.</p>
               </div>
               <details class="msg-peek"><summary>מה בדיוק נשלח?</summary><pre id="msgPreview" dir="rtl"></pre></details>
               <ol class="next-steps">
@@ -120,6 +125,7 @@
                 <li><b>אוהבים?</b> משלמים בביט או בפייבוקס ושולחים</li>
               </ol>
               <button type="button" class="btn btn--ghost btn--sm" data-back><span data-icon="pencil"></span>חזרה לעריכה</button>
+              <p class="terms-note">השליחה לא מחייבת בתשלום. משלמים רק אחרי שאישרתם את הגרסה הסופית. <a href="terms.html">תנאי השירות</a></p>
             </div>
           </div>
           <div class="sketch-bar"><a class="btn btn--wa btn--block" id="sendWa2" data-send target="_blank" rel="noopener"><span data-icon="whatsapp"></span>אהבתי! שליחה בווטסאפ<span class="sr-only"> (נפתח בחלון חדש)</span></a></div>
@@ -139,7 +145,7 @@
 
   <footer class="footer footer--slim">
     <div class="container">
-      <p class="footer__copy">© 2026 Matanot · שמואל לוי · <a href="privacy.html">מדיניות פרטיות</a> · <a href="negishut.html">הצהרת נגישות</a></p>
+      <p class="footer__copy">© 2026 Matanot · שמואל לוי · <a href="privacy.html">מדיניות פרטיות</a> · <a href="terms.html">תנאי שירות</a> · <a href="negishut.html">הצהרת נגישות</a></p>
     </div>
   </footer>
 
@@ -171,6 +177,7 @@
   </aside>
 
   <script src="config.js"></script>
+  <script src="track.js"></script>
   <script src="order-config.js"></script>
   <script src="icons.js"></script>
   <script src="envelope.js"></script>

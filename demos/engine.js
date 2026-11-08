@@ -2,7 +2,11 @@
    Matanot: מנוע ההפתעות
    כל דוגמה מגדירה window.DEMO = { palette, theme, deco, mood, steps: [...] }
    סוגי שלבים: envelope, message, choice, runaway, checklist, quiz,
-   scratch, photos, hold, candles, notes, countdown, final
+   scratch, photos, hold, candles, notes, countdown, reasons, openwhen,
+   wheel, coupons, voice, final
+   מצבים (mode): ריק = אתר דוגמה · "sketch" = סקיצה מהטופס ·
+   "gift" = הפתעה אמיתית ללקוח (בלי תוויות דוגמה, עם כפתור תגובה וקרדיט קטן)
+   reply: { phone: "9725...", name: "דני" } = כפתור "לענות בווטסאפ" בסוף
    אייקונים: שמות מתוך icons.js (למשל "heart", "plane")
    ========================================================= */
 (function () {
@@ -10,6 +14,12 @@
   const D = window.DEMO;
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const SKETCH = D.mode === "sketch";
+  const GIFT = D.mode === "gift";
+  // ?embed=1: בתוך הטלפון בדף הבית. בלי תוויות, קישורים נפתחים בחלון הראשי, מוזיקה רק אחרי נגיעה אמיתית
+  const EMBED = new URLSearchParams(location.search).has("embed");
+  const SITE_URL = D.siteUrl || "https://shmuel-levy.github.io/shmuel-landingpage/";
+  const track = (n, p) => { try { if (!GIFT && window.mtTrack) window.mtTrack(n, p || {}); } catch (e) { /* */ } };
+  const fmt = (sec) => { sec = Math.max(0, Math.round(sec || 0)); return Math.floor(sec / 60) + ":" + ("0" + (sec % 60)).slice(-2); };
   const answers = {};
   let idx = 0;
 
@@ -30,15 +40,15 @@
   Object.entries(theme).forEach(([k, v]) => document.documentElement.style.setProperty("--" + k, v));
 
   /* ---------- תבנית העמוד ---------- */
-  const flag = SKETCH
-    ? `<p class="demo-flag demo-flag--sketch">${ico("pencil")}סקיצה ראשונית, נבנתה מהפרטים שמילאתם</p>`
+  const flag = GIFT ? ""
+    : SKETCH ? `<p class="demo-flag demo-flag--sketch">${ico("pencil")}סקיצה לכיוון · הגרסה האמיתית נבנית ביד</p>`
     : `<p class="demo-flag">${ico("sparkle")}אתר לדוגמה · השמות והתמונות להמחשה</p>`;
   document.body.insertAdjacentHTML("afterbegin", `
     <div class="deco" aria-hidden="true"></div>
     <div class="app">
       <header>
         <div class="topbar">
-          ${SKETCH ? `<span class="back back--sketch">${ico("eye")}תצוגה מקדימה</span>` : `<a class="back" href="../index.html#examples">${ico("arrow-right")}חזרה ל-Matanot</a>`}
+          ${GIFT ? `<span class="back back--gift" aria-hidden="true"></span>` : SKETCH ? `<span class="back back--sketch">${ico("eye")}תצוגה מקדימה</span>` : `<a class="back" href="../index.html#examples">${ico("arrow-right")}חזרה ל-Matanot</a>`}
           <div class="progress" aria-hidden="true"></div>
           <button class="music" type="button" aria-pressed="false" aria-label="מוזיקת רקע">${ico("music")}</button>
         </div>
@@ -121,6 +131,12 @@
     },
   };
   if (D.music === false) musicBtn.hidden = true;
+  // בזמן הודעה קולית המוזיקה עוצרת, ואחריה חוזרת
+  let musicResume = false;
+  const duck = (on) => {
+    if (on) { musicResume = Music.on; if (Music.on) Music.stop(); }
+    else if (musicResume) { musicResume = false; Music.start(); }
+  };
   musicBtn.addEventListener("click", () => (Music.on ? Music.stop() : Music.start()));
   document.addEventListener("visibilitychange", () => { if (document.hidden && Music.on) Music.stop(); });
 
@@ -165,8 +181,28 @@
     return b;
   }
 
+  /* ---------- דמות שמסיימת שלב (fx.js): קופידון, חופה, טבעת, בלון, חסידה, יונה, מטוס ----------
+     אחרי שסיימו פעילות, הדמות "פוגעת" בכפתור ההמשך וממשיכים לבד.
+     D.fx קובע דמות לכל ההפתעה (ברירת מחדל לפי orderType), s.fx לשלב אחד, fx: "none" / cupid: false מבטלים.
+     לחיצה על הכפתור לפני כן = ממשיכים מיד, בלי כפילות */
+  let fxRun = null;
+  function celebrate(el, btn, lead, s) {
+    if (!btn || reduce || !window.MatanotFX) return;
+    if (s && (s.cupid === false || s.fx === false || s.fx === "none")) return;
+    const theme = (s && s.fx) || D.fx || window.MatanotFX.byType[D.orderType] || "cupid";
+    if (theme === "none") return;
+    // בטלפון בדף הבית קופידון כבר ירה פעם אחת בכניסה (ופתח את המעטפה). פעם שנייה זה יותר מדי
+    if (EMBED && theme === "cupid") return;
+    const myIdx = idx;
+    if (fxRun) fxRun.stop();
+    fxRun = window.MatanotFX.play(theme, { target: btn, lead: lead || 700, onDone: (ok) => { fxRun = null; if (ok && idx === myIdx && el.isConnected) next(); } });
+    const run = fxRun;
+    btn.addEventListener("click", () => run.stop(), { once: true });
+  }
+
   /* ---------- מעבר בין שלבים ---------- */
   function render(focus) {
+    if (fxRun) { fxRun.stop(); fxRun = null; }
     const s = D.steps[idx];
     stage.innerHTML = "";
     const el = document.createElement("section");
@@ -194,18 +230,26 @@
   const TYPES = {
     envelope(s, el) {
       const card = s.card || {};
-      el.innerHTML = (s.to ? `<p class="env-to">${tpl(s.to)}</p>` : "") + title(s.title) +
+      const to = s.to ? tpl(s.to).replace(/&#39;/g, "'").replace(/&quot;/g, '"').replace(/&amp;/g, "&") : "";
+      el.innerHTML = title(s.title) +
         `<div class="env-stage">${window.MatanotEnvelope.html({
-          label: "פתיחת המעטפה", mark: s.mark || "", liner: s.liner || D.liner || "dots",
+          label: "פתיחת המעטפה", mark: s.mark || "", liner: s.liner || D.liner || "dots", to,
           cardIcon: card.icon || "heart", cardTitle: card.title || "", cardText: card.text || "",
         })}</div><p class="hint">${ico("tap")}${esc(s.hint || "הקישו על החותם כדי לפתוח")}</p>`;
       const env = $(".env", el);
       window.MatanotEnvelope.applyPalette(env, D.palette || "ink");
-      env.addEventListener("click", () => {
+      let opened = false;
+      env.addEventListener("click", (e) => {
+        if (opened) { next(); return; } // הקשה על הכרטיס הפתוח = ממשיכים
         if (env.classList.contains("is-cracked")) return;
-        $(".hint", el).classList.add("is-hidden");
-        Music.start();
-        window.MatanotEnvelope.open(env, next);
+        el.classList.add("is-opening");
+        if (!EMBED || e.isTrusted) Music.start();
+        window.MatanotEnvelope.open(env, () => {
+          opened = true;
+          env.setAttribute("aria-label", [card.title, card.text].filter(Boolean).join(". ") + ". הקישו כדי להמשיך");
+          announce([card.title, card.text].filter(Boolean).join(". "));
+          addNext(el, s.cta || "ממשיכים", { focus: true });
+        });
       });
     },
 
@@ -281,7 +325,7 @@
         if (s.after) {
           el.innerHTML = medal(s.afterIcon || "smile-heart", "beat") + title(s.after) + (s.afterText ? `<p class="step__text">${tpl(s.afterText)}</p>` : "");
           $(".step__title", el).focus({ preventScroll: true });
-          addNext(el, s.cta);
+          celebrate(el, addNext(el, s.cta), 1200, s);
         } else next();
       });
     },
@@ -300,7 +344,7 @@
         meter.style.width = (done / boxes.length) * 100 + "%";
         status.textContent = `סומנו ${done} מתוך ${boxes.length}`;
         const all = done === boxes.length;
-        if (all && btn.disabled) { btn.disabled = false; btn.classList.add("is-ready"); burst(40); announce(s.doneText || "הכל מוכן!"); }
+        if (all && btn.disabled) { btn.disabled = false; btn.classList.add("is-ready"); burst(40); announce(s.doneText || "הכל מוכן!"); celebrate(el, btn, 900, s); }
         if (!all) btn.disabled = true;
       });
     },
@@ -338,7 +382,7 @@
         const all = firstTry === s.questions.length;
         el.innerHTML = medal(all ? "trophy" : "star", "beat") + title(all ? `${firstTry} מתוך ${firstTry}! ציון מושלם` : `צדקת ב-${firstTry} מתוך ${s.questions.length}`) + `<p class="step__text">${tpl(s.doneText || "")}</p>`;
         $(".step__title", el).focus({ preventScroll: true });
-        addNext(el, s.cta);
+        celebrate(el, addNext(el, s.cta), 1400, s);
       }
       show();
     },
@@ -387,7 +431,7 @@
         skip.hidden = true;
         announce(`${r.text}. ${r.small || ""}`);
         burst(90);
-        addNext(el, s.cta, { focus: true });
+        celebrate(el, addNext(el, s.cta, { focus: true }), 2300, s);
       }
       cv.addEventListener("pointerdown", (e) => { drawing = true; last = null; cv.setPointerCapture(e.pointerId); scratchTo(pos(e)); });
       cv.addEventListener("pointermove", (e) => { if (drawing) scratchTo(pos(e)); });
@@ -423,7 +467,8 @@
           cards[cur].focus({ preventScroll: true });
         } else {
           count.textContent = s.doneText || "אלה הרגעים שלנו";
-          addNext(el, s.cta, { focus: true });
+          const nb = addNext(el, s.cta, { focus: true });
+          celebrate(el, nb, 600, s);
         }
       }));
     },
@@ -453,7 +498,7 @@
           burst(70);
           announce(s.doneText || "הלב מלא!");
           if (s.doneText) el.insertAdjacentHTML("beforeend", `<p class="reply">${tpl(s.doneText)}</p>`);
-          addNext(el, s.cta, { focus: true });
+          celebrate(el, addNext(el, s.cta, { focus: true }), 1700, s);
           return;
         }
         if (holding || p > 0) requestAnimationFrame(frame); else lastT = 0;
@@ -480,7 +525,7 @@
         c.classList.add("is-out"); c.disabled = true; c.setAttribute("aria-label", "הנר כבוי");
         left--;
         count.textContent = left ? `נשארו ${left} נרות` : (s.doneText || "המשאלה בדרך!");
-        if (!left) { burst(100); addNext(el, s.cta, { focus: true }); }
+        if (!left) { burst(100); celebrate(el, addNext(el, s.cta, { focus: true }), 1100, s); }
       }));
     },
 
@@ -533,6 +578,7 @@
         count.textContent = open < items.length ? `נחשפו ${open} מתוך ${items.length}` : (s.doneText || "ויש עוד אלף כאלה");
         if (open === items.length) burst(60);
         if (!nb) nb = addNext(el, s.cta);
+        if (open === items.length) celebrate(el, nb, 1700, s);
       }));
     },
 
@@ -594,7 +640,7 @@
           if (s.key) answers[s.key] = opts[i];
           out.innerHTML = `<p class="reply"><b>${esc(opts[i])}</b>${s.reply ? " · " + tpl(s.reply) : ""}</p>`;
           burst(50);
-          if (!nb) nb = addNext(el, s.cta);
+          if (!nb) { nb = addNext(el, s.cta); celebrate(el, nb, 2600, s); }
         }, reduce ? 50 : 3700);
       });
     },
@@ -616,6 +662,63 @@
       addNext(el, s.cta);
     },
 
+    // הודעה קולית מהשולח: בועה בסגנון הודעה קולית, עם גל שמתמלא
+    voice(s, el) {
+      const has = !!s.src;
+      const N = 30;
+      const bars = Array.from({ length: N }, (_, i) => `<i style="--h:${Math.round(28 + Math.abs(Math.sin(i * 1.7) + Math.sin(i * 0.63)) * 34)}%"></i>`).join("");
+      const from = s.from ? `<b class="voice__from">${tpl(s.from)}</b>` : "";
+      el.innerHTML = medal(s.icon || "mic") + title(s.title || "השארתי לך הודעה") + sub(s.sub) +
+        `<div class="voice${has ? "" : " voice--empty"}">
+          <button type="button" class="voice__play" aria-label="השמעת ההודעה"${has ? "" : " disabled"}><span class="voice__ring" aria-hidden="true"></span>${ico("play")}</button>
+          <div class="voice__body">${from}<div class="voice__wave" aria-hidden="true">${bars}</div>
+            <p class="voice__time" aria-hidden="true"><span class="voice__cur">0:00</span><span>${fmt(s.duration)}</span></p></div>
+        </div>` +
+        (has ? "" : `<p class="voice__ph">${ico("mic")}כאן תתנגן ההקלטה שלכם. מקליטים אותה בשלב העיצוב בטופס.</p>`) +
+        (s.caption ? `<p class="voice__caption">${ico("chat")}<span>${tpl(s.caption)}</span></p>` : "") +
+        (has ? `<audio preload="metadata" src="${esc(s.src)}"></audio>` : "");
+      addNext(el, s.cta);
+      if (!has) return;
+      const a = $("audio", el), btn = $(".voice__play", el), box = $(".voice", el), cur = $(".voice__cur", el), ws = $$(".voice__wave i", el);
+      const total = () => (isFinite(a.duration) && a.duration > 0 ? a.duration : s.duration || 0);
+      const paint = () => {
+        const p = total() ? Math.min(1, a.currentTime / total()) : 0;
+        const k = Math.round(p * N);
+        ws.forEach((w, i) => w.classList.toggle("is-on", i < k));
+        cur.textContent = fmt(a.currentTime);
+      };
+      const setBtn = (playing) => {
+        btn.innerHTML = `<span class="voice__ring" aria-hidden="true"></span>${ico(playing ? "pause" : "play")}`;
+        btn.setAttribute("aria-label", playing ? "עצירת ההודעה" : "השמעת ההודעה");
+        box.classList.toggle("is-playing", playing);
+      };
+      btn.addEventListener("click", () => {
+        if (a.paused) { duck(true); a.play().catch(() => { setBtn(false); duck(false); }); }
+        else a.pause();
+      });
+      a.addEventListener("play", () => { setBtn(true); track("voice_play"); });
+      a.addEventListener("pause", () => { setBtn(false); if (!a.ended) duck(false); });
+      a.addEventListener("timeupdate", paint);
+      a.addEventListener("ended", () => { setBtn(false); ws.forEach((w) => w.classList.add("is-on")); duck(false); burst(40); announce("ההודעה הסתיימה"); });
+      // יוצאים מהשלב באמצע? עוצרים את ההקלטה
+      const gone = new MutationObserver(() => { if (!el.isConnected) { a.pause(); gone.disconnect(); } });
+      gone.observe(stage, { childList: true });
+    },
+
+    // הסקיצה נעצרת באמצע: רשימת החלקים שמחכים, והסוף מטושטש
+    locked(s, el) {
+      const t = s.teaser || {};
+      el.innerHTML = medal(s.icon || "lock", "") + title(s.title || "וזה רק חצי") + sub(s.sub) +
+        `<ol class="locked" aria-label="מה עוד מחכה בהפתעה">` + (s.items || []).map((it, i) =>
+          `<li style="--i:${i}"><span class="locked__ico" aria-hidden="true">${ico(it.icon || "sparkle")}</span><span>${esc(it.label)}</span>${ico("lock", "locked__lock")}</li>`).join("") + `</ol>` +
+        `<div class="locked__final" aria-hidden="true"><div class="locked__card"><b>${tpl(t.title)}</b><i></i><i></i><i></i><i></i><em>${tpl(t.sign)}</em></div>
+          <p class="locked__cap">${ico("lock")}הסוף נחשף רק אצל מי שמקבל</p></div>` +
+        `<div class="outro"><button type="button" class="btn btn--ghost replay">${ico("replay")}לצפות שוב</button>
+          <p class="sketch-note">${ico("pencil")}זו רק סקיצה לכיוון. את הגרסה האמיתית אני בונה ביד: מנסח את המילים, מעצב עם התמונות שלכם, ומוסיף רגעים שלא מופיעים כאן.</p></div>`;
+      $(".replay", el).addEventListener("click", restart);
+      announce("הסקיצה נגמרת כאן. את ההמשך שמואל בונה ביד");
+    },
+
     final(s, el) {
       let body = "";
       if (s.variant === "ticket") {
@@ -635,23 +738,79 @@
           ${[].concat(s.text || []).map((p) => `<p class="letter__text">${tpl(p)}</p>`).join("")}
           ${s.sign ? `<p class="sign">${tpl(s.sign)}</p>` : ""}</article>`;
       }
-      const outro = SKETCH
-        ? `<div class="outro"><button type="button" class="btn btn--ghost replay">${ico("replay")}לצפות שוב</button>
-            <p class="sketch-note">${ico("pencil")}זו סקיצה ראשונית שנבנתה אוטומטית. את הגרסה הסופית שמואל מעצב ידנית, עם התמונות שלכם.</p></div>`
+      const R = D.reply && D.reply.phone ? D.reply : null;
+      const quick = (R && R.quick) || ["וואו, אין לי מילים", "התרגשתי ממש", "זה הדבר הכי מתוק שיש", "תודה, מכל הלב"];
+      const replyBox = R ? `<div class="replybox">
+          <p class="replybox__t" id="rbTitle">${ico("reply")}${R.name ? "רוצה לענות ל" + esc(R.name) + "?" : "רוצה לענות?"}</p>
+          <div class="replybox__chips" role="group" aria-labelledby="rbTitle">${quick.map((q, i) => `<button type="button" class="replybox__chip" aria-pressed="${i === 0}">${esc(q)}</button>`).join("")}</div>
+          <a class="btn btn--primary replybox__send" target="_blank" rel="noopener">${ico("whatsapp")}שליחת תגובה בווטסאפ<span class="sr-only"> (נפתח בחלון חדש)</span></a>
+        </div>` : "";
+      const credit = D.credit === false ? "" : `<a class="credit" href="${esc(SITE_URL)}?src=gift" target="_blank" rel="noopener"><img src="${esc(SITE_URL)}images/favicon.png" alt="" width="28" height="28"><span>נוצר באהבה ב-<b lang="en">Matanot</b> · רוצים להכין הפתעה כזו?</span><span class="sr-only"> (נפתח בחלון חדש)</span></a>`;
+      const outro = GIFT
+        ? `<div class="outro">${replyBox}<button type="button" class="btn btn--ghost replay">${ico("replay")}לחוות שוב מההתחלה</button>${credit}</div>`
+        : SKETCH
+        ? `<div class="outro">${replyBox}<button type="button" class="btn btn--ghost replay">${ico("replay")}לצפות שוב</button>
+            <p class="sketch-note">${ico("pencil")}זו רק סקיצה לכיוון. את הגרסה האמיתית אני בונה ביד: מנסח את המילים, מעצב עם התמונות שלכם, ומוסיף רגעים שלא מופיעים כאן.</p></div>`
         : `<div class="outro">
             <button type="button" class="btn btn--ghost replay">${ico("replay")}לחוות שוב מההתחלה</button>
-            <a class="madeby" href="../order.html${D.orderType ? "?type=" + esc(D.orderType) : ""}">
+            <a class="madeby" href="../order.html?${D.orderType ? "type=" + esc(D.orderType) + "&amp;" : ""}src=demo-${esc((location.pathname.split("/").pop() || "").replace(".html", ""))}">
               <img src="../images/favicon.png" alt="" width="52" height="52">
               <span><b>רוצים הפתעה כזו?</b><small>ממלאים פרטים, רואים סקיצה מיד, ומקבלים את ההפתעה תוך 24 שעות</small></span>
               <em>לבנות סקיצה${ico("arrow-left")}</em></a></div>`;
       el.innerHTML = (s.variant === "ticket" ? title(s.title) : "") + body + outro;
       $(".replay", el).addEventListener("click", restart);
+      track("demo_complete", { demo: (location.pathname.split("/").pop() || "").replace(".html", "") });
+      if (R) {
+        const send = $(".replybox__send", el);
+        const setText = (t) => { send.href = "https://wa.me/" + String(R.phone).replace(/[^\d]/g, "") + "?text=" + encodeURIComponent(t); };
+        setText(quick[0]);
+        $(".replybox__chips", el).addEventListener("click", (e) => {
+          const b = e.target.closest(".replybox__chip");
+          if (!b) return;
+          $$(".replybox__chip", el).forEach((x) => x.setAttribute("aria-pressed", x === b ? "true" : "false"));
+          setText(b.textContent);
+        });
+      }
       setTimeout(() => burst(120), reduce ? 0 : 500);
     },
   };
 
+  /* ---------- הגנה על הסקיצה ----------
+     סימן מים על כל המסך, בלי בחירת טקסט ובלי שמירת תמונות,
+     ובמחשב: מסתירים את התוכן ברגע של צילום מסך / הדפסה / מעבר לחלון אחר.
+     בטלפון אי אפשר לחסום צילום מסך באתר, ולכן סימן המים והחצי הנעול הם ההגנה העיקרית */
+  if (SKETCH) {
+    document.body.classList.add("is-sketch");
+    document.body.insertAdjacentHTML("beforeend", `<div class="sketch-wm" aria-hidden="true"></div><div class="sketch-veil" aria-hidden="true"><p>${ico("lock")}<b>הסקיצה מוסתרת</b><small>היא רק להמחשה. הגרסה האמיתית נבנית ביד.</small></p></div>`);
+    let vt = 0;
+    const veil = (ms) => { document.body.classList.add("is-veiled"); clearTimeout(vt); if (ms) vt = setTimeout(() => document.body.classList.remove("is-veiled"), ms); };
+    const unveil = () => { clearTimeout(vt); document.body.classList.remove("is-veiled"); };
+    window.mtVeil = veil;
+    const shot = (e) => {
+      const k = e.key || "";
+      if (k === "PrintScreen" || ((e.metaKey || e.ctrlKey) && e.shiftKey && /^[345sS]$/.test(k))) {
+        veil(3000);
+        try { if (navigator.clipboard) navigator.clipboard.writeText(""); } catch (er) { /* */ }
+      }
+      if ((e.ctrlKey || e.metaKey) && /^[psPS]$/.test(k)) { e.preventDefault(); veil(2000); }
+    };
+    document.addEventListener("keydown", shot);
+    document.addEventListener("keyup", shot);
+    document.addEventListener("contextmenu", (e) => e.preventDefault());
+    document.addEventListener("dragstart", (e) => e.preventDefault());
+    document.addEventListener("visibilitychange", () => { if (document.hidden) veil(); else setTimeout(unveil, 350); });
+    // בתצוגה במסך מלא (לא בתוך הטופס): מעבר לחלון אחר, למשל כלי צילום, מסתיר
+    if (window.top === window) { window.addEventListener("blur", () => veil()); window.addEventListener("focus", () => setTimeout(unveil, 250)); }
+    window.addEventListener("beforeprint", () => veil());
+    window.addEventListener("afterprint", unveil);
+  }
+
   // ?clean=1 מסתיר את "חזרה" ואת התווית "אתר לדוגמה" (לצילומי וידאו, כמו שהלקוח מקבל)
   if (new URLSearchParams(location.search).has("clean")) document.body.classList.add("is-clean");
+  if (EMBED) {
+    document.body.classList.add("is-clean", "is-embed");
+    document.addEventListener("click", (e) => { const a = e.target.closest && e.target.closest("a[href]"); if (a && !a.target) a.target = "_top"; }, true);
+  }
   // ?step=3 פותח ישר בשלב מסוים (לצילומי מסך ולקישורים)
   const startAt = parseInt(new URLSearchParams(location.search).get("step"), 10);
   if (startAt > 0 && startAt < D.steps.length) idx = startAt;

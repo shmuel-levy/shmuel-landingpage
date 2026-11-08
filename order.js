@@ -33,8 +33,41 @@
   var DEF_LINER = { partner: "hearts", proposal: "dots", birthday: "confetti", sorry: "confetti", baby: "dots", friend: "confetti", thanks: "dots", family: "stripes", other: "dots" };
   var DEF_MOOD = { partner: "romantic", proposal: "emotional", birthday: "happy", sorry: "romantic", baby: "happy", friend: "happy", thanks: "happy", family: "emotional", other: "romantic" };
   var DRAFT = "matanot-order-draft";
+  // לאיזו קבוצה בשלב הסיפור שייכת כל שאלה (מה שלא מופיע כאן נכנס ל"הסיפור שלכם")
+  var STORY_GROUPS = [
+    { id: "story", icon: "hearts", title: "הסיפור שלכם", desc: "כמה פרטים קטנים שהופכים את זה לאישי." },
+    { id: "moments", icon: "images", title: "רגעים לאלבום", desc: "כיתוב קצר לכל תמונה. את התמונות מוסיפים בשלב הבא." },
+    { id: "play", icon: "sparkle", title: "המשחקים בדרך", desc: "השאלות, החידון וההפתעות הקטנות." },
+    { id: "finale", icon: "gift", title: "הסוף", desc: "מה מחכה בסוף המסע." },
+    { id: "letter", icon: "letter", title: "המכתב", desc: "כמה מילים מהלב. אפשר בנקודות, אני מנסח." },
+  ];
+  var GROUP_OF = {
+    memories: "moments",
+    question: "play", quiz: "play", noTexts: "play", reveal: "play", revealText: "play", promises: "play", makeUp: "play", makeUpText: "play", notes: "play", gift: "play",
+    finale: "finale", finaleWhen: "finale", finaleWhere: "finale", proposalPlan: "finale", placeTime: "finale", whoKnows: "finale", dueDate: "finale",
+    letter: "letter", letterHelp: "letter",
+  };
+  function groupOf(id) { return GROUP_OF[id] || "story"; }
+  var EXTRAS = ["כפתור תגובה בסוף: יוכלו לענות לי בווטסאפ בלחיצה", "תזכורת ממני שבועיים לפני התאריך, בשנה הבאה"];
+  var VOICE_AT = ["מיד כשהמעטפה נפתחת", "רגע לפני הסוף"];
+  var VOICE_MAX = 90; // שניות
+  // רעיון קטן למה להגיד בהקלטה, לפי סוג ההפתעה
+  var VOICE_IDEA = {
+    partner: "למשל: מה הרגשת כשראית אותה בפעם הראשונה. או סתם \"היי, תקשיבי עד הסוף\".",
+    proposal: "למשל: כמה מילים לפני השאלה הגדולה. בקול שלך זה שווה פי אלף.",
+    birthday: "למשל: \"מזל טוב!\", או שיר יום הולדת מזויף במיוחד.",
+    sorry: "למשל: \"סליחה\" אחד אמיתי, בלי תירוצים.",
+    baby: "למשל: \"יש לנו משהו לספר לכם...\"",
+    friend: "למשל: הבדיחה הפנימית שלכם, בקול.",
+    thanks: "למשל: הילדים אומרים \"תודה\" ביחד. נשמע מושלם גם מטלפון.",
+    family: "למשל: \"אמא, רק רציתי להגיד...\"",
+    other: "כמה מילים בקול שלכם. זה הכל.",
+  };
+  function fmtTime(sec) { sec = Math.max(0, Math.round(sec || 0)); return Math.floor(sec / 60) + ":" + ("0" + (sec % 60)).slice(-2); }
+  function intlPhone(p) { var dg = String(p || "").replace(/[^\d]/g, "").replace(/^972/, "0"); return /^0\d{8,9}$/.test(dg) ? "972" + dg.slice(1) : ""; }
 
-  var state = { type: null, step: 0, data: {}, photos: [], visited: 0 };
+  var state = { type: null, step: 0, data: {}, photos: [], voice: null, visited: 0 };
+  function track(name, params) { try { if (window.mtTrack) window.mtTrack(name, params || {}); } catch (e) { /* */ } }
   function typeDef(id) { return O.types.filter(function (t) { return t.id === (id || state.type); })[0]; }
 
   /* ---------- שדות משותפים ---------- */
@@ -47,15 +80,26 @@
     { id: "tone", type: "multi", label: "באיזה טון?", options: O.tones },
   ];
   var DETAILS = [
-    { id: "deadline", type: "date", label: "עד מתי ההפתעה צריכה להיות מוכנה?", required: true, hint: "ככה אני יודע לתעדף. צריכים היום? בחרו אקספרס למטה." },
+    { id: "deadline", noHelp: true, type: "date", label: "עד מתי ההפתעה צריכה להיות מוכנה?", required: true, hint: "ככה אני יודע לתעדף. צריכים היום? בחרו אקספרס למטה." },
     { id: "name", type: "text", label: "השם שלכם", required: true, autocomplete: "name" },
     { id: "phone", type: "tel", label: "טלפון לחזרה", required: true, autocomplete: "tel", placeholder: "050-0000000", validate: "phone" },
-    { id: "notes", type: "textarea", label: "משהו נוסף שחשוב שאדע?", placeholder: "שיר מסוים, צבע שהיא אוהבת, תאריך מיוחד..." },
+    { id: "extras", type: "multi", label: "עוד שני דברים קטנים", options: EXTRAS },
+    { id: "notes", noHelp: true, type: "textarea", label: "משהו נוסף שחשוב שאדע?", placeholder: "שיר מסוים, צבע שהיא אוהבת, תאריך מיוחד..." },
+    { id: "source", type: "chips", label: "איך הגעתם אליי? (רשות)", options: ["אינסטגרם", "טיקטוק", "פייסבוק", "גוגל", "חבר/ה המליצו", "קיבלתי הפתעה כזו", "אחר"] },
   ];
 
   /* ---------- בניית שדה ---------- */
   function val(id) { return state.data[id]; }
+  // שדה + כפתור "רעיון" (אם יש הצעות לשדה הזה)
   function field(f) {
+    var h = fieldRaw(f), hb = helpBtn(f);
+    if (!hb) return h;
+    FIELD_DEF[f.id] = f;
+    var iL = h.indexOf("</label>"), iG = h.indexOf("</legend>");
+    var tag = iG < 0 || (iL > -1 && iL < iG) ? "</label>" : "</legend>";
+    return h.replace(tag, tag + hb).replace(/class="field( |")/, function (m, c) { return 'class="field has-help' + c; });
+  }
+  function fieldRaw(f) {
     var id = "f-" + f.id;
     var req = f.required ? '<span class="req" aria-hidden="true"> *</span><span class="sr-only"> (חובה)</span>' : "";
     var hint = f.hint ? '<p class="field__hint" id="' + id + '-hint">' + esc(f.hint) + "</p>" : "";
@@ -145,11 +189,107 @@
     var T = typeDef();
     if (!T) return;
     $("#storyType").innerHTML = ico(T.icon) + esc(T.label);
+    // השאלות מחולקות לקבוצות מתקפלות: רואים כותרת, הסבר קצר וכמה מולא
     var main = T.fields.filter(function (f) { return !f.more; }), more = T.fields.filter(function (f) { return f.more; });
-    var moreOpen = more.some(function (f) { var v = state.data[f.id]; return v && (Array.isArray(v) ? v.some(Boolean) : true); });
-    $("#step-story .fields").innerHTML = COMMON_TOP.concat(main).map(field).join("") +
-      (more.length ? '<details class="more-fields"' + (moreOpen ? " open" : "") + "><summary>" + ico("wand") + "<span>" + esc(T.moreLabel || "עוד רעיונות (רשות)") + '</span><span class="more-fields__plus" aria-hidden="true">' + ico("plus") + '</span></summary><div class="fields">' + more.map(field).join("") + "</div></details>" : "") +
-      COMMON_BOTTOM.map(field).join("");
+    var groups = [{ id: "who", icon: "users", title: "למי ההפתעה", desc: "שם, פנייה וחתימה. 30 שניות.", fields: COMMON_TOP }];
+    STORY_GROUPS.forEach(function (g) {
+      var fs = main.filter(function (f) { return groupOf(f.id) === g.id; });
+      if (fs.length) groups.push({ id: g.id, icon: g.icon, title: g.title, desc: g.desc, fields: fs });
+    });
+    if (more.length) groups.push({ id: "more", icon: "wand", title: "עוד רעיונות", desc: T.moreLabel || "רשות. למי שרוצה להוסיף עוד.", fields: more });
+    groups.push({ id: "tone", icon: "music", title: "הטון", desc: "רומנטי, מצחיק, מרגש? עוזר לי לכתוב נכון.", fields: COMMON_BOTTOM });
+    $("#step-story .fields").innerHTML = groups.map(function (g, i) {
+      return acc(g.id, g.icon, g.title, g.desc, '<div class="fields">' + g.fields.map(field).join("") + "</div>", { open: i === 0, req: g.fields.some(function (f) { return f.required; }), fields: g.fields });
+    }).join("");
+    updateAcc();
+  }
+
+  /* ---------- אקורדיון: קבוצה מתקפלת עם סטטוס ---------- */
+  var ACC_FIELDS = {};
+  function acc(id, icon, title, desc, inner, o) {
+    o = o || {};
+    if (o.fields) ACC_FIELDS[id] = o.fields;
+    return '<details class="acc" data-acc="' + id + '"' + (o.open ? " open" : "") + ">" +
+      '<summary class="acc__sum"><span class="acc__ico" aria-hidden="true">' + ico(icon) + "</span>" +
+      '<span class="acc__t"><b>' + esc(title) + (o.req ? '<span class="acc__req">חובה</span>' : "") + "</b><small>" + esc(desc) + "</small></span>" +
+      '<span class="acc__state" data-acc-state="' + id + '"></span><span class="acc__chev" aria-hidden="true">' + ico("plus") + "</span></summary>" +
+      '<div class="acc__body">' + inner + "</div></details>";
+  }
+  function isFilled(v) { return v != null && (Array.isArray(v) ? v.some(function (x) { return x && (typeof x === "object" ? Object.keys(x).some(function (k) { return String(x[k] || "").trim(); }) : String(x).trim()); }) : String(v).trim() !== ""); }
+  // הסטטוס הקטן בכל כותרת: כמה מולא, או מה נבחר
+  function updateAcc() {
+    var d = state.data;
+    $$("[data-acc-state]").forEach(function (el) {
+      var id = el.getAttribute("data-acc-state"), txt = "", done = false;
+      if (ACC_FIELDS[id] && STEPS[state.step].id === "story") {
+        var fs = ACC_FIELDS[id], n = fs.filter(function (f) { return isFilled(d[f.id]); }).length;
+        var reqOk = fs.every(function (f) { return !f.required || isFilled(d[f.id]); });
+        done = n > 0 && reqOk;
+        txt = n ? n + "/" + fs.length : "";
+      } else if (id === "look") txt = (ENV.palettes[d.palette] || {}).label || "";
+      else if (id === "parts") { var c = chosenParts().length; txt = c + "/" + maxParts(); done = c > 0; }
+      else if (id === "music") txt = (O.moods.filter(function (m) { return m.id === d.mood; })[0] || {}).label || "";
+      else if (id === "photos") { txt = state.photos.length ? state.photos.length + " תמונות" : ""; done = !!state.photos.length; }
+      else if (id === "voice") { txt = state.voice ? fmtTime(state.voice.dur) : ""; done = !!state.voice; }
+      else if (id === "plan") txt = (S.pricing.plans.filter(function (p) { return p.id === d.plan; })[0] || {}).name || "";
+      else if (id === "addons") { txt = (d.addons || []).length ? (d.addons || []).length + " נבחרו" : ""; done = !!(d.addons || []).length; }
+      else if (id === "you") { done = !!(d.name && d.phone && d.deadline); txt = done ? "מוכן" : ""; }
+      el.textContent = txt;
+      el.closest(".acc").classList.toggle("is-done", done);
+    });
+  }
+
+  /* ---------- כפתור "רעיון" ---------- */
+  var helpIdx = {}, helping = false;
+  function helpList(fid) {
+    var H = O.help || {}, T = typeDef();
+    return (T && H[T.id] && H[T.id][fid]) || (H.common && H.common[fid]) || null;
+  }
+  // [נקבה|זכר|רבים] לפי הפנייה שנבחרה
+  function gtxt(s) {
+    var k = state.data.address === ADDR[1] ? 1 : state.data.address === ADDR[2] ? 2 : 0;
+    return String(s).replace(/\[([^\]]*)\]/g, function (_, alt) { var p = alt.split("|"); return p[k] != null ? p[k] : p[0]; });
+  }
+  function helpBtn(f) {
+    if (f.noHelp || ["text", "textarea", "list", "notes", "quiz"].indexOf(f.type) < 0 || !helpList(f.id)) return "";
+    return '<button type="button" class="help-btn" data-help="' + f.id + '">' + ico("wand") + '<span class="help-btn__t">רעיון</span><span class="sr-only"> ל' + esc(f.label) + "</span></button>";
+  }
+  var FIELD_DEF = {};
+  function applyHelp(fid) {
+    var list = helpList(fid), f = FIELD_DEF[fid];
+    if (!list || !f) return;
+    var k = helpIdx[fid] || 0, first = null, filledN = 0;
+    var set = function (inp, v) { if (!inp) return; inp.value = v; helping = true; inp.dispatchEvent(new Event("input", { bubbles: true })); helping = false; first = first || inp; };
+    if (f.type === "text" || f.type === "textarea") {
+      var el = $("#f-" + fid), v = gtxt(list[k % list.length]);
+      if (f.type === "textarea" && el.value.trim() && !el.dataset.fromHelp) v = el.value.replace(/\s+$/, "") + "\n" + v;
+      set(el, v); el.dataset.fromHelp = "1"; helpIdx[fid] = k + 1;
+    } else if (f.type === "list") {
+      var ins = $$('input[data-key="' + fid + '"]'), empty = ins.filter(function (i) { return !i.value.trim(); });
+      var target = empty.length ? empty : ins;
+      var used = ins.map(function (i) { return i.value; });
+      var pool = list.map(gtxt).filter(function (x) { return used.indexOf(x) < 0; });
+      if (!empty.length) pool = list.map(gtxt).slice(k % list.length).concat(list.map(gtxt).slice(0, k % list.length));
+      target.forEach(function (inp, i) { if (pool[i] != null) set(inp, pool[i]); });
+      helpIdx[fid] = k + 1;
+    } else if (f.type === "notes" || f.type === "quiz") {
+      var parts = f.type === "quiz" ? ["q", "a", "w1", "w2"] : (f.parts || ["text", "from"]);
+      var cur = state.data[fid] || [];
+      for (var i = 0; i < f.count; i++) {
+        var row = cur[i] || {};
+        if (row[parts[0]] && String(row[parts[0]]).trim()) { filledN++; continue; }
+        var sug = list[(k + i) % list.length];
+        parts.forEach(function (p) { set($('[data-key="' + fid + '"][data-i="' + i + '"][data-part="' + p + '"]'), gtxt(sug[p] || "")); });
+        if (f.type === "quiz") break; // שאלה אחת בכל לחיצה
+      }
+      helpIdx[fid] = k + 1;
+    }
+    var b = $('[data-help="' + fid + '"] .help-btn__t');
+    if (b) b.textContent = "רעיון אחר";
+    if (first) { first.focus(); first.scrollIntoView({ block: "nearest", behavior: reduced() ? "auto" : "smooth" }); }
+    var st = $("#helpStatus");
+    if (st) { st.textContent = ""; var said = filledN === f.count && f.type !== "text" && f.type !== "textarea" ? "כל השורות כבר מלאות. אפשר לערוך אותן." : "הוספנו רעיון. אפשר לערוך אותו כמו שבא לכם."; setTimeout(function () { st.textContent = said; }, 50); }
+    track("help_idea", { field: fid, type: state.type });
   }
 
   /* ---------- שלב 3: עיצוב ---------- */
@@ -160,9 +300,15 @@
     if (!d.palette) d.palette = DEF_PALETTE[T.id];
     if (!d.liner) d.liner = DEF_LINER[T.id];
     if (!d.mood) d.mood = DEF_MOOD[T.id];
-    if (!d.elements) d.elements = T.elements.slice();
+    if (!d.elements) d.elements = defaultParts();
     var pals = Object.keys(ENV.palettes);
-    var html =
+    var PD = partsDef();
+    var chip = function (id, rec) {
+      var e = O.elements.filter(function (x) { return x.id === id; })[0];
+      if (!e) return "";
+      return '<label class="chip chip--ico chip--part"><input type="checkbox" name="elements" value="' + e.id + '" data-key="elements"' + (d.elements.indexOf(e.id) > -1 ? " checked" : "") + "><span>" + ico(e.icon) + esc(e.label) + (rec ? '<em class="chip__rec">מומלץ</em>' : "") + "</span></label>";
+    };
+    var look =
       '<fieldset class="field field--group"><legend class="field__label">פלטת צבעים</legend><div class="swatches">' +
       pals.map(function (k) {
         var p = ENV.palettes[k];
@@ -174,29 +320,279 @@
         return '<label class="liner"><input type="radio" name="liner" value="' + k + '" data-key="liner"' + (d.liner === k ? " checked" : "") + '><span class="liner__chip env--liner-' + k + '" aria-hidden="true"><span class="env__liner"></span></span><span>' + esc(ENV.liners[k]) + "</span></label>";
       }).join("") + "</div></fieldset>" +
       '<div class="field"><label class="field__label" for="f-mark">האות על חותם השעווה</label><p class="field__hint" id="f-mark-hint">בדרך כלל האות הראשונה של השם. ריק = לב.</p>' +
-      '<input class="input input--short" id="f-mark" type="text" maxlength="2" data-key="mark" aria-describedby="f-mark-hint" value="' + esc(d.mark != null ? d.mark : (d.recipient || "").trim().charAt(0)) + '"></div>' +
-      '<fieldset class="field field--group"><legend class="field__label">מוזיקה</legend><div class="chips">' +
+      '<input class="input input--short" id="f-mark" type="text" maxlength="2" data-key="mark" aria-describedby="f-mark-hint" value="' + esc(d.mark != null ? d.mark : (d.recipient || "").trim().charAt(0)) + '"></div>';
+    var parts =
+      '<fieldset class="field field--group parts-field" aria-describedby="partsHint"><legend class="sr-only">החלקים בהפתעה</legend>' +
+      '<p class="field__hint" id="partsHint">סימנו את מה שהכי עובד ב' + esc(T.label) + ". עד " + maxParts() + " חלקים, כדי שלכל רגע יהיה מקום לנשום.</p>" +
+      '<div class="chips chips--elements">' + PD.rec.map(function (id) { return chip(id, true); }).join("") + "</div>" +
+      (PD.more.length ? '<details class="more-parts"><summary>' + ico("plus") + "עוד " + PD.more.length + " חלקים שמתאימים</summary>" +
+        '<div class="chips chips--elements">' + PD.more.map(function (id) { return chip(id, false); }).join("") + "</div></details>" : "") +
+      '<p class="parts-count" id="partsCount" aria-live="polite"></p></fieldset>' +
+      '<div class="path"><p class="path__label">' + ico("eye") + "ככה זה ייראה, לפי הסדר:</p><ol class=\"path__list\" id=\"partsPath\"></ol></div>";
+    var music =
+      '<fieldset class="field field--group"><legend class="sr-only">מוזיקה</legend><div class="chips">' +
       O.moods.map(function (m) {
         return '<label class="chip chip--ico"><input type="radio" name="mood" value="' + m.id + '" data-key="mood"' + (d.mood === m.id ? " checked" : "") + "><span>" + ico(m.icon) + esc(m.label) + "</span></label>";
       }).join("") + '</div><button type="button" class="link-btn" id="listenBtn">' + ico("music") + "להשמיע דוגמה</button></fieldset>" +
-      field({ id: "song", type: "text", label: "שיר מסוים? (בחבילת פרימיום)", placeholder: "שם השיר והזמר" }) +
-      '<fieldset class="field field--group"><legend class="field__label">מה נכניס להפתעה?</legend><p class="field__hint">סימנו בשבילכם את מה שמתאים ל' + esc(T.label) + '. אפשר לשנות.</p><div class="chips chips--elements">' +
-      O.elements.map(function (e) {
-        var fixed = e.id === "envelope" || e.id === "final";
-        return '<label class="chip chip--ico"><input type="checkbox" name="elements" value="' + e.id + '" data-key="elements"' + (d.elements.indexOf(e.id) > -1 || fixed ? " checked" : "") + (fixed ? " disabled" : "") + "><span>" + ico(e.icon) + esc(e.label) + "</span></label>";
-      }).join("") + "</div></fieldset>" +
-      '<div class="field"><p class="field__label" id="photosLabel">תמונות לסקיצה (רשות)</p><p class="field__hint" id="photosHint">התמונות נשארות בטלפון שלכם ומשמשות רק לסקיצה. אותן שולחים לי אחר כך בווטסאפ.</p>' +
-      '<div class="photos-pick"><input type="file" id="photoInput" class="file-input" accept="image/*" multiple aria-labelledby="photosLabel" aria-describedby="photosHint">' +
+      field({ id: "song", type: "text", label: "שיר מסוים? (בחבילת פרימיום)", placeholder: "שם השיר והזמר", noHelp: true });
+    var photos =
+      '<div class="field"><p class="field__hint" id="photosHint">התמונות נשארות בטלפון שלכם ומשמשות רק לסקיצה. אותן שולחים לי אחר כך בווטסאפ.</p>' +
+      '<div class="photos-pick"><input type="file" id="photoInput" class="file-input" accept="image/*" multiple aria-label="הוספת תמונות" aria-describedby="photosHint">' +
       '<label for="photoInput" class="btn btn--ghost btn--sm">' + ico("upload") + "הוספת תמונות</label>" +
       '<ul class="thumbs" id="thumbs" aria-label="התמונות שנבחרו"></ul></div></div>';
+    var voice =
+      '<div class="field voice-field"><p class="field__hint" id="voiceHint">ההקלטה נשמרת רק בטלפון שלכם, עד שתשלחו לי אותה.</p>' +
+      '<div class="rec" id="rec" role="group" aria-label="הקלטה קולית" aria-describedby="voiceHint"></div>' +
+      '<p class="sr-only" id="recStatus" aria-live="polite"></p></div>';
+    var html =
+      acc("look", "palette", "המראה של המעטפה", "צבעים, בטנה ואות על החותם.", look, { open: true }) +
+      acc("parts", "sparkle", "מה יהיה בפנים", "החלקים שמי שמקבל עובר, לפי הסדר.", parts, { open: !isMobile() }) +
+      acc("voice", "mic", "הודעה קולית", "לא אוהבים לכתוב? מקליטים כמה מילים. עד דקה וחצי.", voice) +
+      acc("photos", "images", "תמונות לסקיצה", "רשות. לראות איך זה ייראה עם התמונות שלכם.", photos) +
+      acc("music", "music", "מוזיקה", "מה מתנגן כשהמעטפה נפתחת.", music);
     $("#step-design .fields").innerHTML = html;
     ENV.applyPalette($("#step-design .fields"), d.palette);
     renderThumbs();
+    renderRec();
+    syncParts();
+    updateAcc();
+  }
+
+  /* ---------- הקלטה קולית ---------- */
+  var Rec = { media: null, stream: null, chunks: [], t0: 0, timer: null, raf: 0, actx: null, busy: false };
+  function recSupported() { return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia && window.MediaRecorder); }
+  function recMime() {
+    var opts = ["audio/webm;codecs=opus", "audio/mp4", "audio/webm", "audio/ogg;codecs=opus"];
+    for (var i = 0; i < opts.length; i++) if (window.MediaRecorder && MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(opts[i])) return opts[i];
+    return "";
+  }
+  function audioExt(type) { return /mp4|m4a|aac/.test(type) ? "m4a" : /ogg/.test(type) ? "ogg" : /mpeg|mp3/.test(type) ? "mp3" : /wav/.test(type) ? "wav" : "webm"; }
+  function recSay(t) { var s = $("#recStatus"); if (s) { s.textContent = ""; setTimeout(function () { s.textContent = t; }, 50); } }
+  function recError(t) {
+    var box = $("#recErr");
+    if (box) { box.hidden = false; box.innerHTML = ico("x") + "<span>" + esc(t) + "</span>"; }
+    recSay(t);
+  }
+  function renderRec() {
+    var host = $("#rec");
+    if (!host) return;
+    setTimeout(function () { if ($("#partsPath")) syncParts(); }, 0);
+    var T = typeDef(), d = state.data, v = state.voice;
+    var upload = '<input type="file" id="voiceFile" class="file-input" accept="audio/*" aria-label="העלאת קובץ הקלטה מהטלפון">';
+    var err = '<p class="rec__err" id="recErr" role="alert" hidden></p>';
+    if (Rec.media) {
+      host.innerHTML = '<div class="rec__live">' +
+        '<button type="button" class="rec__btn is-on" id="recStop">' + ico("stop") + '<span>סיום הקלטה</span></button>' +
+        '<div class="rec__meter" aria-hidden="true"><span class="rec__dot"></span><span class="rec__bars">' + new Array(13).join("<i></i>") + "</span></div>" +
+        '<p class="rec__time"><span id="recTime">0:00</span> / ' + fmtTime(VOICE_MAX) + "</p></div>" + err;
+      return;
+    }
+    if (v) {
+      host.innerHTML = '<div class="rec__done">' +
+        '<audio controls preload="metadata" src="' + v.url + '" aria-label="ההקלטה שלכם"></audio>' +
+        '<p class="rec__meta">' + ico("check") + "הוקלט · " + fmtTime(v.dur) + "</p>" +
+        '<div class="rec__actions"><button type="button" class="btn btn--ghost btn--sm" id="recAgain">' + ico("replay") + 'הקלטה מחדש</button>' +
+        '<button type="button" class="btn btn--ghost btn--sm" id="recDel">' + ico("trash") + "מחיקה</button></div></div>" + err +
+        field({ id: "voiceAt", type: "chips", label: "מתי ההקלטה מתנגנת?", options: VOICE_AT }) +
+        field({ id: "voiceCaption", type: "text", label: "כמה מילים על מה שאמרתם (רשות)", hint: "יופיע ככתובית מתחת להקלטה, בשביל מי שלא יכול לשמוע ברגע זה.", placeholder: "למשל: רק רציתי שתשמעי את זה בקול שלי" });
+      return;
+    }
+    host.innerHTML = '<p class="rec__idea">' + ico("sparkle") + esc(VOICE_IDEA[T ? T.id : "other"]) + "</p>" +
+      '<div class="rec__start">' +
+      (recSupported() ? '<button type="button" class="rec__btn" id="recStart">' + ico("mic") + "<span>להתחיל להקליט</span></button>" : "") +
+      upload + '<label for="voiceFile" class="btn btn--ghost btn--sm">' + ico("upload") + (recSupported() ? "או להעלות הקלטה" : "העלאת הקלטה מהטלפון") + "</label></div>" + err;
+    if (!recSupported()) recError("הדפדפן הזה לא מאפשר להקליט ישירות. אפשר להקליט בטלפון (למשל בהודעה קולית או בהקלטות) ולהעלות כאן את הקובץ.");
+  }
+  function startRec() {
+    if (Rec.busy || Rec.media) return;
+    Rec.busy = true;
+    navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } }).then(function (stream) {
+      Rec.busy = false;
+      var mime = recMime();
+      var mr;
+      try { mr = mime ? new MediaRecorder(stream, { mimeType: mime }) : new MediaRecorder(stream); } catch (e) { mr = new MediaRecorder(stream); }
+      Rec.media = mr; Rec.stream = stream; Rec.chunks = []; Rec.t0 = Date.now();
+      mr.ondataavailable = function (e) { if (e.data && e.data.size) Rec.chunks.push(e.data); };
+      mr.onstop = function () {
+        var dur = (Date.now() - Rec.t0) / 1000;
+        var type = (mr.mimeType || mime || "audio/webm").split(";")[0];
+        stopStream();
+        Rec.media = null;
+        if (dur < 1 || !Rec.chunks.length) { renderRec(); recError("ההקלטה קצרה מדי. נסו שוב, ודברו קצת יותר."); $("#recStart") && $("#recStart").focus(); return; }
+        setVoice(new Blob(Rec.chunks, { type: type }), dur, "recorded");
+      };
+      mr.start(250);
+      renderRec();
+      meter(stream);
+      $("#recStop").focus();
+      recSay("מקליט. לחצו על \"סיום הקלטה\" כשתסיימו.");
+      Rec.timer = setInterval(function () {
+        var sec = (Date.now() - Rec.t0) / 1000, el = $("#recTime");
+        if (el) el.textContent = fmtTime(sec);
+        if (sec >= VOICE_MAX) stopRec();
+        else if (Math.floor(sec) === VOICE_MAX - 10) recSay("נשארו 10 שניות");
+      }, 250);
+    }).catch(function (err) {
+      Rec.busy = false;
+      var n = err && err.name;
+      recError(n === "NotAllowedError" || n === "SecurityError"
+        ? "לא קיבלנו אישור להשתמש במיקרופון. אפשר לאשר בהגדרות הדפדפן ולנסות שוב, או להעלות הקלטה מהטלפון."
+        : n === "NotFoundError" ? "לא מצאנו מיקרופון במכשיר הזה. אפשר להעלות הקלטה מהטלפון."
+          : "ההקלטה לא עבדה בדפדפן הזה (קורה בדפדפן שבתוך אינסטגרם או טיקטוק). פתחו את הקישור בכרום או בספארי, או העלו הקלטה מהטלפון.");
+    });
+  }
+  function stopRec() {
+    clearInterval(Rec.timer);
+    cancelAnimationFrame(Rec.raf);
+    if (Rec.media && Rec.media.state !== "inactive") Rec.media.stop();
+  }
+  function stopStream() {
+    if (Rec.stream) Rec.stream.getTracks().forEach(function (t) { t.stop(); });
+    Rec.stream = null;
+    if (Rec.actx) { try { Rec.actx.close(); } catch (e) { /* */ } Rec.actx = null; }
+  }
+  // מד עוצמה קטן בזמן ההקלטה, כדי לראות שהמיקרופון שומע
+  function meter(stream) {
+    if (reduced()) return;
+    try {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      Rec.actx = new AC();
+      var an = Rec.actx.createAnalyser();
+      an.fftSize = 64;
+      Rec.actx.createMediaStreamSource(stream).connect(an);
+      var buf = new Uint8Array(an.frequencyBinCount);
+      var loop = function () {
+        var bars = $$(".rec__bars i");
+        if (!bars.length || !Rec.media) return;
+        an.getByteFrequencyData(buf);
+        bars.forEach(function (b, i) { var v = buf[(i + 1) % buf.length] / 255; b.style.transform = "scaleY(" + (0.15 + v * 0.95).toFixed(2) + ")"; });
+        Rec.raf = requestAnimationFrame(loop);
+      };
+      loop();
+    } catch (e) { /* בלי מד */ }
+  }
+  function setVoice(blob, dur, how) {
+    clearVoice(true);
+    state.voice = { blob: blob, url: URL.createObjectURL(blob), dur: dur, type: blob.type || "audio/webm" };
+    var d = state.data;
+    d.elements = d.elements || (typeDef() ? typeDef().elements.slice() : []);
+    if (d.elements.indexOf("voice") < 0) d.elements.push("voice");
+    var cb = $('input[name="elements"][value="voice"]');
+    if (cb) cb.checked = true;
+    if (!d.voiceAt) d.voiceAt = VOICE_AT[0];
+    saveDraft();
+    IDB.put("voice", { blob: blob, dur: dur, type: state.voice.type });
+    renderRec();
+    var again = $("#recAgain");
+    if (again) again.focus();
+    recSay("ההקלטה נשמרה, " + fmtTime(dur) + " דקות. אפשר להאזין לה כאן.");
+    track("voice_added", { how: how, seconds: Math.round(dur) });
+  }
+  function clearVoice(silent) {
+    if (state.voice) URL.revokeObjectURL(state.voice.url);
+    state.voice = null;
+    if (!silent) {
+      IDB.del("voice");
+      var d = state.data;
+      if (d.elements) d.elements = d.elements.filter(function (x) { return x !== "voice"; });
+      var cb = $('input[name="elements"][value="voice"]');
+      if (cb) cb.checked = false;
+      saveDraft();
+    }
+  }
+  function addVoiceFile(f) {
+    if (!f) return;
+    if (!/^audio\//.test(f.type) && !/\.(m4a|mp3|wav|ogg|opus|aac|webm)$/i.test(f.name)) { recError("זה לא נראה כמו קובץ שמע. בחרו הקלטה (m4a, mp3, wav)."); return; }
+    if (f.size > 15 * 1024 * 1024) { recError("הקובץ גדול מדי (מעל 15MB). נסו הקלטה קצרה יותר."); return; }
+    var url = URL.createObjectURL(f), a = new Audio();
+    var done = function (dur) { URL.revokeObjectURL(url); setVoice(f, dur, "upload"); };
+    a.preload = "metadata";
+    a.onloadedmetadata = function () { done(isFinite(a.duration) ? a.duration : 0); };
+    a.onerror = function () { done(0); };
+    a.src = url;
+  }
+
+  // אחסון ההקלטה בדפדפן (IndexedDB), כדי שלא תיעלם ברענון
+  var IDB = {
+    db: function () {
+      return new Promise(function (res, rej) {
+        if (!window.indexedDB) return rej(new Error("no idb"));
+        var r = indexedDB.open("matanot", 1);
+        r.onupgradeneeded = function () { r.result.createObjectStore("files"); };
+        r.onsuccess = function () { res(r.result); };
+        r.onerror = function () { rej(r.error); };
+      });
+    },
+    run: function (mode, fn) {
+      return this.db().then(function (db) {
+        return new Promise(function (res, rej) {
+          var tx = db.transaction("files", mode), req = fn(tx.objectStore("files"));
+          tx.oncomplete = function () { res(req && req.result); db.close(); };
+          tx.onerror = function () { rej(tx.error); db.close(); };
+        });
+      }).catch(function () { return null; });
+    },
+    put: function (k, v) { return this.run("readwrite", function (s) { return s.put(v, k); }); },
+    get: function (k) { return this.run("readonly", function (s) { return s.get(k); }); },
+    del: function (k) { return this.run("readwrite", function (s) { return s.delete(k); }); },
+  };
+
+  /* ---------- החלקים: המלצה לפי סוג, ותקרה כדי שההפתעה תישאר ממוקדת ---------- */
+  function isMobile() { return window.matchMedia("(max-width: 639px)").matches; }
+  function partsDef() {
+    var T = typeDef();
+    return (O.parts && O.parts[T.id]) || { rec: T.elements.filter(function (x) { return x !== "envelope" && x !== "final"; }), more: [] };
+  }
+  function allowedParts() { var P = partsDef(); return P.rec.concat(P.more); }
+  function planParts(id) { var p = S.pricing.plans.filter(function (x) { return x.id === (id || "premium"); })[0]; return (p && p.parts) || 5; }
+  function maxParts() { return Math.max.apply(null, S.pricing.plans.map(function (p) { return p.parts || 5; })); }
+  // מה שנבחר, לפי הסדר המומלץ, וקטוע לפי החבילה
+  function chosenParts(all) {
+    var al = allowedParts(), d = state.data;
+    var c = (d.elements || defaultParts()).filter(function (x) { return al.indexOf(x) > -1; });
+    c.sort(function (a, b) { return al.indexOf(a) - al.indexOf(b); });
+    return all ? c : c.slice(0, planParts(d.plan || "premium"));
+  }
+  // ברירת מחדל: המומלצים, ועוד חלק אם כבר כתבו לו תוכן בשלב הסיפור
+  function defaultParts() {
+    var d = state.data, al = allowedParts(), list = partsDef().rec.slice();
+    var BY_DATA = { reasons: "reasons", openWhen: "openwhen", coupons: "coupons", wheel: "wheel", quiz: "quiz", notes: "notes", promises: "notes", gift: "scratch" };
+    Object.keys(BY_DATA).forEach(function (k) {
+      var p = BY_DATA[k];
+      if (isFilled(d[k]) && al.indexOf(p) > -1 && list.indexOf(p) < 0 && list.length < maxParts()) list.push(p);
+    });
+    return list;
+  }
+  var STEP_LABEL = { envelope: ["envelope", "המעטפה"], message: ["letter", "הודעה אישית"], voice: ["mic", "הודעה קולית"], choice: ["question", "שאלה"] };
+  function stepLabel(s) {
+    if (s.type === "final") return s.variant === "ticket" ? ["ticket", "כרטיס טיסה"] : s.variant === "invite" ? ["glass", "הזמנה רשמית"] : ["letter", "המכתב בסוף"];
+    if (STEP_LABEL[s.type]) return STEP_LABEL[s.type];
+    var e = O.elements.filter(function (x) { return x.id === s.type; })[0];
+    return e ? [e.icon, e.label.replace(/"/g, "")] : ["sparkle", s.type];
+  }
+  function syncParts() {
+    var d = state.data, max = maxParts(), n = chosenParts(true).length, full = n >= max;
+    $$('input[name="elements"]').forEach(function (i) {
+      var lock = full && !i.checked;
+      i.disabled = lock;
+      i.closest(".chip").classList.toggle("is-locked", lock);
+    });
+    var c = $("#partsCount");
+    if (c) c.textContent = full ? "בחרתם " + n + " מתוך " + max + ". רוצים חלק אחר? הורידו אחד קודם." : "נבחרו " + n + " מתוך " + max + " (בחבילה הבסיסית: " + planParts("basic") + ")";
+    var path = $("#partsPath");
+    if (path) {
+      path.innerHTML = buildDemo().steps.map(function (s, i) {
+        var l = stepLabel(s);
+        return '<li style="--i:' + i + '"><span class="path__ico" aria-hidden="true">' + ico(l[0]) + "</span><span>" + esc(l[1]) + "</span></li>";
+      }).join("");
+    }
+    updateAcc();
   }
 
   function renderThumbs() {
     var ul = $("#thumbs");
     if (!ul) return;
+    setTimeout(updateAcc, 0);
     ul.innerHTML = state.photos.map(function (p, i) {
       return '<li><img src="' + p.url + '" alt="תמונה ' + (i + 1) + '" width="72" height="72"><button type="button" class="thumb__x" data-rm="' + i + '" aria-label="הסרת תמונה ' + (i + 1) + '">' + ico("x") + "</button></li>";
     }).join("");
@@ -207,24 +603,32 @@
     var d = state.data;
     if (!d.plan) d.plan = "premium";
     if (!d.addons) d.addons = [];
+    if (!d.extras) d.extras = [EXTRAS[0]];
     var P = S.pricing;
-    var html =
-      '<fieldset class="field field--group"><legend class="field__label">חבילה</legend><div class="plan-pick">' +
+    var byId = function (id) { return DETAILS.filter(function (f) { return f.id === id; })[0]; };
+    var planHtml = '<fieldset class="field field--group"><legend class="sr-only">חבילה</legend><div class="plan-pick">' +
       P.plans.map(function (p) {
         var now = planPrice(p);
         return '<label class="plan-opt' + (p.popular ? " plan-opt--pop" : "") + '"><input type="radio" name="plan" value="' + p.id + '" data-key="plan"' + (d.plan === p.id ? " checked" : "") + ">" +
           "<span><b>" + esc(p.name) + "</b><small>" + esc(p.description) + "</small></span>" +
           '<span class="plan-opt__price">' + (promo ? '<del><span class="sr-only">במקום </span>' + p.price + " ₪</del>" : "") + "<strong>" + now + " ₪</strong></span></label>";
-      }).join("") + "</div></fieldset>" +
-      '<fieldset class="field field--group"><legend class="field__label">תוספות</legend><div class="addon-pick">' +
+      }).join("") + "</div></fieldset>" + '<p class="plan-note" id="planNote" hidden></p>';
+    var addonsHtml = '<fieldset class="field field--group"><legend class="sr-only">תוספות</legend><div class="addon-pick">' +
       P.addons.map(function (a) {
         return '<label class="addon-opt"><input type="checkbox" name="addons" value="' + a.id + '" data-key="addons"' + (d.addons.indexOf(a.id) > -1 ? " checked" : "") + ">" +
           '<span class="addon-opt__box" aria-hidden="true">' + ico("check") + "</span>" + ico(a.icon, "addon-opt__ico") + "<span>" + esc(a.name) + '</span><strong dir="ltr">+' + a.price + " ₪</strong></label>";
-      }).join("") + "</div></fieldset>" +
-      DETAILS.map(field).join("") +
+      }).join("") + "</div></fieldset>";
+    var you = '<div class="fields">' + ["deadline", "name", "phone"].map(function (id) { return field(byId(id)); }).join("") + "</div>";
+    var extra = '<div class="fields">' + ["extras", "notes", "source"].map(function (id) { return field(byId(id)); }).join("") + "</div>";
+    var html =
+      acc("plan", "star", "חבילה", "כמה חלקים, כמה תמונות וכמה סבבי תיקונים.", planHtml, { open: true }) +
+      acc("you", "call", "הפרטים שלכם", "עד מתי צריך, ואיך לחזור אליכם.", you, { open: true, req: true }) +
+      acc("addons", "plus", "תוספות", "דומיין אישי, אנימציה מיוחדת או אקספרס.", addonsHtml) +
+      acc("extra", "sparkle", "עוד כמה דברים קטנים", "כפתור תגובה, תזכורת לשנה הבאה והערות.", extra) +
       '<div class="total" aria-live="polite" id="total"></div>';
     $("#step-details .fields").innerHTML = html;
     updateTotal();
+    updateAcc();
   }
   function totals() {
     var d = state.data, P = S.pricing;
@@ -238,6 +642,13 @@
     var el = $("#total");
     if (!el) return;
     var t = totals();
+    var pn = $("#planNote");
+    if (pn) {
+      var all = chosenParts(true), lim = planParts(state.data.plan);
+      var lbl = function (id) { var e = O.elements.filter(function (x) { return x.id === id; })[0]; return e ? e.label.replace(/"/g, "") : id; };
+      pn.hidden = all.length <= lim;
+      if (all.length > lim) pn.innerHTML = ico("sparkle") + "<span>בחבילה הזו נכנסים " + lim + " חלקים: " + esc(all.slice(0, lim).map(lbl).join(", ")) + ". <b>" + esc(all.slice(lim).map(lbl).join(", ")) + "</b> נכנס" + (all.length - lim > 1 ? "ים" : "") + " רק בפרימיום.</span>";
+    }
     el.innerHTML = '<span>סה"כ משוער</span><strong>' + t.sum + " ₪</strong>" + (promo && t.full > t.sum ? '<small>חסכתם ' + (t.full - t.sum) + " ₪ במבצע</small>" : "");
   }
 
@@ -251,6 +662,7 @@
     var mark = d.mark != null ? d.mark : (d.recipient || "").trim().charAt(0);
     host.innerHTML = ENV.html({
       label: "הדגמת פתיחת המעטפה", mark: mark, liner: d.liner || (T ? DEF_LINER[T.id] : "dots"),
+      to: d.recipient ? "ל" + d.recipient : "",
       cardIcon: T ? T.icon : "heart", cardTitle: d.recipient ? "ל" + d.recipient : "למי שאתם אוהבים", cardText: T ? T.label : "",
     });
     ENV.applyPalette(host.firstChild, pal);
@@ -258,7 +670,7 @@
     var screen = $("#liveScreen");
     screen.style.background = theme.bg;
     screen.style.setProperty("--ink-live", theme.ink);
-    $("#liveTo").textContent = d.recipient ? "ל" + d.recipient : "השם יופיע כאן";
+    $("#liveTo").textContent = d.recipient ? "" : "השם יופיע על המעטפה";
     if (livePal !== pal) { livePal = pal; screen.classList.remove("is-swap"); void screen.offsetWidth; screen.classList.add("is-swap"); }
   }
 
@@ -280,9 +692,12 @@
 
     if (key === "palette") ENV.applyPalette($("#step-design .fields"), d.palette);
     if (key === "addons" || key === "plan") updateTotal();
+    if (key === "elements") syncParts();
     if (key === "recipient" && d.mark == null) { var m = $("#f-mark"); if (m) m.value = (t.value || "").trim().charAt(0); }
     if (t.closest(".field") && t.closest(".field").classList.contains("has-error")) validateField(t.closest("[data-field]"));
     if (["palette", "liner", "mark", "recipient"].indexOf(key) > -1) updateLive();
+    if (!helping && t.dataset) delete t.dataset.fromHelp;
+    updateAcc();
     saveDraft();
   }
   var saveTimer;
@@ -335,6 +750,7 @@
       if (!validateField(wrap)) bad.push({ id: f.id, label: f.label + ": " + problem(f), target: "#f-" + f.id + ', input[name="f-' + f.id + '"]' });
     });
     if (!bad.length) { box.hidden = true; box.innerHTML = ""; return true; }
+    $$(".acc", sec).forEach(function (a) { if ($(".has-error", a)) a.open = true; });
     box.hidden = false;
     box.innerHTML = '<h3 class="wz-errors__title">' + ico("x") + "רגע, חסר משהו (" + bad.length + ")</h3><ul>" +
       bad.map(function (b) { return '<li><a href="#" data-target="' + esc(b.target) + '">' + esc(b.label) + "</a></li>"; }).join("") + "</ul>";
@@ -346,6 +762,8 @@
   function go(n, opts) {
     opts = opts || {};
     if (n < 0 || n >= STEPS.length) return;
+    if (Rec.media) stopRec();
+    if (!opts.silent || n > 0) track("order_step", { step: STEPS[n].id, n: n + 1, type: state.type || "" });
     state.step = n;
     state.visited = Math.max(state.visited, n);
     var id = STEPS[n].id;
@@ -389,8 +807,8 @@
     var name = (d.recipient || "").trim() || "אהובה";
     var nick = (d.nickname || "").trim() || name;
     var sign = (d.from || "").trim();
-    var el = d.elements || T.elements;
-    var has = function (x) { return el.indexOf(x) > -1; };
+    var el = chosenParts();
+    var has = function (x) { return x === "envelope" || x === "final" || el.indexOf(x) > -1; };
     var pics = state.photos.map(function (p) { return p.url; });
     var caps = filled(d.memories);
     var letter = lines(d.letter);
@@ -436,11 +854,11 @@
         text: filled([d.howMet, d.insideJoke ? "ו... \"" + d.insideJoke + "\"" : ""]).concat(d.howMet || d.insideJoke ? [] : ["הכנתי לך משהו קטן. " + G("מוכנה?", "מוכן?", "מוכנים?")]) });
       if (has("photos")) push(album("הרגעים שלנו"));
       var whys = filled(d.loves).concat(filled(d.reasons));
-      if (has("reasons") || whys.length) push({ type: "reasons", title: G("למה דווקא את?", "למה דווקא אתה?", "למה דווקא אתם?"), sub: G("הקישי", "הקש", "הקישו") + " על כל קלף", items: whys.length ? whys.slice(0, 8) : ["הצחוק שלך", "החיבוקים", "שאת" + G("", "ה", "ם") + " תמיד שם", "הכל"] });
+      if (has("reasons")) push({ type: "reasons", title: G("למה דווקא את?", "למה דווקא אתה?", "למה דווקא אתם?"), sub: G("הקישי", "הקש", "הקישו") + " על כל קלף", items: whys.length ? whys.slice(0, 8) : ["הצחוק שלך", "החיבוקים", "שאת" + G("", "ה", "ם") + " תמיד שם", "הכל"] });
       var ows = (d.openWhen || []).filter(function (o) { return o && o.when; });
-      if (has("openwhen") || ows.length) push({ type: "openwhen", title: "מעטפות לימים שאני לא לידך", prefix: G("תפתחי כש...", "תפתח כש...", "תפתחו כש..."), items: ows.length ? ows.map(function (o) { return { when: o.when, text: o.text || "..." }; }) : [{ when: G("את עצובה", "אתה עצוב", "אתם עצובים"), text: "אני בדרך עם שוקולד." }, { when: G("את מתגעגעת", "אתה מתגעגע", "אתם מתגעגעים"), text: "גם אני. תתקשר" + G("י", "", "ו") + "." }] });
-      if (has("coupons") || filled(d.coupons).length) push({ type: "coupons", title: "פנקס שוברים", items: filled(d.coupons).length ? filled(d.coupons) : ["עיסוי של 20 דקות", "בחירת הסרט", "ארוחת בוקר במיטה"] });
-      if (has("wheel") || filled(d.wheel).length > 1) push({ type: "wheel", key: "date", title: G("סובבי את הגלגל", "סובב את הגלגל", "סובבו את הגלגל"), sub: "מה שיוצא, זה הדייט שלנו", reply: "סגור. אני מארגן", options: filled(d.wheel).length > 1 ? filled(d.wheel).slice(0, 8) : ["פיקניק", "מסעדה", "סרט", "ים בשקיעה", "הפתעה"] });
+      if (has("openwhen")) push({ type: "openwhen", title: "מעטפות לימים שאני לא לידך", prefix: G("תפתחי כש...", "תפתח כש...", "תפתחו כש..."), items: ows.length ? ows.map(function (o) { return { when: o.when, text: o.text || "..." }; }) : [{ when: G("את עצובה", "אתה עצוב", "אתם עצובים"), text: "אני בדרך עם שוקולד." }, { when: G("את מתגעגעת", "אתה מתגעגע", "אתם מתגעגעים"), text: "גם אני. תתקשר" + G("י", "", "ו") + "." }] });
+      if (has("coupons")) push({ type: "coupons", title: "פנקס שוברים", items: filled(d.coupons).length ? filled(d.coupons) : ["עיסוי של 20 דקות", "בחירת הסרט", "ארוחת בוקר במיטה"] });
+      if (has("wheel")) push({ type: "wheel", key: "date", title: G("סובבי את הגלגל", "סובב את הגלגל", "סובבו את הגלגל"), sub: "מה שיוצא, זה הדייט שלנו", reply: "סגור. אני מארגן", options: filled(d.wheel).length > 1 ? filled(d.wheel).slice(0, 8) : ["פיקניק", "מסעדה", "סרט", "ים בשקיעה", "הפתעה"] });
       if (has("runaway")) push({ type: "runaway", icon: "smile-heart", title: d.question || "נצא לדייט?", yes: "כן!", no: "לא", hint: "רמז: יש רק תשובה אחת נכונה",
         noTexts: [G("בטוחה?", "בטוח?", "בטוחים?"), G("תחשבי שוב", "תחשוב שוב", "תחשבו שוב"), "כמעט...", "אין מצב", "נו באמת"],
         after: "ידעתי!!!", afterIcon: "hearts", afterText: "עכשיו רק נשאר לסגור פרטים...", cta: "לפרטים" });
@@ -515,6 +933,13 @@
     if (t === "partner" && d.finale === "מתנה") used.scratch = true;
     el.forEach(function (x) { if (EXTRA[x] && !used[x]) push(EXTRA[x]); });
 
+    // ההודעה הקולית: מיד אחרי המעטפה, או רגע לפני הסוף
+    if (state.voice) {
+      var v = state.voice;
+      var vs = { type: "voice", icon: "mic", title: "השארתי לך הודעה", sub: G("לחצי", "לחץ", "לחצו") + " על הכפתור. הכי טוב עם אוזניות", from: sign || "", src: v ? v.url : "", duration: v ? v.dur : 0, caption: (d.voiceCaption || "").trim(), cta: "ממשיכים" };
+      if (d.voiceAt === VOICE_AT[1]) push(vs); else { used.voice = true; steps.splice(1, 0, vs); }
+    }
+
     // הסיום
     var fin;
     if (t === "partner") {
@@ -545,7 +970,10 @@
       palette: d.palette || DEF_PALETTE[t], liner: d.liner || DEF_LINER[t],
       mood: d.mood && d.mood !== "none" ? d.mood : "romantic", music: d.mood !== "none",
       deco: { partner: ["heart", "sparkle", "letter", "star"], proposal: ["heart", "ring", "sparkle", "star"], birthday: ["balloon", "party", "star", "cake"], sorry: ["heart", "flower", "flag", "sparkle"], baby: ["star", "cloud", "heart", "baby"], friend: ["star", "party", "heart", "sparkle"], thanks: ["flower", "sun", "sprout", "heart"], family: ["home", "heart", "flower", "star"], other: ["sparkle", "heart", "star", "gift"] }[t],
-      steps: steps, mode: "sketch",
+      steps: steps, mode: "sketch", orderType: t,
+      // הדמות שמסיימת כל פעילות: לפי סוג ההפתעה, ויום נישואין / חתונה = חופה
+      fx: /נישואין|חתונה/.test(String(d.occasion || "")) ? "chuppah" : undefined,
+      reply: (d.extras || []).indexOf(EXTRAS[0]) > -1 && intlPhone(d.phone) ? { phone: intlPhone(d.phone), name: String(d.name || "").trim().split(/\s+/)[0] || sign } : null,
     };
   }
 
@@ -574,6 +1002,7 @@
     out.push("• מוזיקה: " + O.moods.filter(function (m) { return m.id === d.mood; })[0].label + (d.song ? " · שיר: " + d.song : ""));
     out.push("• חלקים: " + O.elements.filter(function (e) { return (d.elements || []).indexOf(e.id) > -1 || e.id === "envelope" || e.id === "final"; }).map(function (e) { return e.label.replace(/"/g, ""); }).join(", "));
     if (state.photos.length) out.push("• תמונות: " + state.photos.length + " (שולח/ת כאן בצ'אט)");
+    if (state.voice) out.push("• הודעה קולית: " + fmtTime(state.voice.dur) + ", " + (d.voiceAt || VOICE_AT[0]) + " (שולח/ת את הקובץ כאן בצ'אט)" + (d.voiceCaption ? " · כתובית: " + d.voiceCaption : ""));
     out.push("");
     add("חבילה", t.plan.name + ", " + planPrice(t.plan) + " ₪" + (promo ? " (במקום " + t.plan.price + " ₪, " + promo.title + ")" : ""));
     if (t.adds.length) add("תוספות", t.adds.map(function (a) { return a.name + " +" + a.price + " ₪"; }).join(", "));
@@ -581,13 +1010,32 @@
     add("צריך עד", d.deadline ? d.deadline.split("-").reverse().join(".") : "");
     add("שם", d.name);
     add("טלפון", d.phone);
+    var ex = d.extras || [];
+    if (ex.indexOf(EXTRAS[0]) > -1) add("כפתור תגובה", "כן, לטלפון שלי");
+    if (ex.indexOf(EXTRAS[1]) > -1) add("תזכורת לשנה הבאה", "כן" + (d.deadline ? ", לפני " + d.deadline.split("-").reverse().slice(0, 2).join(".") : ""));
     add("הערות", d.notes);
+    var src = window.mtSource ? window.mtSource() : null;
+    add("הגעתי דרך", filled([d.source, src ? src.label : ""]).join(" · "));
     return out.join("\n");
   }
 
   /* ---------- שלב 5: סקיצה ---------- */
+  /* הסקיצה מראה רק חצי: המעטפה והחלקים הראשונים. השאר והסוף נעולים עד הגרסה האמיתית */
+  function lockHalf(demo) {
+    var st = demo.steps, fin = st[st.length - 1], mid = st.slice(1, -1);
+    var show = mid.length <= 1 ? mid.length : Math.ceil(mid.length / 2);
+    var hidden = mid.slice(show).concat([fin]);
+    var d = state.data;
+    demo.steps = [st[0]].concat(mid.slice(0, show), [{
+      type: "locked", icon: "lock", title: "וזה רק חצי",
+      sub: "את ההמשך אני בונה ביד, עם המילים והתמונות שלכם. ככה הוא יחכה ל" + ((d.recipient || "").trim() || "מי שמקבל") + ":",
+      items: hidden.map(function (s) { var l = stepLabel(s); return { icon: l[0], label: l[1] }; }).concat(demo.reply ? [{ icon: "reply", label: "כפתור תגובה אליכם" }] : []),
+      teaser: { title: fin.title || "", sign: fin.sign || (d.from || "") },
+    }]);
+    return demo;
+  }
   function renderSketch() {
-    var demo = buildDemo();
+    var demo = lockHalf(buildDemo());
     store("matanot-sketch", demo);
     var frame = $("#sketchFrame");
     frame.src = "demos/preview.html?v=" + Date.now();
@@ -603,6 +1051,28 @@
     var msg = message();
     $$("[data-send]").forEach(function (a) { a.href = "https://wa.me/" + S.contact.phoneIntl + "?text=" + encodeURIComponent(msg); });
     $("#msgPreview").textContent = msg;
+    var vb = $("#voiceSend");
+    vb.hidden = !state.voice;
+    if (state.voice) $("#voiceSendLen").textContent = fmtTime(state.voice.dur);
+    track("sketch_view", { type: T.id, plan: d.plan, value: t.sum, voice: !!state.voice, photos: state.photos.length });
+  }
+
+  // שליחת קובץ ההקלטה: בטלפון נפתח חלון השיתוף (ישר לווטסאפ), במחשב יורד קובץ
+  function shareVoice() {
+    var v = state.voice;
+    if (!v) return;
+    var name = "matanot-voice-" + (String(state.data.recipient || "").trim().replace(/\s+/g, "-") || "hakalata") + "." + audioExt(v.type);
+    var file = null;
+    try { file = new File([v.blob], name, { type: v.type }); } catch (e) { /* דפדפן ישן */ }
+    if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
+      navigator.share({ files: [file], title: "ההקלטה להפתעה", text: "ההקלטה להפתעה של " + (state.data.recipient || "") }).then(function () { track("voice_shared", { how: "share" }); }, function () { /* בוטל */ });
+      return;
+    }
+    var a = document.createElement("a");
+    a.href = v.url; a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    $("#copyStatus").textContent = "ההקלטה ירדה למכשיר. צרפו אותה בשיחת הווטסאפ איתי.";
+    track("voice_shared", { how: "download" });
   }
 
   /* ---------- תמונות ---------- */
@@ -643,6 +1113,16 @@
     if (state.type) startAt = 1;
     renderType();
 
+    // הקלטה מהביקור הקודם (נשמרת בדפדפן בלבד). בלי טיוטה, אין סיבה לשמור אותה
+    if (draft && draft.type) {
+      IDB.get("voice").then(function (v) {
+        if (!v || !v.blob || state.voice) return;
+        state.voice = { blob: v.blob, url: URL.createObjectURL(v.blob), dur: v.dur || 0, type: v.type || v.blob.type };
+        renderRec();
+        if (STEPS[state.step].id === "sketch") renderSketch();
+      });
+    } else IDB.del("voice");
+
     var form = $("#wizard");
     form.addEventListener("input", onInput);
     form.addEventListener("change", function (e) {
@@ -658,6 +1138,7 @@
         return;
       }
       if (e.target.id === "photoInput") { addPhotos(e.target.files); e.target.value = ""; return; }
+      if (e.target.id === "voiceFile") { addVoiceFile(e.target.files && e.target.files[0]); e.target.value = ""; return; }
       onInput(e);
     });
     form.addEventListener("submit", function (e) { e.preventDefault(); });
@@ -677,9 +1158,16 @@
       if (errLink) {
         e.preventDefault();
         var tg = $(errLink.getAttribute("data-target"));
-        if (tg) { tg.focus(); tg.scrollIntoView({ block: "center", behavior: reduced() ? "auto" : "smooth" }); }
+        if (tg) { var dd = tg.closest("details"); if (dd) dd.open = true; tg.focus(); tg.scrollIntoView({ block: "center", behavior: reduced() ? "auto" : "smooth" }); }
       }
       if (e.target.closest("#listenBtn")) playSample();
+      var hb = e.target.closest("[data-help]");
+      if (hb) applyHelp(hb.getAttribute("data-help"));
+      if (e.target.closest("#recStart")) startRec();
+      if (e.target.closest("#recStop")) stopRec();
+      if (e.target.closest("#recAgain")) { clearVoice(); renderRec(); if (recSupported()) startRec(); else $('label[for="voiceFile"]').focus(); }
+      if (e.target.closest("#recDel")) { clearVoice(); renderRec(); recSay("ההקלטה נמחקה"); var s0 = $("#recStart") || $('label[for="voiceFile"]'); if (s0) s0.focus(); }
+      if (e.target.closest("#shareVoice")) shareVoice();
       var st = e.target.closest("[data-starter]");
       if (st) {
         var ta = $("#" + st.getAttribute("data-for"));
@@ -700,29 +1188,48 @@
     });
     $("#restart").addEventListener("click", function () {
       store(DRAFT, null); store("matanot-sketch", null);
-      state = { type: null, step: 0, data: {}, photos: [], visited: 0 };
+      clearVoice();
+      state = { type: null, step: 0, data: {}, photos: [], voice: null, visited: 0 };
       $("#draftNote").hidden = true;
       renderType(); go(0);
     });
     $("#liveEnv").addEventListener("click", function (e) {
       var env = e.target.closest(".env");
       if (!env) return;
-      ENV.open(env, function () { setTimeout(function () { ENV.reset(env); }, 1400); });
+      var scr = $("#liveScreen");
+      scr.classList.add("is-opening");
+      ENV.open(env, function () { ENV.reset(env); scr.classList.remove("is-opening"); }, { hold: 1800 });
     });
     $("#copyMsg").addEventListener("click", function () {
       var txt = message(), btn = $("#copyMsg");
+      track("copy_summary", { type: state.type });
       var done = function () { btn.innerHTML = ico("check") + "הועתק!"; $("#copyStatus").textContent = "הסיכום הועתק. אפשר להדביק בווטסאפ."; setTimeout(function () { btn.innerHTML = ico("copy") + "העתקת הסיכום"; }, 2200); };
       if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done, fallback); else fallback();
       function fallback() { var ta = document.createElement("textarea"); ta.value = txt; ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0"; document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); done(); } catch (er) { /* */ } ta.remove(); }
     });
     $$("[data-send]").forEach(function (a) { a.addEventListener("click", function () {
       $("#sentNote").hidden = false;
+      $("#sentVoice").hidden = !state.voice;
       store(DRAFT, null);
+      var t = totals();
+      track("send_whatsapp", { type: state.type, plan: t.plan.id, value: t.sum, currency: "ILS", voice: !!state.voice });
     }); });
     $("#fullPreview").addEventListener("click", function (e) {
       e.preventDefault();
       window.open("demos/preview.html", "_blank");
     });
+
+    // צילום מסך כשהסקיצה פתוחה: מסתירים אותה לרגע (במחשב)
+    var veilSketch = function (e) {
+      if (STEPS[state.step].id !== "sketch") return;
+      var k = e.key || "";
+      if (k === "PrintScreen" || ((e.metaKey || e.ctrlKey) && e.shiftKey && /^[345sS]$/.test(k))) {
+        try { $("#sketchFrame").contentWindow.mtVeil(3000); } catch (er) { /* */ }
+        try { if (navigator.clipboard) navigator.clipboard.writeText(""); } catch (er) { /* */ }
+      }
+    };
+    document.addEventListener("keydown", veilSketch);
+    document.addEventListener("keyup", veilSketch);
 
     go(startAt, { silent: true });
   }

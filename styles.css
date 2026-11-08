@@ -184,6 +184,8 @@ a.wa-icon:hover { transform: scale(1.08) rotate(-6deg); }
   padding: 7px 16px; border-radius: 999px; border: 1.5px dashed var(--pink); margin-bottom: 18px;
 }
 .eyebrow__heart { width: 18px; height: 17px; color: var(--rose); animation: beat 1.6s ease-in-out infinite; }
+/* בטלפון: בלי התגית מעל הכותרת, כדי שהמעטפה תעלה למעלה */
+@media (max-width: 639px) { .hero .eyebrow { display: none; } }
 .hero__title { font-size: clamp(2.3rem, 10vw, 4.4rem); margin-bottom: 12px; color: var(--text); }
 .hero__title > span { display: block; }
 .hero__title .w { display: inline-block; animation: wordUp .9s var(--ease-out) both; animation-delay: calc(var(--i) * 110ms + 80ms); }
@@ -215,14 +217,61 @@ a.wa-icon:hover { transform: scale(1.08) rotate(-6deg); }
 }
 .stamp img { width: 100%; aspect-ratio: 1; object-fit: cover; background: var(--sky); border: 1px solid rgba(18,41,122,.15); }
 .stamp figcaption { background: #fff; font: 800 .5rem/1.6 var(--font-body); letter-spacing: .08em; color: var(--ink); text-align: center; direction: ltr; text-transform: uppercase; }
+/* פרופורציה של טלפון אמיתי (בערך 9:19), מסגרת דקה, אי דינמי, שורת סטטוס וכפתורי צד */
+.demo-wrap { --pw: 270px; }
+.demo-wrap::before, .demo-wrap::after {
+  content: ""; position: absolute; z-index: 0; width: 4px; border-radius: 3px; background: var(--ink-deep, #0B1A55);
+}
+.demo-wrap::before { top: 128px; height: 58px; right: calc(50% - var(--pw) / 2 - 3px); }
+.demo-wrap::after { top: 110px; height: 34px; left: calc(50% - var(--pw) / 2 - 3px); box-shadow: 0 48px 0 var(--ink-deep, #0B1A55); }
 .phone {
-  position: relative; width: min(100%, 320px); height: 450px;
-  border-radius: 42px; border: 9px solid var(--ink);
+  position: relative; z-index: 1; width: var(--pw); height: auto; aspect-ratio: 9 / 19.2;
+  border-radius: 44px; border: 7px solid var(--ink);
   background: linear-gradient(170deg, #FFF6F8 0%, #FCE1EA 60%, #F3E4FA 100%);
   box-shadow: var(--shadow-lg), 0 0 0 2px rgba(255,255,255,.6) inset;
   overflow: hidden;
 }
-.phone__notch { position: absolute; top: 9px; left: 50%; transform: translateX(-50%); width: 76px; height: 20px; border-radius: 99px; background: var(--ink); z-index: 6; }
+.phone__notch { position: absolute; top: 9px; left: 50%; transform: translateX(-50%); width: 74px; height: 22px; border-radius: 99px; background: #0B1022; z-index: 6; }
+/* שורת סטטוס: שעה מצד אחד, קליטה וסוללה מהצד השני */
+.demo-wrap .phone::before {
+  content: "9:41"; position: absolute; z-index: 6; top: 11px; left: 22px; direction: ltr;
+  font: 700 .74rem/1 var(--font-body); color: var(--ink); letter-spacing: .02em;
+}
+.demo-wrap .phone::after {
+  content: ""; position: absolute; z-index: 6; top: 13px; right: 20px; width: 42px; height: 10px;
+  background:
+    linear-gradient(var(--ink), var(--ink)) 0 6px / 3px 4px no-repeat, linear-gradient(var(--ink), var(--ink)) 4px 4px / 3px 6px no-repeat,
+    linear-gradient(var(--ink), var(--ink)) 8px 2px / 3px 8px no-repeat, linear-gradient(var(--ink), var(--ink)) 12px 0 / 3px 10px no-repeat,
+    linear-gradient(var(--ink), var(--ink)) 21px 1px / 17px 8px no-repeat;
+  border-radius: 2px; opacity: .85;
+}
+.screen__env .env { --w: 196px; }
+/* המסך של הטלפון: החוויה האמיתית (iframe) מוקטנת בדיוק לרוחב */
+.phone__screen { position: absolute; inset: 0; border-radius: 37px; overflow: hidden; background: linear-gradient(170deg, #FFF6F8 0%, #FCE1EA 60%, #F3E4FA 100%); }
+.phone__screen iframe { position: absolute; top: 0; left: 0; border: 0; transform-origin: 0 0; background: transparent; transition: opacity .3s ease, filter .3s ease; }
+.phone__loading { position: absolute; inset: 0; display: grid; place-items: center; opacity: 0; pointer-events: none; transition: opacity .25s ease; }
+.phone__loading span { width: 34px; height: 34px; border-radius: 50%; border: 3px solid rgba(184,53,99,.2); border-top-color: var(--rose-deep); animation: spin .8s linear infinite; }
+.phone__screen.is-loading iframe { opacity: 0; filter: blur(6px); }
+.phone__screen.is-loading .phone__loading { opacity: 1; }
+
+/* מתחת לטלפון: הגרלת דוגמה, מה יש בה, ולינקים */
+.demo-ctl { display: flex; flex-direction: column; align-items: center; gap: 8px; margin-top: 16px; text-align: center; width: min(100%, 340px); }
+.demo-shuffle {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 46px; padding: 8px 20px; border-radius: 99px; cursor: pointer;
+  border: 2px dashed var(--pink); background: #fff; color: var(--rose-deep); font: 800 .98rem var(--font-body);
+  box-shadow: 0 10px 22px -16px rgba(184,53,99,.7); transition: transform .2s var(--ease-bounce), background .2s;
+}
+.demo-shuffle:hover { transform: translateY(-2px); background: var(--blush); }
+.demo-shuffle__ico .ico { width: 20px; height: 20px; }
+.demo-shuffle.is-spin .demo-shuffle__ico { animation: spin .6s var(--ease-out); }
+.demo-now { margin: 0; font-size: .92rem; color: var(--text-soft); }
+.demo-now b { color: var(--ink); font-weight: 800; }
+.demo-feat { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin: 0; }
+.demo-feat li { font-size: .8rem; font-weight: 700; color: var(--rose-deep); background: var(--blush); padding: 4px 10px; border-radius: 99px; }
+.demo-links { display: flex; gap: 18px; justify-content: center; margin: 2px 0 0; font-size: .9rem; }
+.demo-links a { display: inline-flex; align-items: center; gap: 5px; color: var(--ink); font-weight: 700; text-underline-offset: 3px; min-height: 40px; }
+.demo-links .ico { width: 17px; height: 17px; color: var(--rose-deep); }
+
 .screen {
   position: absolute; inset: 0; padding: 40px 18px 20px;
   display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
@@ -240,6 +289,8 @@ a.wa-icon:hover { transform: scale(1.08) rotate(-6deg); }
 .screen__hint .ico { width: 17px; height: 17px; color: var(--rose-deep); }
 .screen__hint.hand { color: var(--cobalt); font-weight: 500; }
 .screen__hint.is-hidden { opacity: 0; }
+.screen__to, .screen__title { transition: opacity .4s ease, transform .5s var(--ease-out); }
+.screen.is-opening .screen__to, .screen.is-opening .screen__title { opacity: 0; transform: translateY(-8px); }
 .medal {
   position: relative; display: inline-grid; place-items: center; width: 86px; height: 86px; margin-bottom: 10px; border-radius: 50%;
   color: var(--rose-deep); background: radial-gradient(circle at 35% 30%, #fff 0%, var(--blush) 70%);
@@ -807,7 +858,7 @@ html.a11y-headings h1, html.a11y-headings h2, html.a11y-headings h3, html.a11y-h
   .demo-wrap { grid-column: 2; grid-row: 1 / 3; }
   .hand-note { left: -30px; top: 30px; }
   .stamp { right: -36px; top: 60px; }
-  .phone { width: 330px; height: 470px; }
+  .demo-wrap { --pw: 284px; }
   .steps__path { display: block; position: absolute; top: -14px; left: 4%; right: 4%; width: 92%; height: 40px; color: var(--pink); clip-path: inset(0 0 0 100%); transition: clip-path 1.6s var(--ease-out) .3s; }
   .steps-wrap.is-visible .steps__path { clip-path: inset(0 0 0 0); }
   .builder { grid-template-columns: 1fr 1fr; gap: 56px; }
@@ -951,7 +1002,9 @@ html.a11y-no-motion .drawer[open], html.a11y-no-motion .drawer__nav a { animatio
   .hero__subtitle { font-size: 1rem; line-height: 1.6; }
   .eyebrow { margin-bottom: 12px; }
   .hero__grid { gap: 18px; }
-  .phone { height: 430px; }
+  .demo-wrap { --pw: min(272px, 72vw); }
+  .demo-wrap::before { top: 104px; height: 48px; }
+  .demo-wrap::after { top: 90px; height: 28px; box-shadow: 0 40px 0 var(--ink-deep, #0B1A55); }
   .proof { margin-top: 12px; font-size: .86rem; }
 
   .steps { gap: 10px; }
@@ -1081,3 +1134,98 @@ html.a11y-no-motion .drawer[open], html.a11y-no-motion .drawer__nav a { animatio
 .step__num::before { content: attr(data-n); }
 
 .choice-no { white-space: nowrap; }
+
+/* ---------- עמודי אירוע (tools/gen-pages.js) ---------- */
+.ev-hero {
+  position: relative; padding: 30px 0 44px; overflow: hidden;
+  background: radial-gradient(520px 400px at 100% 0%, #FBD3E0, transparent 70%), radial-gradient(460px 360px at 0% 100%, #EBDDFA, transparent 70%), var(--paper);
+}
+.ev-hero__grid { display: grid; gap: 28px; align-items: center; }
+.ev-hero .kicker-pill { justify-content: flex-start; }
+.ev-hero h1 { font-size: clamp(2rem, 8.6vw, 3.4rem); line-height: 1.12; margin: 8px 0 12px; color: var(--text); }
+.ev-hero__lead { font-size: 1.08rem; color: var(--text-soft); max-width: 52ch; margin: 0; }
+.ev-hero__ctas { display: flex; flex-wrap: wrap; gap: 10px; margin: 20px 0 12px; }
+.ev-price { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; font-weight: 700; color: var(--ink); margin: 0; }
+.ev-price del { color: var(--text-soft); font-weight: 500; }
+.ev-price__tag { background: var(--rose-deep); color: #fff; font-size: .82rem; font-weight: 800; padding: 4px 10px; border-radius: 99px; }
+.ev-shot {
+  position: relative; justify-self: center; display: block; width: min(230px, 62vw); aspect-ratio: 780 / 1300; border-radius: 30px;
+  border: 7px solid #1C2452; overflow: hidden; box-shadow: var(--shadow-lg); transform: rotate(-3deg); transition: transform .4s var(--ease-bounce);
+}
+.ev-shot:hover { transform: rotate(0) scale(1.02); }
+.ev-shot img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+.ev-shot__tag {
+  position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(255,255,255,.94); color: var(--ink); font-weight: 800; font-size: .85rem; padding: 7px 13px; border-radius: 99px; white-space: nowrap;
+  box-shadow: 0 8px 18px -10px rgba(0,0,0,.45);
+}
+.ev-shot__tag .ico { width: 16px; height: 16px; color: var(--rose-deep); }
+.ev-ideas { display: grid; gap: 12px; }
+.ev-idea { display: flex; gap: 14px; align-items: flex-start; background: #fff; border-radius: 20px; padding: 16px; box-shadow: var(--shadow); }
+.ev-idea .tile { width: 50px; height: 50px; border-radius: 16px; }
+.ev-idea .tile .ico { width: 24px; height: 24px; }
+.ev-idea h3 { font-size: 1.12rem; margin: 2px 0 2px; }
+.ev-idea p { margin: 0; color: var(--text-soft); font-size: .95rem; }
+.ev-steps { display: grid; gap: 12px; counter-reset: s; }
+.ev-steps li { counter-increment: s; position: relative; background: #fff; border-radius: 20px; padding: 16px 64px 16px 16px; box-shadow: var(--shadow); }
+.ev-steps li::before { content: counter(s); position: absolute; right: 16px; top: 16px; width: 34px; height: 34px; border-radius: 50%; background: var(--rose-deep); color: #fff; display: grid; place-items: center; font-weight: 800; }
+.ev-steps b { display: block; color: var(--ink); font-size: 1.05rem; }
+.ev-steps span { color: var(--text-soft); font-size: .95rem; }
+.ev-final { text-align: center; padding: 46px 0 56px; background: linear-gradient(180deg, var(--paper), var(--blush)); }
+.ev-final h2 { font-size: clamp(1.7rem, 6vw, 2.3rem); margin-bottom: 6px; }
+.ev-final__ctas { justify-content: center; }
+.ev-more__title { font-weight: 800; color: var(--ink); margin: 0 0 10px; }
+.ev-more { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 0 0 16px; }
+.ev-more a { display: inline-flex; align-items: center; min-height: 44px; padding: 8px 14px; border-radius: 99px; background: #fff; color: var(--ink); font-weight: 700; font-size: .92rem; text-decoration: none; box-shadow: 0 6px 14px -10px rgba(18,41,122,.5); }
+.ev-more a:hover { background: var(--blush); }
+@media (max-width: 639px) {
+  .ev-hero__ctas .btn { flex: 1 1 100%; }
+  .ev-final__ctas .btn { flex: 1 1 100%; }
+}
+@media (min-width: 640px) {
+  .ev-ideas { grid-template-columns: 1fr 1fr; }
+  .ev-steps { grid-template-columns: repeat(3, 1fr); }
+}
+@media (min-width: 980px) {
+  .ev-hero { padding: 64px 0 72px; }
+  .ev-hero__grid { grid-template-columns: 1.25fr .75fr; }
+  .ev-shot { width: 270px; }
+  .ev-ideas { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* ---------- חלון המבצע ---------- */
+/* קטן, באמצע המסך, בלי רקע כהה ובלי לחסום את האתר */
+.ppop {
+  position: fixed; inset: 0; z-index: 95; margin: auto; height: fit-content; padding: 0; border: 0; background: transparent;
+  width: min(84vw, 300px); max-width: none; overflow: visible; color: inherit;
+}
+.ppop[open] .ppop__card { animation: ppopIn .55s cubic-bezier(.2,1.25,.35,1); }
+.ppop.is-closing .ppop__card { animation: ppopOut .22s ease forwards; }
+.ppop__card {
+  position: relative; display: grid; justify-items: center; text-align: center; padding: 18px 18px 12px; border-radius: 26px; overflow: hidden;
+  background: radial-gradient(260px 160px at 50% 0%, #FDE1EA, transparent 70%), radial-gradient(220px 160px at 100% 100%, #EEE4FF, transparent 70%), #FFF9FA;
+  box-shadow: 0 0 0 1px rgba(184,53,99,.12), 0 30px 60px -22px rgba(70, 15, 45, .5);
+}
+.ppop__x { position: absolute; top: 8px; left: 8px; z-index: 2; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; border: 0; background: rgba(255,255,255,.85); color: var(--ink); cursor: pointer; }
+.ppop__x .ico { width: 18px; height: 18px; }
+.ppop__env { padding: 44px 0 16px; }
+.ppop__env .env { --w: 136px; --lift: 1.3; pointer-events: none; }
+.ppop__title { font-size: 1.3rem; margin: 2px 0 4px; color: var(--ink); line-height: 1.2; }
+.ppop__text { color: var(--text-soft); margin: 0 0 12px; font-size: .88rem; line-height: 1.5; max-width: 28ch; }
+.ppop__cta.btn--lg { width: 100%; padding: .75em 1.2em; font-size: .98rem; }
+.ppop__later { margin-top: 2px; min-height: 40px; color: var(--text-soft); font-size: .9rem; }
+@keyframes ppopIn { from { opacity: 0; transform: translateY(18px) scale(.9); } }
+@keyframes ppopOut { to { opacity: 0; transform: translateY(10px) scale(.95); } }
+@media (prefers-reduced-motion: reduce) { .ppop[open] .ppop__card { animation: none; } }
+html.a11y-no-motion .ppop[open] .ppop__card { animation: none; }
+.cta-bar__main { position: relative; }
+.cta-bar__tag { position: absolute; top: -9px; left: 10px; font-style: normal; font-size: .72rem; font-weight: 800; background: #FFD45C; color: #4A2A00; border-radius: 99px; padding: 2px 8px; direction: ltr; transform: rotate(-6deg); box-shadow: 0 4px 10px -4px rgba(0,0,0,.35); }
+
+/* ---------- טלפון: פחות גלילה, רק מה שחשוב ---------- */
+@media (max-width: 639px) {
+  #builder, #why { display: none; }
+  .toolbox > li:nth-child(n+9) { display: none; }
+  .toolbox.is-all > li { display: revert; }
+}
+.ppop__card:focus { outline: none; }
+.ppop__card:focus-visible { outline: 3px solid var(--cobalt); outline-offset: 3px; }

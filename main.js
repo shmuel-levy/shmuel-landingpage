@@ -83,16 +83,62 @@ window.MatanotRun = {
     return '<li><a href="' + esc(n.href) + '">' + esc(n.label) + "</a></li>";
   }).join("");
 
-  var banner = $("#banner");
-  if (promo) {
-    banner.innerHTML = '<div class="container banner__inner">' + ico("percent", "banner__ico") +
-      "<span><b>" + esc(promo.title) + ":</b> " + esc(promo.text) + ' <span class="banner__left">· ' + leftText() + "</span></span>" +
-      '<a class="banner__link" href="order.html">לבנות סקיצה' + ico("arrow-left") + "</a></div>";
-    banner.hidden = false;
-  } else if (S.banner && S.banner.show) {
-    banner.innerHTML = '<div class="container banner__inner">' + ico("sparkle", "banner__ico") + "<span>" + esc(S.banner.text) + '</span><a class="banner__link" href="order.html">לטופס' + ico("arrow-left") + "</a></div>";
-    banner.hidden = false;
-  }
+  /* ---------- המבצע: חלון קופץ עדין במקום פס בראש האתר ----------
+     כל כמה זמן: config.js → promo.popupEvery ("load" = בכל כניסה ורענון, "session" = פעם בביקור, "week" = פעם בשבוע).
+     מופיע אחרי 7 שניות או כשגוללים לדוגמאות. מי שמשחק בהדגמה בטלפון לא יקבל חלון באמצע: הוא יחכה לגלילה.
+     מעטפה קטנה נפתחת וחושפת את ההנחה. Esc, לחיצה בחוץ או "אולי אחר כך" סוגרים */
+  (function promoPop() {
+    var pop = $("#promoPop");
+    if (!promo || !pop || typeof pop.showModal !== "function") return;
+    var KEY = "matanot-promo-pop", seen = 0, every = promo.popupEvery || "load";
+    try { seen = every === "session" ? +sessionStorage.getItem(KEY) || 0 : every === "week" ? +localStorage.getItem(KEY) || 0 : 0; } catch (e) { /* */ }
+    // ?promo=1 בכתובת = מציג תמיד, אחרי 1.5 שניות (לבדיקה)
+    var force = /[?&]promo=1/.test(location.search);
+    if (!force && (seen || /[?&](src|utm_source)=promo/.test(location.search))) {
+      if (every !== "week" || Date.now() - seen < 7 * 864e5) return;
+    }
+    var host = $("#ppopEnv");
+    host.innerHTML = ENV.html({ label: "", mark: "%", liner: "confetti", cardIcon: "gift", cardTitle: promo.percent + "% הנחה", cardText: "על כל החבילות", postmark: false });
+    var env = host.firstChild;
+    env.setAttribute("tabindex", "-1"); env.setAttribute("aria-hidden", "true");
+    ENV.applyPalette(env, "blush");
+    $("#ppopTitle").textContent = promo.percent + "% הנחה על כל ההפתעות";
+    $("#ppopText").textContent = promo.title + " עד " + promo.endsLabel + " · " + leftText() + ". ההנחה כבר מחושבת בטופס.";
+    // חלון קטן באמצע, בלי רקע כהה ובלי לחסום: אפשר להמשיך לגלול וללחוץ באתר.
+    // לא גונב את המיקוד; קורא המסך מקבל הודעה קצרה. Esc או לחיצה מחוץ לחלון סוגרים
+    var shown = false;
+    function show() {
+      if (shown || document.querySelector("dialog[open]")) return;
+      shown = true;
+      try { (every === "session" ? sessionStorage : localStorage).setItem(KEY, String(Date.now())); } catch (e) { /* */ }
+      pop.show();
+      setTimeout(function () { ENV.open(env); }, motionOff() ? 0 : 450);
+      var st = $("#a11yStatus") || $("#demoStatus");
+      if (st) st.textContent = promo.percent + "% הנחה על כל ההפתעות, עד " + promo.endsLabel + ". אפשר לסגור עם Escape.";
+      if (window.mtTrack) window.mtTrack("promo_popup", {});
+    }
+    function close() {
+      if (!pop.open) return;
+      pop.classList.add("is-closing");
+      setTimeout(function () { pop.classList.remove("is-closing"); pop.close(); }, motionOff() ? 0 : 220);
+    }
+    pop.addEventListener("click", function (e) { if (e.target.closest("[data-pop-close]")) close(); });
+    window.addEventListener("keydown", function (e) { if (e.key === "Escape" && pop.open) close(); }, true);
+    pop.addEventListener("cancel", function (e) { e.preventDefault(); close(); });
+    document.addEventListener("click", function (e) { if (pop.open && !pop.contains(e.target)) close(); });
+    var timer = setTimeout(show, force ? 1500 : 7000);
+    // נגעו בהדגמה בטלפון? לא קופצים באמצע. החלון יחכה לגלילה לדוגמאות
+    var demoBox = $("#demo");
+    if (demoBox && !force) demoBox.addEventListener("pointerdown", function () { clearTimeout(timer); }, { once: true });
+    var ex = $("#examples");
+    if (ex && "IntersectionObserver" in window) {
+      var io2 = new IntersectionObserver(function (en) { if (en[0].isIntersecting) { io2.disconnect(); clearTimeout(timer); setTimeout(show, 600); } }, { threshold: 0.2 });
+      io2.observe(ex);
+    }
+    // מי שכבר בדרך להזמנה לא צריך חלון
+    document.addEventListener("click", function (e) { if (e.target.closest && e.target.closest('a[href*="order.html"]')) { clearTimeout(timer); shown = true; } }, true);
+  })();
+  if (promo) document.querySelectorAll(".cta-bar__main").forEach(function (a) { a.insertAdjacentHTML("beforeend", '<em class="cta-bar__tag">-' + promo.percent + "%</em>"); });
 
   document.querySelectorAll("[data-order]").forEach(function (a) { a.href = "order.html"; });
   $("#waFloat").href = waLink();
@@ -277,6 +323,16 @@ window.MatanotRun = {
   $("#toolboxList").innerHTML = S.toolbox.items.map(function (t, i) {
     return '<li class="tool reveal"' + stagger(i, 45) + '><span class="tile tile--' + ((i % 6) + 1) + '" aria-hidden="true">' + ico(t.icon) + "</span>" + esc(t.title) + "</li>";
   }).join("");
+  // בטלפון רואים 8, והשאר בלחיצה
+  if (S.toolbox.items.length > 8) {
+    $("#toolboxList").insertAdjacentHTML("afterend", '<button type="button" class="btn btn--ghost more-btn" id="toolMore" aria-expanded="false" aria-controls="toolboxList">' + ico("plus") + "לכל " + S.toolbox.items.length + " החלקים</button>");
+    $("#toolMore").addEventListener("click", function () {
+      $("#toolboxList").classList.add("is-all");
+      this.remove();
+      var li = $("#toolboxList > li:nth-child(9)");
+      if (li) { li.setAttribute("tabindex", "-1"); li.focus({ preventScroll: true }); }
+    });
+  }
 
   /* ---------- עליי ---------- */
   var A = S.about;
@@ -375,9 +431,8 @@ window.MatanotRun = {
   // ספירה לאחור של המבצע: מתעדכנת כל דקה
   if (promo) setInterval(function () {
     var t = leftText();
-    var a = $("#promoLeft"), b = $(".banner__left");
+    var a = $("#promoLeft");
     if (a) a.textContent = t;
-    if (b) b.textContent = "· " + t;
   }, 60000);
 
   /* ---------- הופעה בגלילה ---------- */
@@ -480,95 +535,94 @@ window.MatanotRun = {
   }
 
   /* =========================================================
-     ההדגמה החיה ב-HERO
+     ההדגמה החיה ב-HERO: החוויה האמיתית בתוך הטלפון (demos/*.html?embed=1)
+     בכניסה קופידון יורה חץ אל החותם והמעטפה נפתחת לבד.
+     "הגרלת דוגמה אחרת" מחליף לדוגמה אחרת מתוך config.js → examples
      ========================================================= */
-  var D = S.hero.demo;
-  var phone = $("#demo"), area = $("#choiceArea");
-  var noBtn = $("#noBtn"), yesBtn = $("#yesBtn"), confetti = $("#confetti"), status = $("#demoStatus");
-  var escapes = 0;
-  var envHost = $("#envHost");
-  function mountEnvelope() {
-    envHost.innerHTML = ENV.html({ label: "פתיחת המעטפה", mark: "M", liner: "hearts", cardIcon: "hearts", cardTitle: D.cardTitle, cardText: D.cardText });
-    var env = envHost.firstChild;
-    env.id = "envelope";
-    ENV.applyPalette(env, "blush");
-    env.addEventListener("click", function () {
-      if (env.classList.contains("is-cracked")) return;
-      status.textContent = "המעטפה נפתחת";
-      phone.querySelector(".screen__hint").classList.add("is-hidden");
-      ENV.open(env, function () { show("question", "#yesBtn"); status.textContent = D.question; });
-    });
-  }
-  mountEnvelope();
+  (function heroDemo() {
+    var phone = $("#demo"), screen = $("#demoScreen"), frame = $("#demoFrame"), status = $("#demoStatus");
+    if (!phone || !frame) return;
+    var VW = 360; // רוחב "המסך" הווירטואלי בתוך הטלפון
+    var items = (S.examples && S.examples.items || []).filter(function (x) { return x.url; });
+    var order = ["demos/date.html", "demos/anniversary.html", "demos/proposal.html", "demos/bestie.html", "demos/baby.html", "demos/love.html", "demos/sorry.html", "demos/trip.html", "demos/thanks.html"];
+    items.sort(function (a, b) { return (order.indexOf(a.url) + 99) % 99 - (order.indexOf(b.url) + 99) % 99; });
+    var cur = 0, bag = [], introDone = false, k = 1;
 
-  function show(name, focusSel) {
-    phone.querySelectorAll(".screen").forEach(function (s) {
-      var on = s.getAttribute("data-screen") === name;
-      s.classList.toggle("is-active", on);
-      s.setAttribute("aria-hidden", on ? "false" : "true");
-      s.inert = !on;
-    });
-    if (focusSel) setTimeout(function () { var f = phone.querySelector(focusSel); f && f.focus({ preventScroll: true }); }, 50);
-  }
-  show("envelope");
-
-  var lastSpot = -1;
-  function runAway(e) {
-    if (e) e.preventDefault();
-    escapes++;
-    var yesScale = Math.min(1.3, 1 + escapes * 0.05);
-    noBtn.classList.add("is-running"); // קודם יוצא מהזרימה, כדי ש"כן" יתמקם במרכז
-    noBtn.textContent = D.noTexts[(escapes - 1) % D.noTexts.length];
-    var noScale = Math.max(0.6, 1 - escapes * 0.06);
-    var spot = window.MatanotRun.pick(area, noBtn, yesBtn, yesScale, lastSpot, noScale);
-    lastSpot = spot.i;
-    noBtn.style.left = spot.x + "px";
-    noBtn.style.top = spot.y + "px";
-    noBtn.style.transform = "scale(" + noScale + ")";
-    yesBtn.style.transform = "scale(" + yesScale + ")";
-  }
-  noBtn.addEventListener("pointerenter", function (e) { if (e.pointerType === "mouse") runAway(e); });
-  noBtn.addEventListener("pointerdown", runAway);
-  noBtn.addEventListener("click", function (e) { runAway(e); status.textContent = "הכפתור ברח. נשאר רק כן"; });
-
-  yesBtn.addEventListener("click", function () {
-    show("success", ".link-btn");
-    status.textContent = D.successTitle;
-    burst(confetti);
-  });
-
-  $("#replayBtn").addEventListener("click", function () {
-    escapes = 0; lastSpot = -1;
-    phone.querySelector(".screen__hint").classList.remove("is-hidden");
-    mountEnvelope();
-    noBtn.classList.remove("is-running");
-    noBtn.removeAttribute("style");
-    yesBtn.removeAttribute("style");
-    noBtn.textContent = D.no;
-    show("envelope", "#envelope");
-  });
-
-  var SHAPES = [
-    '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 21s-8-4.9-8-10.9A4.6 4.6 0 0 1 12 7.2a4.6 4.6 0 0 1 8 2.9C20 16.1 12 21 12 21z"/></svg>',
-    '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2c.8 5.6 3 8.3 9 9.5-6 1.2-8.2 3.9-9 9.5-.8-5.6-3-8.3-9-9.5 6-1.2 8.2-3.9 9-9.5z"/></svg>',
-  ];
-  function burst(host) {
-    if (motionOff()) return;
-    var colors = ["#F5A9C0", "#1F5BD1", "#FFD6A5", "#E26D93", "#9B7FE0", "#3BB58A", "#FFFFFF"];
-    var frag = document.createDocumentFragment();
-    for (var i = 0; i < 56; i++) {
-      var s = document.createElement("span");
-      var c = colors[i % colors.length];
-      if (i % 5 === 0) { s.className = "confetti__bit is-shape"; s.innerHTML = SHAPES[i % 2]; s.style.color = c; }
-      else { s.className = "confetti__bit" + (i % 3 === 0 ? " is-dot" : ""); s.style.background = c; }
-      var ang = Math.random() * Math.PI * 2, dist = 90 + Math.random() * 150;
-      s.style.setProperty("--x", Math.cos(ang) * dist + "px");
-      s.style.setProperty("--y", Math.sin(ang) * dist - 60 + "px");
-      s.style.setProperty("--r", Math.random() * 720 - 360 + "deg");
-      s.style.animationDelay = Math.random() * 120 + "ms";
-      frag.appendChild(s);
+    function fit() {
+      k = screen.clientWidth / VW;
+      frame.style.width = VW + "px";
+      frame.style.height = Math.round(screen.clientHeight / k) + "px";
+      frame.style.transform = "scale(" + k.toFixed(4) + ")";
     }
-    host.appendChild(frag);
-    setTimeout(function () { host.innerHTML = ""; }, 1900);
-  }
+    fit();
+    window.addEventListener("resize", fit);
+
+    function setMeta(it) {
+      $("#demoNow").textContent = it.title;
+      $("#demoFeat").innerHTML = (it.features || []).map(function (f) { return "<li>" + esc(f) + "</li>"; }).join("");
+      $("#demoFull").href = it.url;
+      $("#demoOrder").href = "order.html?type=" + encodeURIComponent(it.order || "partner") + "&src=hero-" + it.url.split("/").pop().replace(".html", "");
+      frame.title = "הדגמה חיה: " + it.title;
+      phone.setAttribute("aria-label", "הדגמה חיה של הפתעה: " + it.title);
+    }
+    if (items[0]) setMeta(items[0]);
+
+    function doc() { try { return frame.contentDocument; } catch (e) { return null; } }
+    function onLoad() {
+      fit();
+      screen.classList.remove("is-loading");
+      var d = doc();
+      // נגיעה בהדגמה = לא קופצים עם חלון המבצע באמצע
+      if (d) d.addEventListener("pointerdown", function () { phone.dispatchEvent(new Event("pointerdown")); introDone = true; }, { once: true });
+      if (!introDone) intro();
+    }
+    frame.addEventListener("load", onLoad);
+    // אם ה-iframe כבר נטען לפני שהסקריפט רץ
+    var d0 = doc();
+    if (d0 && d0.readyState === "complete" && d0.querySelector(".env")) onLoad();
+
+    // קופידון יורה חץ אל החותם, והמעטפה נפתחת
+    function sealRect() {
+      var d = doc(), s = d && d.querySelector(".env__seal");
+      if (!s) return null;
+      var fr = frame.getBoundingClientRect(), r = s.getBoundingClientRect();
+      return { left: fr.left + r.left * k, top: fr.top + r.top * k, width: r.width * k, height: r.height * k };
+    }
+    function intro() {
+      introDone = true;
+      if (motionOff() || !window.MatanotFX) return;
+      setTimeout(function () {
+        var r = phone.getBoundingClientRect();
+        if (r.bottom < 0 || r.top > innerHeight) return; // לא בתצוגה: בלי
+        var sr = sealRect();
+        if (!sr) return;
+        var x = Math.min(innerWidth - 56, r.right + (innerWidth > 979 ? 90 : 4));
+        window.MatanotFX.play("cupid", {
+          target: sealRect, from: { x: x, y: sr.top - 40 },
+          onHit: function () {
+            var d = doc(), env = d && d.querySelector(".env");
+            if (env && !env.classList.contains("is-cracked")) env.click();
+            status.textContent = "המעטפה נפתחת";
+          },
+        });
+      }, 1100);
+    }
+
+    // הגרלה: כל הדוגמאות לפני שחוזרים על אחת
+    function pick() {
+      if (!bag.length) { bag = items.map(function (_, i) { return i; }).filter(function (i) { return i !== cur; }); bag.sort(function () { return Math.random() - 0.5; }); }
+      return bag.shift();
+    }
+    $("#demoShuffle").addEventListener("click", function () {
+      if (items.length < 2) return;
+      cur = pick();
+      var it = items[cur], btn = this;
+      btn.classList.remove("is-spin"); void btn.offsetWidth; btn.classList.add("is-spin");
+      screen.classList.add("is-loading");
+      setMeta(it);
+      setTimeout(function () { frame.src = it.url + "?embed=1"; }, motionOff() ? 0 : 220);
+      status.textContent = "דוגמה חדשה: " + it.title + ". הקישו על החותם כדי לפתוח";
+      if (window.mtTrack) window.mtTrack("hero_shuffle", { demo: it.url });
+    });
+  })();
 })();

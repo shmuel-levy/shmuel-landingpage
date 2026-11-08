@@ -1,0 +1,86 @@
+/* =========================================================
+   Matanot: הדמויות שמסיימות שלב (fx.js)
+   ========================================================= */
+.fx-layer { position: fixed; inset: 0; z-index: 90; pointer-events: none; overflow: hidden; }
+.fx-actor { position: fixed; filter: drop-shadow(0 8px 10px rgba(60, 20, 50, .2)); will-change: transform; }
+.fx-svg { display: block; width: 100%; height: 100%; overflow: visible; }
+
+/* כנפיים שמתנפנפות (קופידון, חסידה, יונה) */
+.fx-wing { transform-box: fill-box; transform-origin: 0% 70%; animation: fxFlap .24s ease-in-out infinite alternate; }
+.fx-wing--b { animation-delay: -.12s; }
+@keyframes fxFlap { from { transform: rotate(-16deg) scaleY(1); } to { transform: rotate(16deg) scaleY(.78); } }
+
+/* קופידון */
+.fx-cupid .fx-svg { animation: fxBob 1.1s ease-in-out infinite; }
+.fx-cupid .fx-string, .fx-cupid .fx-nock { transition: transform .45s cubic-bezier(.3,.7,.4,1); }
+.fx-cupid.is-drawing .fx-nock { transform: translateX(9px); }
+.fx-cupid.is-drawing .fx-string { d: path("M36 36L45 65L36 94"); }
+.fx-cupid.is-shot .fx-nock { opacity: 0; transition: opacity .05s; }
+.fx-cupid.is-shot .fx-string { transition: d .12s cubic-bezier(.2,1.6,.4,1); }
+.fx-arrow { transform-origin: 0 50%; filter: drop-shadow(0 3px 3px rgba(0,0,0,.18)); }
+
+/* חופה והרב */
+.fx-chuppah { transform-origin: 50% 100%; filter: drop-shadow(0 10px 14px rgba(60, 40, 10, .18)); }
+.fx-rabbi .fx-arm-r { transform-box: fill-box; transform-origin: 0% 50%; transition: transform .3s cubic-bezier(.3,.7,.4,1); }
+.fx-rabbi.is-winding .fx-arm-r { transform: rotate(38deg); }
+.fx-rabbi.is-thrown .fx-arm-r { transform: rotate(-40deg); transition-duration: .14s; }
+.fx-rabbi.is-thrown .fx-held { opacity: 0; }
+.fx-rabbi .fx-svg { animation: fxBob 1.6s ease-in-out infinite; }
+.fx-glass { filter: drop-shadow(0 4px 4px rgba(0,0,0,.15)); }
+
+/* טבעת */
+.fx-ringbox .fx-lid { transform-box: fill-box; transform-origin: 100% 100%; transition: transform .5s cubic-bezier(.3,1.4,.5,1); }
+.fx-ringbox.is-open .fx-lid { transform: rotate(72deg); }
+.fx-ring { filter: drop-shadow(0 4px 8px rgba(233, 184, 74, .5)); }
+
+/* בלון */
+.fx-balloonA .fx-svg { animation: fxSway 1.4s ease-in-out infinite; transform-origin: 50% 100%; }
+.fx-balloonA .fx-balloon { transform-box: fill-box; transform-origin: 50% 100%; transition: transform .25s ease; }
+.fx-balloonA.is-squash .fx-balloon { transform: scale(1.12, .86); }
+.fx-balloonA.is-popped .fx-balloon { transform: scale(1.5); opacity: 0; transition: transform .08s ease-out, opacity .08s; }
+.fx-balloonA.is-popped .fx-strand { animation: fxFall .7s cubic-bezier(.5,0,.9,.6) forwards; }
+
+/* חסידה */
+.fx-stork .fx-svg { animation: fxBob 1s ease-in-out infinite; }
+.fx-stork.is-dropped .fx-held { opacity: 0; }
+
+/* יונה */
+.fx-dove.is-landed .fx-wing { animation: none; transform: rotate(-4deg) scaleY(.7); }
+.fx-dove.is-landed .fx-svg { animation: fxPeck .9s ease-in-out infinite; transform-origin: 30% 80%; }
+
+/* מטוס נייר */
+.fx-plane { left: 0; top: 0; }
+.fx-trail { position: fixed; width: 6px; height: 6px; margin: -3px 0 0 -3px; border-radius: 50%; background: var(--fx-accent2, var(--accent, #E26D93)); opacity: .7; animation: fxTrail 1.2s ease-out forwards; }
+
+/* חלקיקים */
+.fx-bit { position: fixed; display: block; width: 14px; height: 14px; margin: -7px 0 0 -7px; animation: fxBit 1s cubic-bezier(.15,.7,.3,1) both; }
+.fx-bit svg { display: block; width: 100%; height: 100%; }
+.fx-bit--heart, .fx-bit--star { width: 18px; height: 18px; margin: -9px 0 0 -9px; }
+.fx-c0 { color: var(--fx-accent, var(--accent-deep, #B83563)); }
+.fx-c1 { color: var(--fx-accent2, var(--accent, #E26D93)); }
+.fx-c2 { color: #FFD45C; }
+.fx-c3 { color: #fff; }
+.fx-bit--confetti { width: 8px; height: 12px; margin: -6px 0 0 -4px; border-radius: 2px; background: currentColor; }
+.fx-bit--confetti.fx-c3 { color: #7FA4D9; }
+.fx-bit--shard { width: 9px; height: 12px; margin: -6px 0 0 -4px; background: linear-gradient(135deg, rgba(225, 242, 255, .95), rgba(160, 196, 230, .85)); clip-path: polygon(50% 0, 100% 70%, 30% 100%, 0 40%); animation-duration: .8s; }
+.fx-pop {
+  position: fixed; z-index: 2; transform: translate(-50%, -50%); white-space: nowrap; pointer-events: none;
+  font: 400 clamp(1.4rem, 7vw, 2rem)/1 "Suez One", "Heebo", serif; color: var(--fx-accent, var(--accent-deep, #B83563));
+  text-shadow: 0 2px 0 #fff, 0 -2px 0 #fff, 2px 0 0 #fff, -2px 0 0 #fff, 0 8px 18px rgba(0,0,0,.18);
+  animation: fxPop 1.1s cubic-bezier(.2,1.4,.4,1) both;
+}
+
+/* הכפתור כשפוגעים בו */
+.fx-hit { animation: fxHit .5s cubic-bezier(.3,.7,.4,1); }
+
+@keyframes fxBob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+@keyframes fxSway { 0%, 100% { transform: rotate(-4deg); } 50% { transform: rotate(4deg); } }
+@keyframes fxPeck { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(-6deg) translateY(1px); } }
+@keyframes fxFall { to { transform: translateY(80px) rotate(40deg); opacity: 0; } }
+@keyframes fxTrail { from { transform: scale(1); } to { transform: scale(.2); opacity: 0; } }
+@keyframes fxBit { 0% { transform: translate(0, 0) scale(.2) rotate(0); opacity: 0; } 15% { opacity: 1; } 100% { transform: translate(var(--x), var(--y)) scale(1) rotate(var(--r)); opacity: 0; } }
+@keyframes fxPop { 0% { transform: translate(-50%, -30%) scale(.3); opacity: 0; } 30% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; } 75% { transform: translate(-50%, -60%) scale(1); opacity: 1; } 100% { transform: translate(-50%, -90%) scale(.95); opacity: 0; } }
+@keyframes fxHit { 0% { transform: scale(1); } 20% { transform: scale(.93) rotate(-2deg); } 45% { transform: scale(1.06) rotate(1.5deg); } 70% { transform: scale(.98); } 100% { transform: scale(1); } }
+
+@media (prefers-reduced-motion: reduce) { .fx-layer { display: none; } }
+html.a11y-no-motion .fx-layer { display: none; }

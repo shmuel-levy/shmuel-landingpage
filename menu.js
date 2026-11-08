@@ -53,7 +53,7 @@
         '<a class="drawer__wa" href="https://wa.me/' + phone + '" target="_blank" rel="noopener">' + ico("whatsapp") + 'ווטסאפ<span class="sr-only"> (נפתח בחלון חדש)</span></a>' +
         '<a href="tel:+' + phone + '">' + ico("call") + '<span dir="ltr">' + phoneShow + "</span></a>" +
       "</div>" +
-      '<div class="drawer__legal"><a href="negishut.html">הצהרת נגישות</a><a href="privacy.html">מדיניות פרטיות</a></div>' +
+      '<div class="drawer__legal"><a href="negishut.html">הצהרת נגישות</a><a href="privacy.html">מדיניות פרטיות</a><a href="terms.html">תנאי שירות</a></div>' +
     "</div>";
   document.body.appendChild(d);
 

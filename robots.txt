@@ -1,0 +1,4 @@
+# עובד רק כשהאתר יושב בשורש של דומיין (למשל matanot.co.il/robots.txt)
+User-agent: *
+Disallow: /demos/preview.html
+Sitemap: https://shmuel-levy.github.io/shmuel-landingpage/sitemap.xml
