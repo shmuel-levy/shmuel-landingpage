@@ -88,6 +88,149 @@
     { id: "source", type: "chips", label: "איך הגעתם אליי? (רשות)", options: ["אינסטגרם", "טיקטוק", "פייסבוק", "גוגל", "חבר/ה המליצו", "קיבלתי הפתעה כזו", "אחר"] },
   ];
 
+  /* ---------- בוחר תאריך (במקום mm/dd/yyyy של הדפדפן) ----------
+     כפתור שמציג את התאריך בעברית, קיצורים ("מחר", "בעוד שבוע"), ולוח שנה שנפתח בתוך הטופס.
+     מקלדת: חיצים בין ימים (ימינה = אחורה, כמו בעברית), PageUp/PageDown חודשים, Enter בוחר, Esc סוגר.
+     הערך נשמר כ-YYYY-MM-DD ב-state.data */
+  var DP_DAYS = ["א׳", "ב׳", "ג׳", "ד׳", "ה׳", "ו׳", "ש׳"];
+  var DP_DAYS_LONG = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
+  var DP_MONTHS = ["ינואר", "פברואר", "מרץ", "אפריל", "מאי", "יוני", "יולי", "אוגוסט", "ספטמבר", "אוקטובר", "נובמבר", "דצמבר"];
+  var dpView = {}; // לכל שדה: איזה חודש מוצג
+  function isoOf(dt) { return dt.getFullYear() + "-" + ("0" + (dt.getMonth() + 1)).slice(-2) + "-" + ("0" + dt.getDate()).slice(-2); }
+  function fromIso(s) { var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s || ""); return m ? new Date(+m[1], +m[2] - 1, +m[3]) : null; }
+  function today0() { var t = new Date(); t.setHours(0, 0, 0, 0); return t; }
+  function addDays(dt, n) { var x = new Date(dt); x.setDate(x.getDate() + n); return x; }
+  function dpMax(f) { return addDays(today0(), f.id === "dueDate" ? 300 : 365); }
+  function dpRel(dt) {
+    var n = Math.round((dt - today0()) / 864e5);
+    return n === 0 ? "היום" : n === 1 ? "מחר" : n === 2 ? "מחרתיים" : n < 14 ? "בעוד " + n + " ימים" : n < 60 ? "בעוד " + Math.round(n / 7) + " שבועות" : "בעוד " + Math.round(n / 30) + " חודשים";
+  }
+  function dpLabel(dt) { return "יום " + DP_DAYS_LONG[dt.getDay()] + ", " + dt.getDate() + " ב" + DP_MONTHS[dt.getMonth()]; }
+  function dpQuick(f) { return f.id === "deadline" ? [[1, "מחר"], [3, "בעוד 3 ימים"], [7, "בעוד שבוע"], [14, "בעוד שבועיים"]] : []; }
+  function datePicker(f, id, describe, v) {
+    var dt = fromIso(v);
+    var face = dt ? '<span class="dp__val"><b>' + esc(dpLabel(dt)) + "</b><small>" + esc(dpRel(dt)) + "</small></span>" : '<span class="dp__val dp__val--empty">בחרו תאריך</span>';
+    return '<div class="dp" data-dp="' + f.id + '">' +
+      '<button type="button" class="input dp__btn" id="' + id + '" data-dp-open="' + f.id + '" aria-expanded="false" aria-controls="' + id + '-pop" aria-describedby="' + describe + '">' +
+        '<span class="dp__ico" aria-hidden="true">' + ico("calendar") + "</span>" + face + '<span class="dp__chev" aria-hidden="true">' + ico("arrow-left") + "</span></button>" +
+      (dpQuick(f).length ? '<div class="dp__quick" role="group" aria-label="קיצורים לתאריך">' + dpQuick(f).map(function (q) {
+        var on = v && v === isoOf(addDays(today0(), q[0]));
+        return '<button type="button" class="dp__q" data-dp-quick="' + f.id + '" data-n="' + q[0] + '" aria-pressed="' + (on ? "true" : "false") + '">' + esc(q[1]) + "</button>";
+      }).join("") + "</div>" : "") +
+      '<div class="dp__pop" id="' + id + '-pop" role="dialog" aria-label="בחירת תאריך: ' + esc(f.label) + '" hidden></div>' +
+      "</div>";
+  }
+  function dpRender(fid) {
+    var f = fieldDefAll(fid), pop = $("#f-" + fid + "-pop");
+    if (!f || !pop) return;
+    var sel = fromIso(state.data[fid]), min = today0(), max = dpMax(f);
+    var view = dpView[fid] || (sel ? new Date(sel.getFullYear(), sel.getMonth(), 1) : new Date(min.getFullYear(), min.getMonth(), 1));
+    dpView[fid] = view;
+    var y = view.getFullYear(), m = view.getMonth();
+    var first = new Date(y, m, 1), days = new Date(y, m + 1, 0).getDate();
+    var opts = "";
+    for (var i = 0; i <= Math.ceil((max - min) / (30 * 864e5)); i++) {
+      var mm = new Date(min.getFullYear(), min.getMonth() + i, 1);
+      opts += '<option value="' + mm.getFullYear() + "-" + mm.getMonth() + '"' + (mm.getFullYear() === y && mm.getMonth() === m ? " selected" : "") + ">" + DP_MONTHS[mm.getMonth()] + " " + mm.getFullYear() + "</option>";
+    }
+    var prevOk = new Date(y, m, 0) >= min, nextOk = new Date(y, m + 1, 1) <= max;
+    var cells = "";
+    for (var b = 0; b < first.getDay(); b++) cells += '<span class="dp__blank" aria-hidden="true"></span>';
+    var focusIso = state.data[fid] && sel && sel.getMonth() === m && sel.getFullYear() === y ? state.data[fid] : null;
+    if (!focusIso) { var t0 = today0(); focusIso = t0.getMonth() === m && t0.getFullYear() === y ? isoOf(t0) : isoOf(first); }
+    for (var dd = 1; dd <= days; dd++) {
+      var dt = new Date(y, m, dd), iso = isoOf(dt), off = dt < min || dt > max;
+      var isSel = sel && iso === isoOf(sel), isToday = iso === isoOf(today0());
+      cells += '<button type="button" class="dp__day' + (isSel ? " is-sel" : "") + (isToday ? " is-today" : "") + (dt.getDay() === 6 ? " is-sat" : "") + '" data-dp-day="' + fid + '" data-iso="' + iso + '"' +
+        (off ? " disabled" : "") + ' tabindex="' + (iso === focusIso ? "0" : "-1") + '" aria-pressed="' + (isSel ? "true" : "false") + '" aria-label="' + dpLabel(dt) + " " + y + (isToday ? ", היום" : "") + '">' + dd + "</button>";
+    }
+    pop.innerHTML = '<div class="dp__head">' +
+      '<button type="button" class="dp__nav" data-dp-nav="' + fid + '" data-d="-1" aria-label="החודש הקודם"' + (prevOk ? "" : " disabled") + ">" + ico("arrow-right") + "</button>" +
+      '<select class="dp__month" data-dp-month="' + fid + '" aria-label="חודש">' + opts + "</select>" +
+      '<button type="button" class="dp__nav" data-dp-nav="' + fid + '" data-d="1" aria-label="החודש הבא"' + (nextOk ? "" : " disabled") + ">" + ico("arrow-left") + "</button></div>" +
+      '<div class="dp__week" aria-hidden="true">' + DP_DAYS.map(function (x) { return "<span>" + x + "</span>"; }).join("") + "</div>" +
+      '<div class="dp__grid" role="group" aria-label="' + DP_MONTHS[m] + " " + y + '">' + cells + "</div>" +
+      '<p class="dp__foot"><button type="button" class="link-btn dp__close" data-dp-close="' + fid + '">סגירה</button></p>';
+  }
+  function fieldDefAll(fid) {
+    var T = typeDef();
+    return DETAILS.concat(T ? T.fields : []).filter(function (x) { return x.id === fid; })[0];
+  }
+  function dpOpen(fid, focusDay) {
+    var pop = $("#f-" + fid + "-pop"), btn = $("#f-" + fid);
+    if (!pop) return;
+    $$(".dp__pop:not([hidden])").forEach(function (p) { if (p !== pop) dpClose(p.id.replace(/^f-|-pop$/g, ""), false); });
+    dpRender(fid);
+    pop.hidden = false;
+    btn.setAttribute("aria-expanded", "true");
+    btn.closest(".dp").classList.add("is-open");
+    if (focusDay !== false) { var d0 = $('.dp__day[tabindex="0"]', pop); if (d0) d0.focus({ preventScroll: true }); }
+    pop.scrollIntoView({ block: "nearest", behavior: reduced() ? "auto" : "smooth" });
+  }
+  function dpClose(fid, refocus) {
+    var pop = $("#f-" + fid + "-pop"), btn = $("#f-" + fid);
+    if (!pop || pop.hidden) return;
+    pop.hidden = true;
+    btn.setAttribute("aria-expanded", "false");
+    btn.closest(".dp").classList.remove("is-open");
+    if (refocus !== false) btn.focus({ preventScroll: true });
+  }
+  function dpSet(fid, iso) {
+    state.data[fid] = iso;
+    var f = fieldDefAll(fid), wrap = $('[data-field="' + fid + '"]');
+    var dt = fromIso(iso), btn = $("#f-" + fid);
+    $(".dp__val", btn).outerHTML = '<span class="dp__val"><b>' + esc(dpLabel(dt)) + "</b><small>" + esc(dpRel(dt)) + "</small></span>";
+    $$('[data-dp-quick="' + fid + '"]').forEach(function (q) { q.setAttribute("aria-pressed", isoOf(addDays(today0(), +q.getAttribute("data-n"))) === iso ? "true" : "false"); });
+    btn.closest(".dp").classList.remove("is-pulse"); void btn.offsetWidth; btn.closest(".dp").classList.add("is-pulse");
+    if (wrap && wrap.classList.contains("has-error")) validateField(wrap);
+    var st = $("#helpStatus"); if (st) st.textContent = "נבחר: " + dpLabel(dt) + ", " + dpRel(dt);
+    saveDraft();
+    if (f && f.id === "deadline") track("deadline_set", { days: Math.round((dt - today0()) / 864e5) });
+  }
+  document.addEventListener("click", function (e) {
+    var t = e.target.closest ? e.target : null;
+    if (!t) return;
+    var op = t.closest("[data-dp-open]"), day = t.closest("[data-dp-day]"), nav = t.closest("[data-dp-nav]"), q = t.closest("[data-dp-quick]"), cl = t.closest("[data-dp-close]");
+    if (op) { var fid = op.getAttribute("data-dp-open"); if ($("#f-" + fid + "-pop").hidden) dpOpen(fid); else dpClose(fid); return; }
+    if (day && !day.disabled) { var f2 = day.getAttribute("data-dp-day"); dpSet(f2, day.getAttribute("data-iso")); dpClose(f2); return; }
+    if (nav && !nav.disabled) { var f3 = nav.getAttribute("data-dp-nav"), v3 = dpView[f3]; dpView[f3] = new Date(v3.getFullYear(), v3.getMonth() + +nav.getAttribute("data-d"), 1); dpRender(f3); var n2 = $('[data-dp-nav="' + f3 + '"][data-d="' + nav.getAttribute("data-d") + '"]'); if (n2 && !n2.disabled) n2.focus(); else $('.dp__day[tabindex="0"]', $("#f-" + f3 + "-pop")).focus(); return; }
+    if (q) { var f4 = q.getAttribute("data-dp-quick"); dpSet(f4, isoOf(addDays(today0(), +q.getAttribute("data-n")))); dpView[f4] = null; dpClose(f4, false); return; }
+    if (cl) { dpClose(cl.getAttribute("data-dp-close")); return; }
+    // לחיצה מחוץ ללוח סוגרת אותו
+    $$(".dp.is-open").forEach(function (dp) { if (!dp.contains(t)) dpClose(dp.getAttribute("data-dp"), false); });
+  });
+  document.addEventListener("change", function (e) {
+    var s = e.target.closest && e.target.closest("[data-dp-month]");
+    if (!s) return;
+    var fid = s.getAttribute("data-dp-month"), p = s.value.split("-");
+    dpView[fid] = new Date(+p[0], +p[1], 1);
+    dpRender(fid);
+    $('[data-dp-month="' + fid + '"]').focus();
+  });
+  document.addEventListener("keydown", function (e) {
+    var pop = e.target.closest && e.target.closest(".dp__pop");
+    if (!pop) return;
+    var fid = pop.id.replace(/^f-|-pop$/g, "");
+    if (e.key === "Escape") { e.preventDefault(); dpClose(fid); return; }
+    var day = e.target.closest(".dp__day");
+    if (!day) return;
+    var step = { ArrowLeft: 1, ArrowRight: -1, ArrowDown: 7, ArrowUp: -7 }[e.key];
+    var cur = fromIso(day.getAttribute("data-iso")), next = null;
+    if (step) next = addDays(cur, step);
+    else if (e.key === "PageDown") next = new Date(cur.getFullYear(), cur.getMonth() + 1, Math.min(cur.getDate(), 28));
+    else if (e.key === "PageUp") next = new Date(cur.getFullYear(), cur.getMonth() - 1, Math.min(cur.getDate(), 28));
+    else if (e.key === "Home") next = addDays(cur, -cur.getDay());
+    else if (e.key === "End") next = addDays(cur, 6 - cur.getDay());
+    if (!next) return;
+    e.preventDefault();
+    var f = fieldDefAll(fid);
+    if (next < today0() || next > dpMax(f)) return;
+    var iso = isoOf(next), btn = $('.dp__day[data-iso="' + iso + '"]', pop);
+    if (!btn) { dpView[fid] = new Date(next.getFullYear(), next.getMonth(), 1); dpRender(fid); btn = $('.dp__day[data-iso="' + iso + '"]', pop); }
+    $$(".dp__day", pop).forEach(function (b) { b.tabIndex = -1; });
+    if (btn) { btn.tabIndex = 0; btn.focus(); }
+  });
+
   /* ---------- בניית שדה ---------- */
   function val(id) { return state.data[id]; }
   // שדה + כפתור "רעיון" (אם יש הצעות לשדה הזה)
@@ -109,6 +252,10 @@
     var common = ' data-key="' + f.id + '" aria-describedby="' + describe + '"' + (f.required ? ' aria-required="true"' : "");
     var ph = f.placeholder ? ' placeholder="' + esc(f.placeholder) + '"' : "";
 
+    if (f.type === "date") {
+      return '<div class="field" data-field="' + f.id + '"><label class="field__label" for="' + id + '">' + esc(f.label) + req + "</label>" + hint +
+        datePicker(f, id, describe, v) + err + "</div>";
+    }
     if (f.type === "text" || f.type === "tel" || f.type === "number" || f.type === "date") {
       var extra = "";
       if (f.type === "date") extra += ' min="' + new Date().toISOString().slice(0, 10) + '"';
@@ -328,7 +475,11 @@
       (PD.more.length ? '<details class="more-parts"><summary>' + ico("plus") + "עוד " + PD.more.length + " חלקים שמתאימים</summary>" +
         '<div class="chips chips--elements">' + PD.more.map(function (id) { return chip(id, false); }).join("") + "</div></details>" : "") +
       '<p class="parts-count" id="partsCount" aria-live="polite"></p></fieldset>' +
-      '<div class="path"><p class="path__label">' + ico("eye") + "ככה זה ייראה, לפי הסדר:</p><ol class=\"path__list\" id=\"partsPath\"></ol></div>";
+      '<div class="path"><p class="path__label">' + ico("eye") + "ככה זה ייראה, לפי הסדר:</p>" +
+      '<p class="path__hint" id="pathHint">' + ico("grip") + "גררו חלק כדי להחליף מקום, או השתמשו בחצים. המעטפה תמיד פותחת והמכתב תמיד סוגר.</p>" +
+      '<ol class="path__list" id="partsPath" aria-describedby="pathHint"></ol>' +
+      '<button type="button" class="link-btn path__reset" id="pathReset" hidden>' + ico("replay") + "חזרה לסדר המומלץ</button>" +
+      '<p class="sr-only" id="pathStatus" aria-live="polite"></p></div>';
     var music =
       '<fieldset class="field field--group"><legend class="sr-only">מוזיקה</legend><div class="chips">' +
       O.moods.map(function (m) {
@@ -483,6 +634,7 @@
     saveDraft();
     IDB.put("voice", { blob: blob, dur: dur, type: state.voice.type });
     renderRec();
+    renderPath();
     var again = $("#recAgain");
     if (again) again.focus();
     recSay("ההקלטה נשמרה, " + fmtTime(dur) + " דקות. אפשר להאזין לה כאן.");
@@ -498,6 +650,7 @@
       var cb = $('input[name="elements"][value="voice"]');
       if (cb) cb.checked = false;
       saveDraft();
+      renderPath();
     }
   }
   function addVoiceFile(f) {
@@ -579,14 +732,125 @@
     });
     var c = $("#partsCount");
     if (c) c.textContent = full ? "בחרתם " + n + " מתוך " + max + ". רוצים חלק אחר? הורידו אחד קודם." : "נבחרו " + n + " מתוך " + max + " (בחבילה הבסיסית: " + planParts("basic") + ")";
-    var path = $("#partsPath");
-    if (path) {
-      path.innerHTML = buildDemo().steps.map(function (s, i) {
-        var l = stepLabel(s);
-        return '<li style="--i:' + i + '"><span class="path__ico" aria-hidden="true">' + ico(l[0]) + "</span><span>" + esc(l[1]) + "</span></li>";
-      }).join("");
-    }
+    renderPath();
     updateAcc();
+  }
+
+  /* ---------- הסדר: המעטפה תמיד ראשונה והמכתב תמיד אחרון, כל מה שבאמצע אפשר לגרור ---------- */
+  // מפתח קבוע לכל שלב לפי הסדר המומלץ (photos, reasons, message2 אם יש שניים...)
+  function keyStepsAndOrder(steps) {
+    var seen = {};
+    steps.forEach(function (s) { var n = seen[s.type] = (seen[s.type] || 0) + 1; s._k = n > 1 ? s.type + n : s.type; });
+    var ord = state.data.order;
+    if (!ord || !ord.length || steps.length < 4) return steps;
+    var mid = steps.slice(1, -1), pos = function (s) { return ord.indexOf(s._k); };
+    // מה שהמשתמש סידר תופס את המקומות שלו לפי הסדר שלו; חלק חדש נכנס במקום המומלץ שלו
+    var known = mid.filter(function (s) { return pos(s) > -1; }).sort(function (a, b) { return pos(a) - pos(b); });
+    var j = 0;
+    mid = mid.map(function (s) { return pos(s) > -1 ? known[j++] : s; });
+    mid.forEach(function (s, i) { if (s.type === "runaway" && s.cta === "לפרטים" && i < mid.length - 1) s.cta = "ממשיכים"; });
+    return [steps[0]].concat(mid, [steps[steps.length - 1]]);
+  }
+  function renderPath() {
+    var path = $("#partsPath");
+    if (!path) return;
+    var steps = buildDemo().steps, last = steps.length - 1, total = steps.length;
+    path.innerHTML = steps.map(function (s, i) {
+      var l = stepLabel(s), head = '<span class="path__n" aria-hidden="true">' + (i + 1) + '</span><span class="path__ico" aria-hidden="true">' + ico(l[0]) + '</span><span class="path__name">' + esc(l[1]) + "</span>";
+      if (i === 0 || i === last) return '<li class="path__item is-fixed" style="--i:' + i + '"><span class="path__grip" aria-hidden="true"></span>' + head + '<span class="path__pin">' + ico("lock") + (i === 0 ? "תמיד ראשונה" : "תמיד בסוף") + "</span></li>";
+      return '<li class="path__item" data-k="' + esc(s._k) + '" data-name="' + esc(l[1]) + '" style="--i:' + i + '"><span class="path__grip" aria-hidden="true">' + ico("grip") + "</span>" + head +
+        '<span class="path__mv"><button type="button" data-mv="-1">' + ico("chev-up") + '</button><button type="button" data-mv="1">' + ico("chev-down") + "</button></span></li>";
+    }).join("");
+    path.setAttribute("data-total", total);
+    renumberPath();
+    requestAnimationFrame(function () { path.classList.add("is-ready"); });
+    var rs = $("#pathReset");
+    if (rs) rs.hidden = !(state.data.order && state.data.order.length);
+  }
+  function movables() { return $$("#partsPath .path__item:not(.is-fixed)"); }
+  function renumberPath() {
+    var all = $$("#partsPath .path__item"), mv = movables(), total = all.length;
+    all.forEach(function (li, i) { var n = li.querySelector(".path__n"); if (n) n.textContent = i + 1; });
+    mv.forEach(function (li, i) {
+      var name = li.getAttribute("data-name"), place = all.indexOf(li) + 1;
+      var up = li.querySelector('[data-mv="-1"]'), dn = li.querySelector('[data-mv="1"]');
+      up.disabled = i === 0; dn.disabled = i === mv.length - 1;
+      up.setAttribute("aria-label", "להקדים את " + name + " (עכשיו במקום " + place + " מתוך " + total + ")");
+      dn.setAttribute("aria-label", "לדחות את " + name + " (עכשיו במקום " + place + " מתוך " + total + ")");
+    });
+  }
+  function saveOrder(li) {
+    state.data.order = movables().map(function (x) { return x.getAttribute("data-k"); });
+    renumberPath();
+    var rs = $("#pathReset");
+    if (rs) rs.hidden = false;
+    if (li) {
+      var place = $$("#partsPath .path__item").indexOf(li) + 1;
+      var st = $("#pathStatus");
+      if (st) { st.textContent = ""; setTimeout(function () { st.textContent = li.getAttribute("data-name") + " עבר למקום " + place; }, 50); }
+      li.classList.remove("is-moved"); void li.offsetWidth; li.classList.add("is-moved");
+    }
+    saveDraft();
+  }
+  function moveBy(li, dir) {
+    var mv = movables(), i = mv.indexOf(li), j = i + dir;
+    if (j < 0 || j >= mv.length) return;
+    var before = li.getBoundingClientRect().top;
+    li.parentNode.insertBefore(li, dir < 0 ? mv[j] : mv[j].nextSibling);
+    flip(li, before);
+    saveOrder(li);
+  }
+  // אנימציה קטנה: הפריט "מחליק" מהמקום הישן לחדש
+  function flip(li, before) {
+    if (reduced()) return;
+    var dy = before - li.getBoundingClientRect().top;
+    if (!dy) return;
+    li.style.transition = "none"; li.style.transform = "translateY(" + dy + "px)";
+    void li.offsetWidth;
+    li.style.transition = ""; li.style.transform = "";
+  }
+  // גרירה עם אצבע או עכבר (Pointer Events: עובד גם בטלפון, שם גוררים מהידית)
+  var Drag = null;
+  function pathDown(e) {
+    var li = e.target.closest(".path__item");
+    if (!li || li.classList.contains("is-fixed") || e.target.closest(".path__mv") || e.button > 0) return;
+    if (e.pointerType !== "mouse" && !e.target.closest(".path__grip")) return; // בטלפון: נגיעה בשורה עדיין גוללת את הדף
+    e.preventDefault();
+    Drag = { li: li, list: li.parentNode, id: e.pointerId, y0: e.clientY + window.scrollY, moved: false, start: movables().indexOf(li) };
+    try { li.setPointerCapture(e.pointerId); } catch (err) { /* */ }
+    li.classList.add("is-drag");
+    Drag.list.classList.add("is-dragging");
+    if (navigator.vibrate && navigator.userActivation && navigator.userActivation.hasBeenActive) try { navigator.vibrate(8); } catch (err) { /* */ }
+  }
+  function pathMove(e) {
+    if (!Drag || e.pointerId !== Drag.id) return;
+    var li = Drag.li, cy = e.clientY;
+    // גלילה אוטומטית ליד הקצוות
+    if (cy < 70) window.scrollBy(0, -10); else if (cy > window.innerHeight - 70) window.scrollBy(0, 10);
+    var mv = movables(), i = mv.indexOf(li), nb = null, down = false;
+    if (mv[i + 1]) { var r1 = mv[i + 1].getBoundingClientRect(); if (cy > r1.top + r1.height / 2) { nb = mv[i + 1]; down = true; } }
+    if (!nb && mv[i - 1]) { var r0 = mv[i - 1].getBoundingClientRect(); if (cy < r0.top + r0.height / 2) nb = mv[i - 1]; }
+    if (nb) {
+      var nTop = nb.getBoundingClientRect().top, t0 = li.offsetTop;
+      Drag.list.insertBefore(li, down ? nb.nextSibling : nb);
+      Drag.y0 += li.offsetTop - t0;
+      flip(nb, nTop);
+      Drag.moved = true;
+      renumberPath();
+    }
+    var dy = cy + window.scrollY - Drag.y0;
+    if (Math.abs(dy) > 3) Drag.moved = true;
+    li.style.transition = "none";
+    li.style.transform = "translateY(" + dy + "px)";
+  }
+  function pathUp(e) {
+    if (!Drag || e.pointerId !== Drag.id) return;
+    var D = Drag; Drag = null;
+    var li = D.li;
+    li.classList.remove("is-drag");
+    D.list.classList.remove("is-dragging");
+    li.style.transition = ""; li.style.transform = "";
+    if (movables().indexOf(li) !== D.start) saveOrder(li);
   }
 
   function renderThumbs() {
@@ -693,6 +957,7 @@
     if (key === "palette") ENV.applyPalette($("#step-design .fields"), d.palette);
     if (key === "addons" || key === "plan") updateTotal();
     if (key === "elements") syncParts();
+    if (key === "voiceAt" && d.order) { d.order = d.order.filter(function (x) { return x !== "voice"; }); renderPath(); }
     if (key === "recipient" && d.mark == null) { var m = $("#f-mark"); if (m) m.value = (t.value || "").trim().charAt(0); }
     if (t.closest(".field") && t.closest(".field").classList.contains("has-error")) validateField(t.closest("[data-field]"));
     if (["palette", "liner", "mark", "recipient"].indexOf(key) > -1) updateLive();
@@ -736,7 +1001,7 @@
     var msg = problem(f);
     var err = $("#f-" + f.id + "-err");
     wrap.classList.toggle("has-error", !!msg);
-    $$("input,textarea", wrap).forEach(function (inp) { if (msg) inp.setAttribute("aria-invalid", "true"); else inp.removeAttribute("aria-invalid"); });
+    $$("input,textarea,.dp__btn", wrap).forEach(function (inp) { if (msg) inp.setAttribute("aria-invalid", "true"); else inp.removeAttribute("aria-invalid"); });
     if (err) { err.hidden = !msg; err.innerHTML = msg ? ico("x") + esc(msg) : ""; }
     return !msg;
   }
@@ -965,6 +1230,7 @@
     else fin = finalLetter("sparkle", d.occasion || "באהבה", ["כמה מילים מהלב יופיעו כאן."]);
     if (!fin.sign && sign) fin.sign = sign;
     push(fin);
+    steps = keyStepsAndOrder(steps); // הסדר שהמשתמש גרר (המעטפה והסוף לא זזים)
 
     return {
       palette: d.palette || DEF_PALETTE[t], liner: d.liner || DEF_LINER[t],
@@ -1001,6 +1267,7 @@
     out.push("• פלטה: " + ENV.palettes[d.palette].label + " · בטנה: " + ENV.liners[d.liner] + " · חותם: " + (d.mark || "לב"));
     out.push("• מוזיקה: " + O.moods.filter(function (m) { return m.id === d.mood; })[0].label + (d.song ? " · שיר: " + d.song : ""));
     out.push("• חלקים: " + O.elements.filter(function (e) { return (d.elements || []).indexOf(e.id) > -1 || e.id === "envelope" || e.id === "final"; }).map(function (e) { return e.label.replace(/"/g, ""); }).join(", "));
+    try { out.push("• הסדר" + (d.order && d.order.length ? " (סידרתי בעצמי)" : "") + ": " + buildDemo().steps.map(function (s) { return stepLabel(s)[1]; }).join(" ← ")); } catch (e) { /* */ }
     if (state.photos.length) out.push("• תמונות: " + state.photos.length + " (שולח/ת כאן בצ'אט)");
     if (state.voice) out.push("• הודעה קולית: " + fmtTime(state.voice.dur) + ", " + (d.voiceAt || VOICE_AT[0]) + " (שולח/ת את הקובץ כאן בצ'אט)" + (d.voiceCaption ? " · כתובית: " + d.voiceCaption : ""));
     out.push("");
@@ -1142,6 +1409,10 @@
       onInput(e);
     });
     form.addEventListener("submit", function (e) { e.preventDefault(); });
+    form.addEventListener("pointerdown", pathDown);
+    document.addEventListener("pointermove", pathMove);
+    document.addEventListener("pointerup", pathUp);
+    document.addEventListener("pointercancel", pathUp);
     form.addEventListener("click", function (e) {
       var nx = e.target.closest("[data-next]"), bk = e.target.closest("[data-back]"), rm = e.target.closest("[data-rm]"), errLink = e.target.closest(".wz-errors a");
       if (nx) { if (validateStep()) go(state.step + 1); }
@@ -1168,6 +1439,19 @@
       if (e.target.closest("#recAgain")) { clearVoice(); renderRec(); if (recSupported()) startRec(); else $('label[for="voiceFile"]').focus(); }
       if (e.target.closest("#recDel")) { clearVoice(); renderRec(); recSay("ההקלטה נמחקה"); var s0 = $("#recStart") || $('label[for="voiceFile"]'); if (s0) s0.focus(); }
       if (e.target.closest("#shareVoice")) shareVoice();
+      var mvb = e.target.closest("[data-mv]");
+      if (mvb) {
+        var mli = mvb.closest(".path__item"), dir = +mvb.getAttribute("data-mv");
+        moveBy(mli, dir);
+        var again = mli.querySelector('[data-mv="' + dir + '"]:not(:disabled)') || mli.querySelector("[data-mv]:not(:disabled)");
+        if (again) again.focus();
+      }
+      if (e.target.closest("#pathReset")) {
+        delete state.data.order;
+        saveDraft(); renderPath();
+        var ps = $("#pathStatus"); if (ps) ps.textContent = "חזרנו לסדר המומלץ";
+        var f0 = $("#partsPath [data-mv]:not(:disabled)"); if (f0) f0.focus();
+      }
       var st = e.target.closest("[data-starter]");
       if (st) {
         var ta = $("#" + st.getAttribute("data-for"));

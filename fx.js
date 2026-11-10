@@ -311,7 +311,19 @@
     L.className = "fx-layer";
     L.setAttribute("aria-hidden", "true");
     const at = (ms, fn) => timers.push(setTimeout(() => { if (!stopped.v) fn(); }, ms));
-    function stop() { stopped.v = true; timers.forEach(clearTimeout); L.remove(); }
+    let raf = 0;
+    function stop() { stopped.v = true; timers.forEach(clearTimeout); cancelAnimationFrame(raf); L.remove(); }
+    // כל הסצנה "דבוקה" לכפתור: אם גוללים, הדמות, החץ והלבבות זזים איתו,
+    // כך שהחץ תמיד פוגע בכפתור (גם כשהוא גולל עם העמוד וגם כשהוא קבוע בתחתית)
+    function follow(r0) {
+      const loop = () => {
+        if (stopped.v) return;
+        const r = rectOf(o.target);
+        if (r && r.width) L.style.transform = `translate(${(r.left - r0.left).toFixed(1)}px,${(r.top - r0.top).toFixed(1)}px)`;
+        raf = requestAnimationFrame(loop);
+      };
+      raf = requestAnimationFrame(loop);
+    }
     if (!scene || reduce()) { if (o.onDone) setTimeout(() => o.onDone(false), 0); return { stop, skipped: true }; }
     timers.push(setTimeout(() => {
       if (stopped.v) return;
@@ -319,6 +331,7 @@
       if (!r || !r.width) { stop(); return; }
       document.body.appendChild(L);
       const t = scene(L, r, at, o);
+      follow(r);
       at(t.hit, () => {
         sfx(t.sound || "crack"); if (t.sound !== "chime") sfx("chime");
         buzz(12);

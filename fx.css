@@ -1,7 +1,8 @@
 /* =========================================================
    Matanot: הדמויות שמסיימות שלב (fx.js)
    ========================================================= */
-.fx-layer { position: fixed; inset: 0; z-index: 90; pointer-events: none; overflow: hidden; }
+/* השכבה זזה עם הכפתור כשגוללים (fx.js → follow), לכן בלי חיתוך בקצוות */
+.fx-layer { position: fixed; inset: 0; z-index: 90; pointer-events: none; overflow: visible; will-change: transform; }
 .fx-actor { position: fixed; filter: drop-shadow(0 8px 10px rgba(60, 20, 50, .2)); will-change: transform; }
 .fx-svg { display: block; width: 100%; height: 100%; overflow: visible; }
 
