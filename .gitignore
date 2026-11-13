@@ -8,3 +8,11 @@ Thumbs.db
 
 # חומרים לפרסומת (לא לפרסום באתר)
 ad-kit/
+
+# build / tests
+node_modules/
+dist/
+test-results/
+playwright-report/
+coverage/
+*.tsbuildinfo

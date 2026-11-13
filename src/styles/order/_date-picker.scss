@@ -1,0 +1,60 @@
+/* ---------- בוחר התאריך ---------- */
+.dp { position: relative; }
+.dp__btn {
+  display: flex; align-items: center; gap: 12px; width: 100%; min-height: 58px; padding: 8px 14px; cursor: pointer; text-align: right; font: inherit; color: var(--text);
+}
+.dp__ico { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 12px; background: var(--blush); color: var(--rose-deep); flex-shrink: 0; }
+.dp__ico .ico { width: 22px; height: 22px; }
+.dp__val { flex: 1; display: flex; flex-direction: column; line-height: 1.25; min-width: 0; }
+.dp__val b { color: var(--ink); font-weight: 800; font-size: 1.02rem; }
+.dp__val small { color: var(--rose-deep); font-weight: 700; font-size: .84rem; }
+.dp__val--empty { color: #7F86A8; font-weight: 500; }
+.dp__chev { color: var(--text-soft); transition: transform .25s var(--ease-out); }
+.dp__chev .ico { width: 18px; height: 18px; }
+.dp.is-open .dp__chev { transform: rotate(-90deg); }
+.dp.is-open .dp__btn { border-color: var(--cobalt); box-shadow: 0 0 0 4px rgba(31,91,209,.14); }
+.dp.is-pulse .dp__ico { animation: dpPulse .45s var(--ease-bounce); }
+@keyframes dpPulse { 40% { transform: scale(1.18) rotate(-6deg); } }
+.dp__quick { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.dp__q {
+  min-height: 40px; padding: 6px 14px; border-radius: 99px; border: 1.5px solid rgba(18,41,122,.18); background: #fff; color: var(--ink);
+  font: 700 .9rem var(--font-body); cursor: pointer; transition: background .2s, border-color .2s, transform .2s var(--ease-bounce);
+}
+.dp__q:hover { border-color: var(--rose-deep); transform: translateY(-1px); }
+.dp__q[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
+.dp__pop {
+  margin-top: 10px; padding: 14px; border-radius: 20px; background: #fff; border: 1.5px solid rgba(18,41,122,.12);
+  box-shadow: 0 22px 40px -24px rgba(18,41,122,.45); animation: dpIn .28s var(--ease-out);
+}
+@keyframes dpIn { from { opacity: 0; transform: translateY(-6px) scale(.98); } }
+.dp__head { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.dp__nav { display: grid; place-items: center; width: 42px; height: 42px; flex-shrink: 0; border-radius: 12px; border: 0; background: var(--paper-2); color: var(--ink); cursor: pointer; }
+.dp__nav .ico { width: 20px; height: 20px; }
+.dp__nav:hover:not([disabled]) { background: var(--blush); }
+.dp__nav[disabled] { opacity: .3; cursor: default; }
+.dp__month {
+  flex: 1; min-height: 42px; padding: 0 12px; border-radius: 12px; border: 1.5px solid rgba(18,41,122,.14); background: #fff; color: var(--ink);
+  font: 800 1rem var(--font-body); text-align: center; text-align-last: center; cursor: pointer; appearance: none; -webkit-appearance: none;
+}
+.dp__week, .dp__grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.dp__week span { text-align: center; font-size: .78rem; font-weight: 800; color: var(--text-soft); padding: 4px 0; }
+.dp__day {
+  aspect-ratio: 1; min-height: 40px; border-radius: 12px; border: 0; background: transparent; color: var(--ink); cursor: pointer;
+  font: 700 .98rem var(--font-body); transition: background .15s, transform .15s var(--ease-bounce);
+}
+.dp__day:hover:not([disabled]) { background: var(--blush); }
+.dp__day.is-sat { color: var(--rose-deep); }
+.dp__day.is-today { box-shadow: inset 0 0 0 2px var(--pink); }
+.dp__day.is-sel { background: var(--rose-deep); color: #fff; box-shadow: 0 8px 16px -8px var(--rose-deep); transform: scale(1.05); }
+.dp__day[disabled] { color: #B8BCCE; cursor: default; background: none; text-decoration: line-through; text-decoration-color: rgba(0,0,0,.15); }
+.dp__day:focus-visible { outline: 3px solid var(--cobalt); outline-offset: 1px; }
+.dp__foot { margin: 8px 0 0; text-align: center; }
+.dp__close { min-height: 40px; color: var(--text-soft); font-weight: 700; }
+.field.has-error .dp__btn { border-color: #C62F4A; background: #FFF7F8; }
+@media (max-width: 639px) {
+  .dp__pop { padding: 12px 10px; }
+  .dp__day { min-height: 38px; font-size: .95rem; }
+}
+.dp__pop { max-width: 380px; scroll-margin-bottom: 110px; }
+.dp__quick { max-width: 520px; }
+.dp__day { min-height: 36px; max-height: 48px; }

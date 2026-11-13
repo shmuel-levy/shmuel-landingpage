@@ -1,0 +1,7 @@
+/* ---------- Doodles ---------- */
+.doodle { position: absolute; color: var(--cobalt); opacity: .55; animation: drift 9s ease-in-out infinite; }
+.doodle--a { width: 30px; height: 30px; top: 9%; left: 7%; }
+.doodle--b { width: 54px; height: 54px; bottom: 16%; left: 3%; color: var(--pink); opacity: .7; animation-delay: -2s; }
+.doodle--c { width: 70px; height: 26px; top: 6%; right: 38%; animation-delay: -4s; opacity: .35; }
+.doodle--d { width: 40px; height: 38px; top: 42%; right: 3%; color: var(--rose); animation-delay: -6s; }
+.doodle--e { width: 26px; height: 26px; bottom: 8%; right: 30%; color: var(--lilac-deep); animation-delay: -1s; opacity: .6; }

@@ -1,0 +1,8 @@
+/* ---------- טלפון: פחות גלילה, רק מה שחשוב ---------- */
+@media (max-width: 639px) {
+  #builder, #why { display: none; }
+  .toolbox > li:nth-child(n+9) { display: none; }
+  .toolbox.is-all > li { display: revert; }
+}
+.ppop__card:focus { outline: none; }
+.ppop__card:focus-visible { outline: 3px solid var(--cobalt); outline-offset: 3px; }

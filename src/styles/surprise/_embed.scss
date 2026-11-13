@@ -1,0 +1,5 @@
+/* ---------- בתוך הטלפון בדף הבית (?embed=1) ---------- */
+body.is-embed .app { padding-top: 30px; }
+body.is-embed .demo-flag, body.is-embed .desk-hint { display: none; }
+body.is-embed::-webkit-scrollbar { width: 0; height: 0; }
+body.is-embed { scrollbar-width: none; }

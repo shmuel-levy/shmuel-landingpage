@@ -9,9 +9,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&family=Suez+One&family=Playpen+Sans+Hebrew:wght@500;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="envelope.css" />
-  <link rel="stylesheet" href="styles.css" />
-  <script src="a11y.js"></script>
+  <script>
+    /* accessibility preferences before first paint (the menu itself is React: A11yWidget) */
+    (function(){try{var p=JSON.parse(localStorage.getItem("matanot-a11y")||"{}")||{},r=document.documentElement;["contrast","links","readable","no-motion","spacing","grayscale","cursor","focus","headings"].forEach(function(k){if(p[k])r.classList.add("a11y-"+k)});var l=+p["text-lg"]||0;if(l===1)r.classList.add("a11y-text-lg");if(l===2)r.classList.add("a11y-text-xl")}catch(e){}})();
+  </script>
 </head>
 <body class="legal-page">
   <a class="skip-link" href="#main">דילוג לתוכן הראשי</a>
@@ -21,7 +22,8 @@
         <img class="brand__mark" src="images/favicon.png" alt="" width="44" height="44" />
         <span class="brand__text"><b lang="en">Matanot</b><small>הפתעות בקישור</small></span>
       </a>
-      <a class="btn btn--ghost btn--sm" href="index.html"><span data-icon="arrow-right"></span>חזרה לאתר</a>
+      <a class="btn btn--ghost btn--sm" href="index.html"><span data-icon="arrow-right"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>חזרה לאתר</a>
+      <span id="menu-root" style="display:contents"></span>
     </div>
   </header>
 
@@ -105,9 +107,6 @@
       <p class="footer__copy">© 2026 Matanot · שמואל לוי · <a href="privacy.html">מדיניות פרטיות</a> · <a href="negishut.html">הצהרת נגישות</a></p>
     </div>
   </footer>
-  <script src="config.js"></script>
-  <script src="track.js"></script>
-  <script src="icons.js"></script>
-  <script src="menu.js"></script>
+  <script type="module" src="/src/app/legal.tsx"></script>
 </body>
 </html>

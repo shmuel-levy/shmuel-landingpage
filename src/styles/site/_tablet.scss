@@ -1,0 +1,12 @@
+/* ---------- מסכים בינוניים ---------- */
+@media (min-width: 640px) {
+  .hero__buttons, .final-cta__buttons { flex-direction: row; justify-content: center; max-width: none; }
+  .steps { grid-template-columns: repeat(3, 1fr); }
+  .examples { grid-template-columns: 1fr 1fr; }
+  .toolbox { grid-template-columns: repeat(3, 1fr); }
+  .plans { grid-template-columns: 1fr 1fr; align-items: center; }
+  .projects { grid-template-columns: repeat(3, 1fr); }
+  .tabs { justify-content: center; margin-inline: 0; }
+  .profile { width: 360px; }
+  .wave { height: 60px; }
+}

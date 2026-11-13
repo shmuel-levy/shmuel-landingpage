@@ -1,0 +1,3 @@
+/* ---------- הופעה בגלילה ---------- */
+.reveal { opacity: 0; transform: translateY(22px); transition: opacity .7s ease var(--d, 0ms), transform .7s var(--ease-out) var(--d, 0ms); }
+.reveal.is-visible { opacity: 1; transform: none; }

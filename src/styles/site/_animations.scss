@@ -1,0 +1,30 @@
+/* ---------- אנימציות ---------- */
+@keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.12); } }
+@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+@keyframes bob { 0%, 100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-8px) rotate(3deg); } }
+@keyframes drift { 0%, 100% { transform: translate(0, 0) rotate(0); } 50% { transform: translate(6px, -12px) rotate(12deg); } }
+@keyframes beat { 0%, 100% { transform: scale(1); } 15% { transform: scale(1.14); } 30% { transform: scale(1); } 45% { transform: scale(1.07); } }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes fly { 0% { transform: translate(-50%, -50%) rotate(0); opacity: 1; } 100% { transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y) + 130px)) rotate(var(--r)); opacity: 0; } }
+@keyframes popIn { from { transform: scale(.92); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes ring { 0% { transform: scale(1); opacity: .7; } 100% { transform: scale(1.6); opacity: 0; } }
+@keyframes draw { to { stroke-dashoffset: 0; } }
+@keyframes marquee { from { transform: translateX(0); } to { transform: translateX(50%); } }
+@keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+@keyframes scan { 0% { top: 0; opacity: 1; } 90% { opacity: 1; } 100% { top: 100%; opacity: 0; } }
+@keyframes blink { 50% { opacity: 0; } }
+@keyframes jump { 0%, 55%, 100% { transform: translateY(0) rotate(0); } 65% { transform: translateY(4px) scaleY(.96); } 75% { transform: translateY(-22px) rotate(-3deg); } 87% { transform: translateY(0) rotate(1deg); } }
+@keyframes blob { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(40px, 30px) scale(1.12); } 100% { transform: translate(-30px, 50px) scale(.95); } }
+@keyframes fly-env { 0% { transform: translateX(0) translateY(0) rotate(-8deg); opacity: 0; } 8% { opacity: .28; } 50% { transform: translateX(55vw) translateY(-30px) rotate(6deg); } 92% { opacity: .28; } 100% { transform: translateX(115vw) translateY(10px) rotate(-6deg); opacity: 0; } }
+@keyframes wordUp { from { opacity: 0; transform: translateY(.5em) rotate(2deg); filter: blur(4px); } to { opacity: 1; transform: none; filter: none; } }
+@keyframes stampIn { from { opacity: 0; transform: rotate(40deg) scale(1.6); } to { opacity: 1; transform: rotate(9deg); } }
+@keyframes wobble { 0%, 100% { transform: rotate(-12deg); } 50% { transform: rotate(-4deg) scale(1.05); } }
+@keyframes mockSwap { 0% { transform: rotate(3deg) scale(.96); } 60% { transform: rotate(1deg) scale(1.02); } 100% { transform: rotate(3deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; transition-delay: 0s !important; }
+  html { scroll-behavior: auto; }
+  .reveal { opacity: 1; transform: none; }
+  .marquee__track, .blob, .flyer { animation: none; }
+  .flyer { display: none; }
+}

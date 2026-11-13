@@ -1,0 +1,24 @@
+/* ---------- מסכים נמוכים: הכל נכנס במסך אחד ---------- */
+@media (max-height: 760px) {
+  .medal { width: 66px; height: 66px; margin-bottom: 8px; }
+  .medal .ico { width: 32px; height: 32px; }
+  .step__title { font-size: clamp(1.45rem, 7vw, 1.9rem); }
+  .step__sub { margin-bottom: 12px; }
+  .stage { padding-top: 8px; }
+  .album { height: 270px; width: 230px; }
+  .photo { width: min(76%, 260px); margin-bottom: 12px; }
+  .env-stage { padding: 50px 0 30px; }
+  .option { min-height: 56px; padding: 10px 14px; }
+  .reason { height: 88px; }
+}
+@media (max-height: 640px) {
+  .medal { display: none; }
+  .step--envelope .env { --w: min(250px, 66vw); }
+}
+
+.run-no { white-space: nowrap; }
+
+.wheel { width: min(250px, 66vw, 36vh); }
+
+/* מצב צילום: בלי "חזרה" ובלי תווית "אתר לדוגמה" */
+.is-clean .back, .is-clean .demo-flag, .is-clean .desk-hint { visibility: hidden; }

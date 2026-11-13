@@ -1,0 +1,54 @@
+/* ---------- הסקיצה ---------- */
+.sketch { display: grid; gap: 26px; }
+.sketch__phone { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.phone--sketch { width: min(100%, 340px); height: 640px; padding: 0; }
+.phone--sketch iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; border-radius: 32px; background: #fff; }
+.sketch__side h3 { font-size: 1.35rem; }
+.summary { display: grid; gap: 0; margin: 0 0 18px; background: var(--paper-2); border-radius: 18px; padding: 6px 16px; }
+.summary div { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px dashed rgba(18,41,122,.14); }
+.summary div:last-child { border-bottom: 0; }
+.summary dt { color: var(--text-soft); font-weight: 500; }
+.summary dd { margin: 0; font-weight: 700; color: var(--ink); text-align: left; }
+.summary__total dd { font-family: var(--font-display); font-weight: 400; font-size: 1.35rem; color: var(--rose-deep); }
+.summary__total small { font-family: var(--font-body); font-size: .8rem; color: var(--text-soft); }
+.sketch__side .btn { margin-bottom: 10px; }
+.btn--wa { background: #0E7A3E; color: #fff; box-shadow: 0 14px 28px -12px rgba(14,122,62,.6); }
+.btn--wa:hover { background: #0B6633; transform: translateY(-2px); }
+.btn--wa .ico { width: 24px; height: 24px; }
+.sent-note { display: flex; gap: 10px; align-items: flex-start; background: #E3F7EF; border: 1.5px solid #8FD6B5; color: #0D3B2B; border-radius: 16px; padding: 12px 14px; margin-bottom: 12px; }
+.sent-note .ico { width: 22px; height: 22px; flex-shrink: 0; color: #17694B; }
+.sent-note p { margin: 0; font-size: .93rem; }
+.msg-peek { margin: 4px 0 16px; }
+.msg-peek summary { cursor: pointer; font-weight: 700; color: var(--cobalt); padding: 8px 0; min-height: 44px; display: flex; align-items: center; }
+.msg-peek pre { white-space: pre-wrap; word-break: break-word; font: 400 .86rem/1.6 var(--font-body); background: #F4F6FC; border-radius: 14px; padding: 12px 14px; max-height: 280px; overflow: auto; margin: 0; }
+.next-steps { counter-reset: n; display: grid; gap: 8px; margin: 0 0 18px; }
+.next-steps li { counter-increment: n; position: relative; padding-right: 38px; font-size: .95rem; color: var(--text-soft); }
+.next-steps li::before { content: counter(n); position: absolute; right: 0; top: 0; width: 28px; height: 28px; border-radius: 50%; background: var(--blush); color: var(--rose-deep); font-weight: 800; display: grid; place-items: center; font-size: .85rem; }
+.next-steps b { color: var(--ink); }
+
+@keyframes wzIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+@keyframes palSwap { 0% { transform: scale(.97); filter: saturate(.6); } 100% { transform: none; filter: none; } }
+
+@media (min-width: 640px) {
+  .types { grid-template-columns: 1fr 1fr; }
+  .swatches { grid-template-columns: repeat(6, 1fr); }
+  .qblock__answers { grid-template-columns: repeat(3, 1fr); }
+  .wz-step { padding: 34px 32px 28px; }
+  .stepper button { font-size: .9rem; }
+}
+@media (min-width: 980px) {
+  .order__grid { grid-template-columns: minmax(0, 1fr) 340px; gap: 34px; }
+  .live { display: block; }
+  body[data-step="design"] .live { order: 0; }
+  body[data-step="sketch"] .order__grid, body[data-step="type"] .order__grid { grid-template-columns: minmax(0, 1fr); max-width: 980px; }
+  body[data-step="sketch"] .live, body[data-step="type"] .live { display: none; }
+  .types { grid-template-columns: repeat(3, 1fr); }
+  .type-card { flex-direction: column; align-items: flex-start; padding: 18px; min-height: 150px; }
+  .type-card__tick { position: absolute; top: 14px; left: 14px; }
+  .sketch { grid-template-columns: 360px minmax(0, 1fr); align-items: start; }
+}
+@media (max-width: 979px) {
+  body[data-step="design"] .live__env { padding: 64px 0 28px; }
+  body[data-step="design"] .live { position: static; max-width: 420px; margin: 0 auto; width: 100%; }
+}
+html.a11y-contrast .wz-step, html.a11y-contrast .type-card, html.a11y-contrast .input, html.a11y-contrast .chip span { border: 2px solid #000; }

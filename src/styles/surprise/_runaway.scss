@@ -1,0 +1,5 @@
+/* ---------- כפתור בורח ---------- */
+.run-area { position: relative; height: 200px; margin-top: 8px; display: flex; align-items: center; justify-content: center; gap: 16px; }
+.run-yes { z-index: 2; transition: transform .3s var(--ease-bounce); }
+.run-no { min-width: 92px; touch-action: none; transition: left .25s var(--ease-out), top .25s var(--ease-out), transform .25s; }
+.run-no.is-running { position: absolute; margin: 0; z-index: 3; }

@@ -1,0 +1,38 @@
+/* ---------- באנר והדר ---------- */
+.banner { background: linear-gradient(90deg, #B83563, #8E2552); color: #fff; font-size: .9rem; font-weight: 500; padding: 8px 0; }
+.banner__inner { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 4px 10px; text-align: center; }
+.banner__ico { width: 20px; height: 20px; color: #FFD3E0; }
+.banner b { color: #fff; }
+.banner__left { color: #FFE0EA; }
+.banner__link { display: inline-flex; align-items: center; gap: 4px; color: #fff; font-weight: 800; text-underline-offset: 3px; padding: 4px 2px; }
+.banner__link .ico { width: 16px; height: 16px; }
+.header {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(255, 247, 248, .9);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid transparent;
+  transition: box-shadow .25s ease, border-color .25s ease;
+}
+.header.is-scrolled { box-shadow: 0 8px 24px -18px rgba(18,41,122,.5); border-color: rgba(18,41,122,.08); }
+.header__inner { display: flex; align-items: center; justify-content: space-between; gap: 16px; height: 66px; }
+.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); }
+.brand__mark {
+  width: 44px; height: 44px; border-radius: 50%; border: 2.5px solid var(--ink); background: #fff;
+  object-fit: cover; transition: transform .4s var(--ease-bounce);
+}
+.brand:hover .brand__mark { transform: rotate(-12deg) scale(1.06); }
+.brand__text { display: flex; flex-direction: column; line-height: 1.05; }
+.brand__text b { font-family: var(--font-hand); font-size: 1.35rem; font-weight: 700; letter-spacing: .01em; }
+.brand__text small { font-size: .74rem; color: var(--text-soft); font-weight: 500; }
+.nav { display: none; }
+.nav ul { display: flex; gap: 4px; }
+.nav a { position: relative; color: var(--text); text-decoration: none; font-weight: 500; padding: 8px 12px; border-radius: 999px; transition: background .2s, color .2s; }
+.nav a:hover { background: var(--blush); color: var(--ink); }
+.header__actions { display: flex; align-items: center; gap: 10px; }
+.wa-icon {
+  display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+  width: 42px; height: 42px; border-radius: 50%; background: var(--wa); color: #fff;
+  box-shadow: 0 8px 18px -8px rgba(29,168,81,.7); transition: transform .25s var(--ease-bounce);
+}
+.wa-icon .ico { width: 24px; height: 24px; }
+a.wa-icon:hover { transform: scale(1.08) rotate(-6deg); }

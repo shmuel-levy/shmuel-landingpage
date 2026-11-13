@@ -1,0 +1,25 @@
+/* ---------- אקורדיונים: כל קבוצת שאלות מתקפלת ---------- */
+.wz-step .fields:has(> .acc) { gap: 10px; }
+.acc { border: 1.5px solid rgba(18,41,122,.12); border-radius: 20px; background: #fff; transition: border-color .25s, box-shadow .25s; }
+.acc[open] { border-color: var(--pink); box-shadow: 0 14px 28px -20px rgba(184,53,99,.5); }
+.acc__sum {
+  list-style: none; display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 12px 14px; cursor: pointer; border-radius: 20px;
+}
+.acc__sum::-webkit-details-marker { display: none; }
+.acc__sum:focus-visible { outline: 3px solid var(--cobalt); outline-offset: 2px; }
+.acc__ico { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 14px; background: var(--blush); color: var(--rose-deep); flex-shrink: 0; transition: background .25s, color .25s; }
+.acc__ico .ico { width: 22px; height: 22px; }
+.acc.is-done .acc__ico { background: var(--mint); color: var(--mint-deep); }
+.acc__t { display: grid; gap: 1px; min-width: 0; flex: 1; }
+.acc__t b { display: flex; align-items: center; gap: 8px; color: var(--ink); font-size: 1.04rem; }
+.acc__t small { color: var(--text-soft); font-size: .86rem; line-height: 1.35; }
+.acc__req { font-size: .7rem; font-weight: 800; color: var(--rose-deep); background: var(--blush); border-radius: 99px; padding: 2px 8px; }
+.acc__state { font-size: .82rem; font-weight: 800; color: var(--text-soft); white-space: nowrap; max-width: 34%; overflow: hidden; text-overflow: ellipsis; }
+.acc.is-done .acc__state { color: var(--mint-deep); }
+.acc__chev { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--paper-2); color: var(--ink); flex-shrink: 0; transition: transform .3s var(--ease-bounce), background .2s; }
+.acc__chev .ico { width: 16px; height: 16px; }
+.acc[open] .acc__chev { transform: rotate(45deg); background: var(--blush); }
+.acc__body { padding: 4px 16px 18px; }
+.acc[open] .acc__body { animation: accIn .35s var(--ease-out); }
+@keyframes accIn { from { opacity: 0; transform: translateY(-6px); } }
+.acc__body > .fields { gap: 20px; }

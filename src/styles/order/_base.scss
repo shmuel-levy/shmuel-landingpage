@@ -1,0 +1,27 @@
+/* =========================================================
+   Matanot: עמוד ההזמנה והסקיצה
+   ========================================================= */
+.order-page { background: var(--paper); }
+.order-page main { position: relative; isolation: isolate; }
+.order-page main::before {
+  content: ""; position: absolute; inset: 0 0 auto; height: 520px; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(420px 300px at 88% 0%, rgba(245,169,192,.45), transparent 70%),
+    radial-gradient(380px 300px at 8% 30%, rgba(155,127,224,.22), transparent 70%),
+    radial-gradient(300px 240px at 50% 80%, rgba(255,214,165,.35), transparent 70%);
+}
+.order-progress { height: 3px; background: rgba(18,41,122,.08); }
+.order-progress b { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--rose), var(--lilac-deep), var(--cobalt)); transition: width .6s var(--ease-out); }
+
+.order__intro { text-align: center; padding-top: 34px; padding-bottom: 6px; }
+.order__intro h1 { font-size: clamp(1.9rem, 7.4vw, 3rem); margin-bottom: 12px; }
+.order__lead { color: var(--text-soft); max-width: 56ch; margin: 0 auto 14px; }
+.order-promo {
+  display: inline-flex; align-items: center; gap: 10px; text-align: right; max-width: 560px;
+  background: linear-gradient(135deg, #FFF4D6, #FFE1EA); border: 1.5px solid #F5C978; color: var(--text);
+  padding: 10px 16px; border-radius: 16px; font-size: .95rem; margin: 0 auto 6px;
+}
+.order-promo .ico { width: 26px; height: 26px; color: var(--rose-deep); flex-shrink: 0; }
+.draft-note { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 4px 8px; font-size: .92rem; color: var(--text-soft); margin: 8px 0 0; }
+.draft-note .ico { width: 18px; height: 18px; color: var(--cobalt); }
+.draft-note .link-btn { margin: 0; padding: 6px; min-height: 40px; }

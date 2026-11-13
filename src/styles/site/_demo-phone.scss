@@ -1,0 +1,112 @@
+/* ---------- ההדגמה ---------- */
+.demo-wrap { position: relative; display: flex; flex-direction: column; align-items: center; padding-top: 6px; }
+.hand-note {
+  position: absolute; top: -8px; left: max(0px, calc(50% - 215px)); z-index: 3; margin: 0;
+  font-family: var(--font-hand); font-weight: 700; color: var(--cobalt); font-size: 1.05rem;
+  transform: rotate(-8deg); display: flex; flex-direction: column; align-items: center;
+}
+.hand-note svg { width: 54px; height: 42px; transform: scaleX(-1) rotate(-30deg); margin-top: -2px; }
+.stamp {
+  position: absolute; z-index: 4; top: 34px; right: max(-4px, calc(50% - 205px)); margin: 0; width: 78px;
+  padding: 7px 7px 4px; transform: rotate(9deg); box-shadow: 0 10px 18px -10px rgba(0,0,0,.45);
+  background: radial-gradient(circle, transparent 3px, #fff 3.6px) -5px -5px / 10px 10px;
+  animation: stampIn .8s var(--ease-bounce) 1s both;
+}
+.stamp img { width: 100%; aspect-ratio: 1; object-fit: cover; background: var(--sky); border: 1px solid rgba(18,41,122,.15); }
+.stamp figcaption { background: #fff; font: 800 .5rem/1.6 var(--font-body); letter-spacing: .08em; color: var(--ink); text-align: center; direction: ltr; text-transform: uppercase; }
+/* פרופורציה של טלפון אמיתי (בערך 9:19), מסגרת דקה, אי דינמי, שורת סטטוס וכפתורי צד */
+.demo-wrap { --pw: 270px; }
+.demo-wrap::before, .demo-wrap::after {
+  content: ""; position: absolute; z-index: 0; width: 4px; border-radius: 3px; background: var(--ink-deep, #0B1A55);
+}
+.demo-wrap::before { top: 128px; height: 58px; right: calc(50% - var(--pw) / 2 - 3px); }
+.demo-wrap::after { top: 110px; height: 34px; left: calc(50% - var(--pw) / 2 - 3px); box-shadow: 0 48px 0 var(--ink-deep, #0B1A55); }
+.phone {
+  position: relative; z-index: 1; width: var(--pw); height: auto; aspect-ratio: 9 / 19.2;
+  border-radius: 44px; border: 7px solid var(--ink);
+  background: linear-gradient(170deg, #FFF6F8 0%, #FCE1EA 60%, #F3E4FA 100%);
+  box-shadow: var(--shadow-lg), 0 0 0 2px rgba(255,255,255,.6) inset;
+  overflow: hidden;
+}
+.phone__notch { position: absolute; top: 9px; left: 50%; transform: translateX(-50%); width: 74px; height: 22px; border-radius: 99px; background: #0B1022; z-index: 6; }
+/* שורת סטטוס: שעה מצד אחד, קליטה וסוללה מהצד השני */
+.demo-wrap .phone::before {
+  content: "9:41"; position: absolute; z-index: 6; top: 11px; left: 22px; direction: ltr;
+  font: 700 .74rem/1 var(--font-body); color: var(--ink); letter-spacing: .02em;
+}
+.demo-wrap .phone::after {
+  content: ""; position: absolute; z-index: 6; top: 13px; right: 20px; width: 42px; height: 10px;
+  background:
+    linear-gradient(var(--ink), var(--ink)) 0 6px / 3px 4px no-repeat, linear-gradient(var(--ink), var(--ink)) 4px 4px / 3px 6px no-repeat,
+    linear-gradient(var(--ink), var(--ink)) 8px 2px / 3px 8px no-repeat, linear-gradient(var(--ink), var(--ink)) 12px 0 / 3px 10px no-repeat,
+    linear-gradient(var(--ink), var(--ink)) 21px 1px / 17px 8px no-repeat;
+  border-radius: 2px; opacity: .85;
+}
+.screen__env .env { --w: 196px; }
+/* המסך של הטלפון: החוויה האמיתית (iframe) מוקטנת בדיוק לרוחב */
+.phone__screen { position: absolute; inset: 0; border-radius: 37px; overflow: hidden; background: linear-gradient(170deg, #FFF6F8 0%, #FCE1EA 60%, #F3E4FA 100%); }
+.phone__screen iframe { position: absolute; top: 0; left: 0; border: 0; transform-origin: 0 0; background: transparent; transition: opacity .3s ease, filter .3s ease; }
+.phone__loading { position: absolute; inset: 0; display: grid; place-items: center; opacity: 0; pointer-events: none; transition: opacity .25s ease; }
+.phone__loading span { width: 34px; height: 34px; border-radius: 50%; border: 3px solid rgba(184,53,99,.2); border-top-color: var(--rose-deep); animation: spin .8s linear infinite; }
+.phone__screen.is-loading iframe { opacity: 0; filter: blur(6px); }
+.phone__screen.is-loading .phone__loading { opacity: 1; }
+
+/* מתחת לטלפון: הגרלת דוגמה, מה יש בה, ולינקים */
+.demo-ctl { display: flex; flex-direction: column; align-items: center; gap: 8px; margin-top: 16px; text-align: center; width: min(100%, 340px); }
+.demo-shuffle {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 46px; padding: 8px 20px; border-radius: 99px; cursor: pointer;
+  border: 2px dashed var(--pink); background: #fff; color: var(--rose-deep); font: 800 .98rem var(--font-body);
+  box-shadow: 0 10px 22px -16px rgba(184,53,99,.7); transition: transform .2s var(--ease-bounce), background .2s;
+}
+.demo-shuffle:hover { transform: translateY(-2px); background: var(--blush); }
+.demo-shuffle__ico .ico { width: 20px; height: 20px; }
+.demo-shuffle.is-spin .demo-shuffle__ico { animation: spin .6s var(--ease-out); }
+.demo-now { margin: 0; font-size: .92rem; color: var(--text-soft); }
+.demo-now b { color: var(--ink); font-weight: 800; }
+.demo-feat { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin: 0; }
+.demo-feat li { font-size: .8rem; font-weight: 700; color: var(--rose-deep); background: var(--blush); padding: 4px 10px; border-radius: 99px; }
+.demo-links { display: flex; gap: 18px; justify-content: center; margin: 2px 0 0; font-size: .9rem; }
+.demo-links a { display: inline-flex; align-items: center; gap: 5px; color: var(--ink); font-weight: 700; text-underline-offset: 3px; min-height: 40px; }
+.demo-links .ico { width: 17px; height: 17px; color: var(--rose-deep); }
+
+.screen {
+  position: absolute; inset: 0; padding: 40px 18px 20px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+  opacity: 0; transform: translateY(14px) scale(.97); pointer-events: none;
+  transition: opacity .45s ease, transform .5s var(--ease-out);
+}
+.screen.is-active { opacity: 1; transform: none; pointer-events: auto; }
+.screen__to { font-weight: 700; color: var(--rose-deep); font-size: 1.15rem; margin: 0; }
+.screen__env { padding: 46px 0 22px; }
+.screen__env .env { --w: 214px; }
+.screen__title { font-family: var(--font-display); font-size: 1.4rem; color: var(--ink); margin: 6px 0 2px; }
+.screen__question { font-family: var(--font-display); font-size: 1.9rem; color: var(--ink); margin: 4px 0 0; }
+.screen__text { color: var(--text-soft); margin-bottom: 16px; }
+.screen__hint { display: inline-flex; align-items: center; gap: 6px; font-size: .88rem; color: var(--text-soft); margin: 0; transition: opacity .3s; }
+.screen__hint .ico { width: 17px; height: 17px; color: var(--rose-deep); }
+.screen__hint.hand { color: var(--cobalt); font-weight: 500; }
+.screen__hint.is-hidden { opacity: 0; }
+.screen__to, .screen__title { transition: opacity .4s ease, transform .5s var(--ease-out); }
+.screen.is-opening .screen__to, .screen.is-opening .screen__title { opacity: 0; transform: translateY(-8px); }
+.medal {
+  position: relative; display: inline-grid; place-items: center; width: 86px; height: 86px; margin-bottom: 10px; border-radius: 50%;
+  color: var(--rose-deep); background: radial-gradient(circle at 35% 30%, #fff 0%, var(--blush) 70%);
+  box-shadow: 0 16px 30px -16px var(--rose-deep), inset 0 0 0 1px rgba(255,255,255,.8);
+}
+.medal .ico { width: 42px; height: 42px; stroke-width: 1.6; position: relative; z-index: 1; }
+.medal__ring { position: absolute; inset: -7px; border-radius: 50%; border: 1.5px dashed var(--rose); opacity: .55; animation: spin 18s linear infinite; }
+.bob { animation: bob 2.6s ease-in-out infinite; }
+.beat { animation: beat 1.2s ease-in-out infinite; }
+
+/* כפתור בורח */
+.choice-area { position: relative; width: 100%; height: 170px; margin: 6px 0 4px; display: flex; align-items: center; justify-content: center; gap: 14px; }
+.choice-yes { transition: transform .3s var(--ease-bounce); z-index: 2; }
+.choice-no { min-width: 86px; transition: left .25s var(--ease-out), top .25s var(--ease-out), transform .25s ease; touch-action: none; }
+.choice-no.is-running { position: absolute; margin: 0; z-index: 3; }
+
+/* קונפטי */
+.confetti { position: absolute; inset: 0; pointer-events: none; z-index: 10; overflow: hidden; }
+.confetti__bit { position: absolute; top: 45%; left: 50%; width: 8px; height: 13px; border-radius: 2px; animation: fly 1.5s cubic-bezier(.15,.7,.35,1) forwards; }
+.confetti__bit.is-dot { width: 9px; height: 9px; border-radius: 50%; }
+.confetti__bit.is-shape { width: 16px; height: 16px; background: none; }
+.confetti__bit.is-shape svg { width: 100%; height: 100%; display: block; }

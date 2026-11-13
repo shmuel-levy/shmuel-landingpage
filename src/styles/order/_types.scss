@@ -1,0 +1,27 @@
+/* ---------- סוגי הפתעה ---------- */
+.types-field { border: 0; padding: 0; margin: 0; }
+.types { display: grid; grid-template-columns: 1fr; gap: 10px; }
+.type-card {
+  --tile: var(--blush); --tile-ink: var(--rose-deep);
+  position: relative; display: flex; align-items: center; gap: 14px; padding: 14px 16px; min-height: 76px;
+  background: #fff; border: 2px solid rgba(18,41,122,.1); border-radius: 20px; cursor: pointer;
+  transition: border-color .2s, transform .25s var(--ease-bounce), box-shadow .25s;
+  animation: wzIn .5s var(--ease-out) both; animation-delay: calc(var(--i) * 40ms);
+}
+.type-card:nth-child(6n+2) { --tile: var(--sky); --tile-ink: var(--cobalt); }
+.type-card:nth-child(6n+3) { --tile: #FFF1CF; --tile-ink: #8A5A00; }
+.type-card:nth-child(6n+4) { --tile: #FFE6D8; --tile-ink: #AD481D; }
+.type-card:nth-child(6n+5) { --tile: #DDF5EA; --tile-ink: #17694B; }
+.type-card:nth-child(6n+6) { --tile: var(--lilac); --tile-ink: #5B3FA8; }
+.type-card:hover { border-color: var(--pink); transform: translateY(-2px); box-shadow: var(--shadow); }
+.type-card input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.type-card__ico { display: grid; place-items: center; width: 50px; height: 50px; border-radius: 16px; background: var(--tile); color: var(--tile-ink); flex-shrink: 0; transition: transform .35s var(--ease-bounce); }
+.type-card__ico .ico { width: 26px; height: 26px; }
+.type-card:hover .type-card__ico { transform: rotate(-8deg) scale(1.06); }
+.type-card__text b { display: block; font-size: 1.05rem; color: var(--ink); }
+.type-card__text small { display: block; color: var(--text-soft); font-size: .86rem; line-height: 1.4; }
+.type-card__tick { margin-inline-start: auto; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; border: 2px solid rgba(18,41,122,.18); color: transparent; flex-shrink: 0; transition: all .25s var(--ease-bounce); }
+.type-card__tick .ico { width: 16px; height: 16px; }
+.type-card:has(input:checked) { border-color: var(--ink); box-shadow: 0 14px 30px -18px var(--ink); background: linear-gradient(135deg, #fff, var(--sky)); }
+.type-card:has(input:checked) .type-card__tick { background: var(--ink); border-color: var(--ink); color: #fff; transform: scale(1.1); }
+.type-card:has(input:focus-visible) { outline: 3px solid var(--cobalt); outline-offset: 3px; }

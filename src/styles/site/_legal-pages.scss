@@ -1,0 +1,10 @@
+/* ---------- עמודי מידע (נגישות / פרטיות) ---------- */
+.legal { padding-top: 40px; padding-bottom: 60px; }
+.legal h1 { font-size: clamp(2rem, 7vw, 2.6rem); margin-bottom: 4px; }
+.legal h2 { font-size: 1.35rem; margin-top: 1.6em; }
+.legal ul { list-style: disc; padding-right: 1.3em; margin-bottom: 1em; }
+.legal li { margin-bottom: .35em; }
+.legal__date { color: var(--text-soft); font-size: .92rem; }
+.legal__contact { background: #fff; border-radius: var(--radius); padding: 18px 20px 6px; box-shadow: var(--shadow); margin-bottom: 1em; }
+.legal__contact p { margin-bottom: .6em; }
+.footer--slim { padding: 24px 0; }

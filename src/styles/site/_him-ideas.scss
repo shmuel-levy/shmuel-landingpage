@@ -1,0 +1,39 @@
+/* =========================================================
+   בשבילו + מחולל רעיונות
+   ========================================================= */
+.section--him { background: linear-gradient(170deg, #FFF0F5 0%, #FFE3EC 55%, #F8E6FA 100%); overflow: hidden; }
+.section--him::after { content: ""; position: absolute; width: 300px; height: 300px; right: -90px; bottom: -110px; border-radius: 50%; background: radial-gradient(closest-side, rgba(226,109,147,.22), transparent); pointer-events: none; }
+.him { display: grid; gap: 28px; align-items: center; position: relative; z-index: 1; }
+.him__text { text-align: center; }
+.him__title { font-size: clamp(1.8rem, 6.6vw, 2.6rem); }
+.him__lead { color: var(--text-soft); max-width: 52ch; margin-inline: auto; }
+.him__points { display: grid; gap: 8px; margin: 0 auto 22px; max-width: 460px; text-align: right; }
+.him__points li { display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,.75); border-radius: 18px; padding: 10px 12px; }
+.him__points .tile { width: 44px; height: 44px; border-radius: 14px; }
+.him__points .tile .ico { width: 22px; height: 22px; }
+.him__points b { display: block; color: var(--ink); }
+.him__points small { display: block; color: var(--text-soft); font-size: .9rem; }
+.him__ctas { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.idea { background: #fff; border-radius: var(--radius-lg); padding: 18px; box-shadow: 0 26px 50px -28px rgba(184,53,99,.5); border: 2px dashed var(--pink); max-width: 480px; width: 100%; margin: 0 auto; }
+.idea__label { display: flex; align-items: center; gap: 8px; font-family: var(--font-hand); font-weight: 700; color: var(--rose-deep); margin: 0 0 12px; }
+.idea__label .ico { width: 20px; height: 20px; }
+.idea__card { display: flex; gap: 14px; align-items: flex-start; min-height: 116px; }
+.idea__card.is-new { animation: ideaIn .55s var(--ease-bounce); }
+.idea__n { font-size: .82rem; font-weight: 700; color: var(--text-soft); margin: 0 0 2px; }
+.idea__title { font-size: 1.3rem; margin: 0 0 4px; }
+.idea__card p:last-child { margin: 0; color: var(--text-soft); }
+.idea__actions { display: flex; gap: 8px; margin-top: 14px; }
+.idea__actions .btn { flex: 1; padding-inline: 1em; }
+@keyframes ideaIn { from { opacity: 0; transform: translateY(10px) rotate(-1deg); } to { opacity: 1; transform: none; } }
+
+.more-btn { display: flex; margin: 18px auto 0; }
+.about__more-btn { color: #FFD3E0; padding-inline: 0; display: none; }
+.cta-bar { display: none; }
+
+@media (min-width: 980px) {
+  .him { grid-template-columns: 1.1fr .9fr; gap: 56px; }
+  .him__text { text-align: right; }
+  .him__lead, .him__points { margin-inline: 0; }
+  .him__ctas { flex-direction: row; gap: 14px; }
+}
+@media (min-width: 640px) { .more-btn { display: none !important; } }

@@ -1,0 +1,6 @@
+/* ---------- טריוויה ---------- */
+.quiz__count { font-size: .85rem; font-weight: 700; color: var(--accent-deep); margin-bottom: 4px; }
+.quiz__q { font-size: 1.3rem; font-weight: 700; color: var(--ink); margin-bottom: 14px; outline: none; }
+.option.is-right { border-color: #1E9E6A; background: #E3F7EF; }
+.option.is-wrong { border-color: #D64545; animation: shake .4s; }
+.feedback { min-height: 1.6em; margin-top: 14px; font-weight: 700; }

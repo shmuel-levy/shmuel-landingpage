@@ -1,0 +1,57 @@
+/* ---------- עמודי אירוע (tools/gen-pages.js) ---------- */
+.ev-hero {
+  position: relative; padding: 30px 0 44px; overflow: hidden;
+  background: radial-gradient(520px 400px at 100% 0%, #FBD3E0, transparent 70%), radial-gradient(460px 360px at 0% 100%, #EBDDFA, transparent 70%), var(--paper);
+}
+.ev-hero__grid { display: grid; gap: 28px; align-items: center; }
+.ev-hero .kicker-pill { justify-content: flex-start; }
+.ev-hero h1 { font-size: clamp(2rem, 8.6vw, 3.4rem); line-height: 1.12; margin: 8px 0 12px; color: var(--text); }
+.ev-hero__lead { font-size: 1.08rem; color: var(--text-soft); max-width: 52ch; margin: 0; }
+.ev-hero__ctas { display: flex; flex-wrap: wrap; gap: 10px; margin: 20px 0 12px; }
+.ev-price { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; font-weight: 700; color: var(--ink); margin: 0; }
+.ev-price del { color: var(--text-soft); font-weight: 500; }
+.ev-price__tag { background: var(--rose-deep); color: #fff; font-size: .82rem; font-weight: 800; padding: 4px 10px; border-radius: 99px; }
+.ev-shot {
+  position: relative; justify-self: center; display: block; width: min(230px, 62vw); aspect-ratio: 780 / 1300; border-radius: 30px;
+  border: 7px solid #1C2452; overflow: hidden; box-shadow: var(--shadow-lg); transform: rotate(-3deg); transition: transform .4s var(--ease-bounce);
+}
+.ev-shot:hover { transform: rotate(0) scale(1.02); }
+.ev-shot img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+.ev-shot__tag {
+  position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(255,255,255,.94); color: var(--ink); font-weight: 800; font-size: .85rem; padding: 7px 13px; border-radius: 99px; white-space: nowrap;
+  box-shadow: 0 8px 18px -10px rgba(0,0,0,.45);
+}
+.ev-shot__tag .ico { width: 16px; height: 16px; color: var(--rose-deep); }
+.ev-ideas { display: grid; gap: 12px; }
+.ev-idea { display: flex; gap: 14px; align-items: flex-start; background: #fff; border-radius: 20px; padding: 16px; box-shadow: var(--shadow); }
+.ev-idea .tile { width: 50px; height: 50px; border-radius: 16px; }
+.ev-idea .tile .ico { width: 24px; height: 24px; }
+.ev-idea h3 { font-size: 1.12rem; margin: 2px 0 2px; }
+.ev-idea p { margin: 0; color: var(--text-soft); font-size: .95rem; }
+.ev-steps { display: grid; gap: 12px; counter-reset: s; }
+.ev-steps li { counter-increment: s; position: relative; background: #fff; border-radius: 20px; padding: 16px 64px 16px 16px; box-shadow: var(--shadow); }
+.ev-steps li::before { content: counter(s); position: absolute; right: 16px; top: 16px; width: 34px; height: 34px; border-radius: 50%; background: var(--rose-deep); color: #fff; display: grid; place-items: center; font-weight: 800; }
+.ev-steps b { display: block; color: var(--ink); font-size: 1.05rem; }
+.ev-steps span { color: var(--text-soft); font-size: .95rem; }
+.ev-final { text-align: center; padding: 46px 0 56px; background: linear-gradient(180deg, var(--paper), var(--blush)); }
+.ev-final h2 { font-size: clamp(1.7rem, 6vw, 2.3rem); margin-bottom: 6px; }
+.ev-final__ctas { justify-content: center; }
+.ev-more__title { font-weight: 800; color: var(--ink); margin: 0 0 10px; }
+.ev-more { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 0 0 16px; }
+.ev-more a { display: inline-flex; align-items: center; min-height: 44px; padding: 8px 14px; border-radius: 99px; background: #fff; color: var(--ink); font-weight: 700; font-size: .92rem; text-decoration: none; box-shadow: 0 6px 14px -10px rgba(18,41,122,.5); }
+.ev-more a:hover { background: var(--blush); }
+@media (max-width: 639px) {
+  .ev-hero__ctas .btn { flex: 1 1 100%; }
+  .ev-final__ctas .btn { flex: 1 1 100%; }
+}
+@media (min-width: 640px) {
+  .ev-ideas { grid-template-columns: 1fr 1fr; }
+  .ev-steps { grid-template-columns: repeat(3, 1fr); }
+}
+@media (min-width: 980px) {
+  .ev-hero { padding: 64px 0 72px; }
+  .ev-hero__grid { grid-template-columns: 1.25fr .75fr; }
+  .ev-shot { width: 270px; }
+  .ev-ideas { grid-template-columns: repeat(3, 1fr); }
+}

@@ -1,0 +1,14 @@
+/* ---------- רצועת אירועים ---------- */
+.marquee-wrap { position: relative; overflow: hidden; padding: 12px 0; margin: -6px 0 0; }
+.marquee { background: var(--rose-deep); color: #fff; overflow: hidden; padding: 14px 0; transform: rotate(-1.2deg); margin: 0 -20px; }
+.marquee__track { display: flex; width: max-content; animation: marquee 38s linear infinite; }
+.marquee__group { display: flex; align-items: center; flex-shrink: 0; }
+.marquee span { font-weight: 700; font-size: 1.02rem; white-space: nowrap; padding: 0 14px; }
+.marquee__ico { width: 16px; height: 16px; color: #FFD3E0; }
+.marquee:hover .marquee__track, .marquee.is-paused .marquee__track { animation-play-state: paused; }
+.marquee__pause {
+  position: absolute; left: 12px; top: 50%; transform: translateY(-50%); z-index: 2;
+  width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--ink); background: #fff; color: var(--ink);
+  display: grid; place-items: center; cursor: pointer; box-shadow: var(--shadow);
+}
+.marquee__pause .ico { width: 18px; height: 18px; }

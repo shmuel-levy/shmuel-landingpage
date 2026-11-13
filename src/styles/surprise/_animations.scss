@@ -1,0 +1,27 @@
+/* ---------- אנימציות ---------- */
+@keyframes stepIn { from { opacity: 0; transform: translateY(26px) scale(.98); } to { opacity: 1; transform: none; } }
+@keyframes stepOut { to { opacity: 0; transform: translateY(-20px) scale(.98); } }
+@keyframes popIn { from { transform: scale(.85); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes bob { 0%, 100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-8px) rotate(3deg); } }
+@keyframes beat { 0%, 100% { transform: scale(1); } 15% { transform: scale(1.1); } 30% { transform: scale(1); } 45% { transform: scale(1.06); } }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes shake { 20%, 60% { transform: translateX(-7px); } 40%, 80% { transform: translateX(7px); } }
+@keyframes shiver { 0% { transform: translate(0, 0); } 50% { transform: translate(1px, -1px); } 100% { transform: translate(-1px, 1px); } }
+@keyframes flicker { from { transform: scale(1) rotate(-3deg); } to { transform: scale(1.08, .94) rotate(3deg); } }
+@keyframes smoke { 0% { opacity: .7; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-50px) scale(3); } }
+@keyframes noteIn { from { opacity: 0; transform: rotate(var(--rot)) scale(.6) translateY(20px); } to { opacity: 1; transform: rotate(var(--rot)); } }
+@keyframes ticketIn { from { opacity: 0; transform: translateY(60px) rotate(-4deg) scale(.9); } to { opacity: 1; transform: none; } }
+@keyframes fly { 0% { transform: translate(-50%, -50%) rotate(0); opacity: 1; } 100% { transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y) + 180px)) rotate(var(--r)); opacity: 0; } }
+@keyframes rise { from { transform: translateY(0) rotate(0); } to { transform: translateY(-115vh) rotate(40deg); } }
+@keyframes spinSoft { 0%, 100% { transform: rotate(-8deg); } 50% { transform: rotate(8deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; transition-delay: 0s !important; }
+  .deco { display: none; }
+}
+@media (min-width: 700px) {
+  .app { padding-top: 22px; }
+  .desk-hint { display: flex !important; }
+}
+.desk-hint { display: none; align-items: center; justify-content: center; gap: 6px; font-size: .82rem; color: var(--text-soft); margin: 10px 0 0; }
+.desk-hint .ico { width: 16px; height: 16px; }

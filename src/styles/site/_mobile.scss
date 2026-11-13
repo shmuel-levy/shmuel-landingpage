@@ -1,0 +1,152 @@
+/* =========================================================
+   טלפון: פחות גלילה, בלי גלילה הצידה, הכל במרחק אגודל
+   ========================================================= */
+@media (max-width: 639px) {
+  html { scroll-padding-bottom: 90px; }
+  body { font-size: 1rem; }
+  .header__inner { height: 60px; gap: 8px; }
+  .brand__mark { width: 40px; height: 40px; }
+  .header__actions { gap: 8px; }
+  .header__actions .wa-icon { display: none; }
+  .section { padding: 52px 0; }
+  .section__head { margin-bottom: 24px; }
+  .section__title { font-size: clamp(1.7rem, 7.4vw, 2.2rem); }
+  .section__subtitle { font-size: .98rem; }
+
+  .hero { padding: 18px 0 40px; }
+  .hero__title { font-size: clamp(2.1rem, 10.5vw, 2.8rem); margin-bottom: 8px; }
+  .hero__subtitle { font-size: 1rem; line-height: 1.6; }
+  .eyebrow { margin-bottom: 12px; }
+  .hero__grid { gap: 18px; }
+  .demo-wrap { --pw: min(272px, 72vw); }
+  .demo-wrap::before { top: 104px; height: 48px; }
+  .demo-wrap::after { top: 90px; height: 28px; box-shadow: 0 40px 0 var(--ink-deep, #0B1A55); }
+  .proof { margin-top: 12px; font-size: .86rem; }
+
+  .steps { gap: 10px; }
+  .step { display: grid; grid-template-columns: auto 1fr; column-gap: 14px; align-items: center; padding: 16px; }
+  .step .tile { grid-row: 1 / 3; margin: 0; width: 50px; height: 50px; }
+  .step h3 { font-size: 1.12rem; margin-bottom: 2px; }
+  .step p { font-size: .93rem; line-height: 1.5; }
+  .step__num { font-size: 2.2rem; top: 8px; left: 10px; opacity: .5; }
+
+  .tabs { flex-wrap: wrap; justify-content: center; overflow: visible; margin: -6px 0 16px; padding: 0; gap: 6px; }
+  .tab { padding: 8px 12px; font-size: .88rem; }
+  .examples { display: grid !important; grid-template-columns: 1fr 1fr; gap: 10px; overflow: visible; margin: 0; padding: 0; }
+  .example { flex: none; }
+  .examples.is-collapsed .example:nth-child(n+5) { display: none; }
+  .example__thumb { height: 150px; }
+  .mini-phone { width: 104px; height: 138px; border-width: 4px; border-radius: 18px 18px 0 0; transform: translateY(8px); }
+  .example__badge { width: 34px; height: 34px; top: 8px; right: 8px; border-radius: 11px; }
+  .example__badge .ico { width: 18px; height: 18px; }
+  .example__body { padding: 10px 12px 12px; }
+  .example .tag, .example p, .example .pills { display: none; }
+  .example h3 { font-size: 1.02rem; line-height: 1.25; margin-bottom: 8px; }
+  .example__links { flex-direction: column; align-items: stretch; gap: 6px; margin-top: auto; }
+  .example__link { justify-content: center; font-size: .88rem; border: 1.5px solid var(--pink); border-radius: 99px; min-height: 40px; padding: 4px 10px; }
+  .example__want { justify-content: center; font-size: .88rem; min-height: 40px; }
+
+  .him__points li { padding: 8px 10px; }
+
+  .builder { gap: 20px; }
+  .mock { grid-template-columns: 1.15fr .85fr; align-items: center; gap: 8px; }
+  .mock__arrow { display: none; }
+  .mock__form { padding: 0 10px 10px; transform: rotate(-1.5deg); }
+  .mock__row { font-size: .76rem; padding: 7px 0; gap: 4px; }
+  .mock__sw { gap: 3px; }
+  .mock__sw i { width: 11px; height: 11px; }
+  .mock__cta { font-size: .72rem; padding: 7px; }
+  .mock__phone { width: 100%; border-width: 6px; border-radius: 24px; }
+  .mock__env { padding: 40px 0 16px; }
+  .mock__env .env { --w: 116px; }
+  .builder__points li { padding: 8px 12px; font-size: .95rem; }
+
+  .toolbox { grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  .tool { flex-direction: column; text-align: center; gap: 6px; padding: 10px 4px; font-size: .78rem; line-height: 1.25; border-radius: 14px; }
+  .tool .tile { width: 38px; height: 38px; border-radius: 12px; }
+  .tool .tile .ico { width: 20px; height: 20px; }
+
+  .section--ink { padding: 70px 0 80px; }
+  .about { gap: 44px; }
+  .profile { width: min(84%, 290px); }
+  .about__more { display: none; }
+  #aboutParas.is-open .about__more { display: block; }
+  .about__more-btn { display: inline-flex; margin: -6px 0 6px; }
+  .stat__num { font-size: 1.6rem; }
+  .stat dt { font-size: .8rem; }
+  .projects__title { margin: 44px 0 14px; font-size: 1.35rem; }
+  .projects { gap: 8px; }
+  .project { padding: 12px 14px; }
+  .project p { display: none; }
+  .project h4 { margin-bottom: 4px; }
+  .project .pills { margin: 0; }
+
+  .why { gap: 8px; }
+  .why__item { padding: 14px 10px; }
+  .why__item .tile { width: 44px; height: 44px; margin-bottom: 8px; }
+  .why__item p { font-size: .86rem; }
+
+  .reviews { gap: 16px; }
+  .review__time { margin-bottom: 6px; font-size: .92rem; }
+  .review__card { display: grid; grid-template-columns: 96px 1fr; border-radius: 20px; }
+  .review__shot { max-height: 150px; height: 100%; }
+  .review__shot::after { height: 40px; }
+  .review__zoom { bottom: 6px; padding: 3px 8px; font-size: .72rem; }
+  .review__zoom .ico { width: 13px; height: 13px; }
+  .review__card figcaption { padding: 12px 14px; display: flex; flex-direction: column; justify-content: center; }
+  .review__card blockquote p { font-size: 1.02rem; }
+  .review__card blockquote::before { display: none; }
+
+  .promo { margin-bottom: 26px; padding: 12px 14px; gap: 10px; }
+  .promo__tag { width: 52px; height: 52px; font-size: 1rem; }
+  .promo__text b { font-size: 1.1rem; }
+  .plans { gap: 22px; }
+  .plan { padding: 24px 16px 18px; }
+  .plan__num { font-size: 2.8rem; }
+  .plan ul { display: grid; grid-template-columns: 1fr 1fr; gap: 0 10px; margin-bottom: 16px; }
+  .plan li { font-size: .88rem; padding: 6px 0; gap: 6px; line-height: 1.35; }
+  .plan li .ico { width: 15px; height: 15px; }
+  .plan__desc { margin-bottom: 10px; font-size: .95rem; }
+  .addons { padding: 16px 16px 6px; margin-top: 20px; }
+  .addons li { font-size: .92rem; padding: 9px 0; }
+
+  .faq { gap: 8px; }
+  .faq__item summary { padding: 14px 16px 14px 54px; min-height: 52px; font-size: .98rem; }
+
+  .final-cta { padding: 44px 0 56px; }
+  .final-cta__doodle { width: 190px; }
+  .footer { padding: 30px 0 120px; }
+  .footer__logo { width: 120px; }
+
+  /* פס תחתון קבוע: תמיד יש כפתור להזמנה במרחק אגודל */
+  .cta-bar {
+    display: flex; gap: 10px; align-items: center; position: fixed; z-index: 80; left: 0; right: 0; bottom: 0;
+    padding: 10px 76px calc(10px + env(safe-area-inset-bottom)) 14px;
+    background: rgba(255, 247, 248, .95); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 -10px 24px -16px rgba(184,53,99,.55); border-top: 1px solid rgba(184,53,99,.12);
+    transform: translateY(110%); transition: transform .35s var(--ease-out), visibility 0s .35s; visibility: hidden;
+  }
+  body.cta-on .cta-bar { transform: none; visibility: visible; transition: transform .35s var(--ease-out), visibility 0s; }
+  .cta-bar__main { flex: 1; min-height: 50px; }
+  .cta-bar__wa { width: 50px; height: 50px; }
+  .wa-float { display: none; }
+  .a11y { bottom: calc(12px + env(safe-area-inset-bottom)); right: 12px; }
+}
+
+.plan-switch { display: none; }
+@media (max-width: 639px) {
+  .plan-switch { display: flex; gap: 4px; padding: 4px; margin: 0 auto 22px; max-width: 360px; background: #fff; border-radius: 99px; box-shadow: var(--shadow); border: 1.5px solid var(--blush); }
+  .plan-switch button { flex: 1; min-height: 44px; border: 0; border-radius: 99px; background: none; color: var(--text); font-weight: 700; font-size: .92rem; cursor: pointer; transition: background .25s, color .25s; }
+  .plan-switch button[aria-pressed="true"] { background: var(--rose-deep); color: #fff; box-shadow: 0 8px 16px -10px var(--rose-deep); }
+  .plans[data-show] .plan { display: none; }
+  .plans[data-show="basic"] .plan--basic, .plans[data-show="premium"] .plan--premium { display: block; animation: popIn .4s var(--ease-out); }
+  .him__points { grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .him__points li { flex-direction: column; text-align: center; gap: 6px; padding: 10px 6px; }
+  .him__points small { font-size: .78rem; line-height: 1.35; }
+  .him__points b { font-size: .9rem; line-height: 1.3; }
+}
+
+.idea__actions .btn { white-space: nowrap; font-size: .95rem; padding-inline: .9em; min-height: 48px; }
+.step__num::before { content: attr(data-n); }
+
+.choice-no { white-space: nowrap; }

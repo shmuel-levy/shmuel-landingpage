@@ -1,0 +1,27 @@
+/* ---------- הודעה קולית ---------- */
+.voice {
+  display: flex; align-items: center; gap: 14px; width: min(100%, 340px); margin: 6px auto 0; padding: 14px 16px 14px 18px;
+  background: var(--card); border-radius: 26px 26px 26px 8px; box-shadow: var(--shadow); text-align: right; animation: popIn .5s var(--ease-bounce);
+}
+.voice__play {
+  position: relative; flex-shrink: 0; display: grid; place-items: center; width: 62px; height: 62px; border: 0; border-radius: 50%;
+  background: var(--accent-deep); color: #fff; cursor: pointer; box-shadow: 0 12px 22px -10px var(--accent-deep); transition: transform .2s var(--ease-bounce);
+}
+.voice__play .ico { width: 26px; height: 26px; fill: currentColor; position: relative; z-index: 1; }
+.voice__play:hover { transform: scale(1.06); }
+.voice__play:active { transform: scale(.95); }
+.voice__play[disabled] { opacity: .45; cursor: default; box-shadow: none; }
+.voice__ring { position: absolute; inset: -6px; border-radius: 50%; border: 2px solid var(--accent); opacity: 0; }
+.voice:not(.voice--empty):not(.is-playing) .voice__ring { animation: voiceCall 2s ease-out infinite; }
+@keyframes voiceCall { 0% { transform: scale(.9); opacity: .8; } 100% { transform: scale(1.35); opacity: 0; } }
+.voice__body { flex: 1; min-width: 0; }
+.voice__from { display: block; font-size: .85rem; color: var(--accent-deep); margin-bottom: 4px; }
+.voice__wave { display: flex; align-items: center; gap: 2px; height: 36px; direction: ltr; }
+.voice__wave i { flex: 1; height: var(--h); min-height: 4px; border-radius: 3px; background: var(--accent); opacity: .35; transition: opacity .15s, background .15s; }
+.voice__wave i.is-on { opacity: 1; background: var(--accent-deep); }
+.voice__time { display: flex; justify-content: space-between; margin: 6px 0 0; font-size: .8rem; font-weight: 700; color: var(--text-soft); font-variant-numeric: tabular-nums; direction: ltr; }
+.voice--empty .voice__wave i { opacity: .25; }
+.voice__ph { display: flex; gap: 8px; align-items: flex-start; justify-content: center; max-width: 34ch; margin: 14px auto 0; font-size: .88rem; color: var(--text-soft); }
+.voice__ph .ico { width: 18px; height: 18px; color: var(--accent-deep); flex-shrink: 0; margin-top: 2px; }
+.voice__caption { display: flex; gap: 8px; align-items: flex-start; max-width: 34ch; margin: 14px auto 0; padding: 10px 14px; background: rgba(255,255,255,.75); border-radius: 14px; font-size: .95rem; text-align: right; }
+.voice__caption .ico { width: 18px; height: 18px; color: var(--accent-deep); flex-shrink: 0; margin-top: 3px; }

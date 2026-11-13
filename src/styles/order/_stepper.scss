@@ -1,0 +1,16 @@
+/* ---------- שלבים ---------- */
+.stepper { display: flex; gap: 4px; justify-content: space-between; margin: 22px auto 22px; max-width: 720px; position: relative; counter-reset: s; }
+.stepper::before { content: ""; position: absolute; top: 21px; right: 8%; left: 8%; height: 2px; background: repeating-linear-gradient(90deg, rgba(18,41,122,.2) 0 6px, transparent 6px 12px); z-index: 0; }
+.stepper li { flex: 1; position: relative; z-index: 1; }
+.stepper button {
+  display: flex; flex-direction: column; align-items: center; gap: 4px; width: 100%; padding: 0 2px; min-height: 64px;
+  background: none; border: 0; cursor: pointer; color: var(--text-soft); font-weight: 700; font-size: .8rem;
+}
+.stepper button:disabled { cursor: default; opacity: .55; }
+.stepper__n {
+  display: grid; place-items: center; width: 42px; height: 42px; border-radius: 50%; font-size: .98rem;
+  background: #fff; border: 2px solid rgba(18,41,122,.18); color: var(--ink); transition: background .3s, border-color .3s, transform .3s var(--ease-bounce);
+}
+.stepper li.is-done .stepper__n { background: var(--blush); border-color: var(--rose); color: var(--rose-deep); }
+.stepper li.is-current .stepper__n { background: var(--ink); border-color: var(--ink); color: #fff; transform: scale(1.1); box-shadow: 0 8px 18px -8px var(--ink); }
+.stepper li.is-current button { color: var(--ink); }

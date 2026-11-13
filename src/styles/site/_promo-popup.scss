@@ -1,0 +1,27 @@
+/* ---------- חלון המבצע ---------- */
+/* קטן, באמצע המסך, בלי רקע כהה ובלי לחסום את האתר */
+.ppop {
+  position: fixed; inset: 0; z-index: 95; margin: auto; height: fit-content; padding: 0; border: 0; background: transparent;
+  width: min(84vw, 300px); max-width: none; overflow: visible; color: inherit;
+}
+.ppop[open] .ppop__card { animation: ppopIn .55s cubic-bezier(.2,1.25,.35,1); }
+.ppop.is-closing .ppop__card { animation: ppopOut .22s ease forwards; }
+.ppop__card {
+  position: relative; display: grid; justify-items: center; text-align: center; padding: 18px 18px 12px; border-radius: 26px; overflow: hidden;
+  background: radial-gradient(260px 160px at 50% 0%, #FDE1EA, transparent 70%), radial-gradient(220px 160px at 100% 100%, #EEE4FF, transparent 70%), #FFF9FA;
+  box-shadow: 0 0 0 1px rgba(184,53,99,.12), 0 30px 60px -22px rgba(70, 15, 45, .5);
+}
+.ppop__x { position: absolute; top: 8px; left: 8px; z-index: 2; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; border: 0; background: rgba(255,255,255,.85); color: var(--ink); cursor: pointer; }
+.ppop__x .ico { width: 18px; height: 18px; }
+.ppop__env { padding: 44px 0 16px; }
+.ppop__env .env { --w: 136px; --lift: 1.3; pointer-events: none; }
+.ppop__title { font-size: 1.3rem; margin: 2px 0 4px; color: var(--ink); line-height: 1.2; }
+.ppop__text { color: var(--text-soft); margin: 0 0 12px; font-size: .88rem; line-height: 1.5; max-width: 28ch; }
+.ppop__cta.btn--lg { width: 100%; padding: .75em 1.2em; font-size: .98rem; }
+.ppop__later { margin-top: 2px; min-height: 40px; color: var(--text-soft); font-size: .9rem; }
+@keyframes ppopIn { from { opacity: 0; transform: translateY(18px) scale(.9); } }
+@keyframes ppopOut { to { opacity: 0; transform: translateY(10px) scale(.95); } }
+@media (prefers-reduced-motion: reduce) { .ppop[open] .ppop__card { animation: none; } }
+html.a11y-no-motion .ppop[open] .ppop__card { animation: none; }
+.cta-bar__main { position: relative; }
+.cta-bar__tag { position: absolute; top: -9px; left: 10px; font-style: normal; font-size: .72rem; font-weight: 800; background: #FFD45C; color: #4A2A00; border-radius: 99px; padding: 2px 8px; direction: ltr; transform: rotate(-6deg); box-shadow: 0 4px 10px -4px rgba(0,0,0,.35); }

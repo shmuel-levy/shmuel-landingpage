@@ -1,0 +1,11 @@
+/* ---------- סיום: הזמנה / מכתב ---------- */
+.invite, .letter { background: var(--paper-tex), var(--card); border-radius: 26px; padding: 28px 22px 22px; box-shadow: 0 30px 50px -24px rgba(0,0,0,.4); animation: ticketIn .9s var(--ease-bounce) both; position: relative; }
+.invite::before, .letter::before { content: ""; position: absolute; inset: 8px; border: 1.5px solid var(--accent); border-radius: 20px; opacity: .45; pointer-events: none; }
+.invite .step__title, .letter .step__title { font-family: var(--font-serif); font-weight: 700; }
+.invite__lines { text-align: right; margin: 16px 0 6px; display: grid; gap: 10px; }
+.invite__lines div { background: var(--soft); border-radius: 14px; padding: 10px 14px; }
+.invite__lines dt { display: flex; align-items: center; gap: 6px; font-size: .78rem; color: var(--text-soft); font-weight: 700; }
+.invite__lines dt .ico { width: 18px; height: 18px; color: var(--accent-deep); }
+.invite__lines dd { margin: 2px 0 0; font-weight: 700; color: var(--ink); }
+.letter__text { font-family: var(--font-serif); font-size: 1.16rem; line-height: 1.75; }
+.sign { font-family: var(--font-hand); font-weight: 700; font-size: 1.3rem; color: var(--accent-deep); transform: rotate(-3deg); display: inline-block; margin: 6px 0 0; }

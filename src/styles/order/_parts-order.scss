@@ -1,0 +1,68 @@
+/* ---------- החלקים והמסלול ---------- */
+.chip__rec { font-style: normal; font-size: .7rem; font-weight: 800; background: var(--rose-deep); color: #fff; border-radius: 99px; padding: 2px 7px; margin-inline-start: 2px; }
+.chip.is-locked span { opacity: .4; cursor: not-allowed; }
+.more-parts { margin-top: 10px; }
+.more-parts summary { list-style: none; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; cursor: pointer; font-weight: 700; color: var(--cobalt); }
+.more-parts summary::-webkit-details-marker { display: none; }
+.more-parts summary .ico { width: 16px; height: 16px; transition: transform .3s var(--ease-bounce); }
+.more-parts[open] summary .ico { transform: rotate(45deg); }
+.parts-count { margin: 10px 0 0; font-size: .86rem; font-weight: 700; color: var(--text-soft); }
+.path { margin-top: 14px; padding: 14px; border-radius: 16px; background: linear-gradient(135deg, #FFF6F9, #F5F0FF); }
+.path__label { display: flex; align-items: center; gap: 6px; margin: 0 0 10px; font-weight: 700; font-size: .9rem; color: var(--ink); }
+.path__label .ico { width: 18px; height: 18px; color: var(--rose-deep); }
+/* הסדר: רשימה אנכית שאפשר לגרור. המעטפה והסוף נעולים */
+.path__hint { display: flex; align-items: flex-start; gap: 6px; margin: -4px 0 10px; font-size: .8rem; color: var(--text-soft); }
+.path__hint .ico { width: 15px; height: 15px; flex-shrink: 0; margin-top: 2px; opacity: .7; }
+.path__list { position: relative; display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.path__item {
+  position: relative; display: flex; align-items: center; gap: 8px; min-height: 46px; padding: 6px 6px 6px 8px;
+  border-radius: 14px; background: #fff; border: 1.5px solid rgba(184, 53, 99, .12);
+  font-size: .88rem; font-weight: 700; color: var(--text);
+  box-shadow: 0 6px 14px -12px rgba(120, 30, 70, .5);
+  transition: transform .2s cubic-bezier(.3, .7, .4, 1), box-shadow .2s, border-color .2s, background .2s;
+  touch-action: pan-y; user-select: none; -webkit-user-select: none;
+}
+.path__list:not(.is-ready) .path__item { animation: popIn .35s var(--ease-bounce) both; animation-delay: calc(var(--i) * 40ms); }
+/* קו מחבר בין החלקים */
+.path__item:not(:last-child)::after { content: ""; position: absolute; inset-inline-start: 78px; bottom: -7px; width: 2px; height: 8px; border-radius: 2px; background: var(--pink); opacity: .7; }
+.path__item:not(.is-fixed) { cursor: grab; }
+.path__item:not(.is-fixed):hover { border-color: rgba(184, 53, 99, .32); }
+.path__item.is-fixed { background: rgba(255, 255, 255, .55); border-style: dashed; box-shadow: none; }
+.path__grip { display: grid; place-items: center; flex-shrink: 0; width: 26px; height: 34px; margin-inline-end: -2px; border-radius: 8px; color: var(--rose-deep); opacity: .55; touch-action: none; cursor: grab; }
+.path__grip .ico { width: 18px; height: 18px; }
+.path__item:not(.is-fixed):hover .path__grip { opacity: 1; background: #FFF0F5; }
+.path__n { flex-shrink: 0; width: 18px; text-align: center; font-size: .76rem; color: var(--text-soft); font-variant-numeric: tabular-nums; }
+.path__ico { display: grid; place-items: center; flex-shrink: 0; width: 30px; height: 30px; border-radius: 10px; background: #FFF4F8; color: var(--rose-deep); box-shadow: 0 4px 10px -6px rgba(184,53,99,.6); }
+.path__ico .ico { width: 16px; height: 16px; }
+.path__name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.path__pin { display: inline-flex; align-items: center; gap: 4px; flex-shrink: 0; padding: 3px 8px; border-radius: 99px; background: rgba(184, 53, 99, .07); font-size: .72rem; font-weight: 600; color: var(--text-soft); }
+.path__pin .ico { width: 12px; height: 12px; }
+.path__mv { display: inline-flex; gap: 2px; flex-shrink: 0; }
+.path__mv button {
+  display: grid; place-items: center; width: 34px; height: 34px; padding: 0; border: 0; border-radius: 10px;
+  background: transparent; color: var(--rose-deep); cursor: pointer; transition: background .15s, opacity .15s;
+}
+.path__mv button .ico { width: 18px; height: 18px; }
+.path__mv button:hover:not(:disabled) { background: #FFF0F5; }
+.path__mv button:disabled { opacity: .22; cursor: default; }
+.path__mv button:focus-visible { outline: 3px solid var(--rose-deep); outline-offset: 1px; }
+/* בזמן גרירה */
+.path__list.is-dragging { cursor: grabbing; }
+.path__list.is-dragging .path__item { cursor: grabbing; }
+.path__item.is-drag { z-index: 3; border-color: var(--rose-deep); background: #FFFBFD; box-shadow: 0 18px 30px -14px rgba(120, 30, 70, .55); scale: 1.03; }
+.path__item.is-drag::after { opacity: 0; }
+.path__item.is-drag .path__grip { opacity: 1; background: #FFE3EE; }
+.path__item.is-moved { animation: pathMoved .6s ease-out; }
+@keyframes pathMoved { 0% { background: #FFE3EE; } 100% { background: #fff; } }
+.path__reset { margin-top: 10px; }
+.path__reset .ico { width: 16px; height: 16px; }
+@media (prefers-reduced-motion: reduce) { .path__item { transition: none; } .path__item.is-moved { animation: none; } }
+.plan-note { display: flex; gap: 8px; align-items: flex-start; margin: 10px 0 0; padding: 10px 12px; border-radius: 14px; background: #FFF4D6; color: #5A3D00; font-size: .9rem; }
+.plan-note .ico { width: 18px; height: 18px; flex-shrink: 0; margin-top: 2px; color: var(--butter-deep); }
+.voice-field .field__hint { margin-bottom: 10px; }
+@media (max-width: 639px) {
+  .acc__sum { gap: 10px; padding: 10px 12px; min-height: 60px; }
+  .acc__ico { width: 38px; height: 38px; border-radius: 12px; }
+  .acc__t small { font-size: .8rem; }
+  .acc__body { padding: 2px 12px 16px; }
+}

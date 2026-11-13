@@ -1,0 +1,81 @@
+/* =========================================================
+   Matanot: "דיו כחולה על נייר שמנת, עם נגיעות ורודות"
+   הצבעים מוגדרים כאן ומשפיעים על כל האתר
+   ========================================================= */
+:root {
+  --paper: #FFF7F8;
+  --paper-2: #FFEDF2;
+  --blush: #FDE3EC;
+  --pink: #F5A9C0;
+  --rose: #E26D93;
+  --rose-deep: #B83563;    /* כפתורים: ניגודיות 5.6:1 לטקסט לבן */
+  --ink: #12297A;          /* הכחול של הלוגו */
+  --ink-deep: #0B1A55;
+  --cobalt: #1F5BD1;
+  --sky: #E6EEFF;
+  --lilac: #EFE8FB;
+  --lilac-mid: #C9B6F2;
+  --lilac-deep: #6E4BC2;
+  --peach: #FFE6D8;
+  --peach-deep: #AD481D;
+  --butter: #FFF1CF;
+  --butter-deep: #8A5A00;
+  --mint: #DDF5EA;
+  --mint-deep: #17694B;
+  --text: #1C2452;
+  --text-soft: #4B5279;
+  --white: #FFFFFF;
+  --wa: #1DA851;           /* ירוק ווטסאפ כהה מעט, לניגודיות של האייקון */
+
+  --radius: 22px;
+  --radius-lg: 30px;
+  --shadow: 0 12px 30px -14px rgba(18, 41, 122, .30);
+  --shadow-pink: 0 14px 30px -12px rgba(184, 53, 99, .45);
+  --shadow-lg: 0 30px 60px -24px rgba(18, 41, 122, .45);
+
+  --font-body: "Heebo", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+  --font-display: "Suez One", "Heebo", serif;
+  --font-serif: "Frank Ruhl Libre", "Suez One", serif;
+  --font-hand: "Playpen Sans Hebrew", "Heebo", cursive;
+  --ease-out: cubic-bezier(.2, .8, .25, 1);
+  --ease-bounce: cubic-bezier(.34, 1.56, .64, 1);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; scroll-padding-top: 80px; }
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 1.0625rem;
+  line-height: 1.7;
+  color: var(--text);
+  background: var(--paper);
+}
+/* מרקם נייר עדין על כל האתר */
+body::after { content: ""; position: fixed; inset: 0; z-index: 90; pointer-events: none; background: var(--paper-tex); opacity: .4; }
+html, body { overflow-x: clip; } /* clip לא שובר את ההדר הדביק, בניגוד ל-hidden */
+img { max-width: 100%; height: auto; display: block; }
+h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 400; line-height: 1.25; margin: 0 0 .5em; color: var(--ink); }
+p { margin: 0 0 1em; }
+a { color: var(--cobalt); }
+ul, ol { margin: 0; padding: 0; list-style: none; }
+button { font: inherit; }
+.ico { width: 1.2em; height: 1.2em; flex-shrink: 0; vertical-align: -.2em; }
+[data-icon] { display: inline-flex; }
+
+.container { width: 100%; max-width: 1140px; margin: 0 auto; padding: 0 16px; }
+.container--narrow { max-width: 780px; }
+.sr-only { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.hand { font-family: var(--font-hand); }
+
+.skip-link {
+  position: absolute; right: 12px; top: -80px; z-index: 200;
+  background: var(--ink); color: #fff; padding: 10px 16px; border-radius: 12px; font-weight: 700;
+}
+.skip-link:focus { top: 12px; }
+:focus-visible { outline: 3px solid var(--cobalt); outline-offset: 3px; border-radius: 10px; }
+.section--ink :focus-visible { outline-color: #FFD3E0; }
+
+.scroll-progress { position: fixed; top: 0; right: 0; left: 0; height: 3px; z-index: 100; pointer-events: none; }
+.scroll-progress b { display: block; height: 100%; background: linear-gradient(270deg, var(--rose), var(--lilac-deep), var(--cobalt)); transform: scaleX(0); transform-origin: right; }

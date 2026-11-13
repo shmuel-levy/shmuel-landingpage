@@ -1,0 +1,15 @@
+/* ---------- שוברים ---------- */
+.coupons { list-style: none; padding: 0; margin: 6px 0 0; display: grid; gap: 10px; }
+.coupon {
+  position: relative; display: flex; align-items: center; gap: 12px; width: 100%; min-height: 66px; padding: 12px 16px; text-align: right; cursor: pointer; overflow: hidden; font: inherit; color: var(--text);
+  background: radial-gradient(circle at 0 50%, transparent 10px, var(--card) 10.5px) left / 51% 100% no-repeat, radial-gradient(circle at 100% 50%, transparent 10px, var(--card) 10.5px) right / 51% 100% no-repeat;
+  border: 0; border-radius: 14px; filter: drop-shadow(0 8px 12px rgba(0,0,0,.12)); transition: transform .25s var(--ease-bounce);
+}
+.coupon:hover { transform: translateY(-2px); }
+.coupon__ico { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 12px; background: var(--soft); color: var(--accent-deep); flex-shrink: 0; border-left: 2px dashed var(--accent); }
+.coupon__ico .ico { width: 22px; height: 22px; }
+.coupon__t b { display: block; color: var(--ink); }
+.coupon__t small { color: var(--text-soft); font-size: .8rem; }
+.coupon__stamp { position: absolute; left: 16px; top: 50%; font: 400 1.1rem/1 var(--font-display); color: var(--accent-deep); border: 2.5px solid currentColor; border-radius: 8px; padding: 4px 8px; transform: translateY(-50%) rotate(-14deg) scale(2); opacity: 0; transition: transform .35s var(--ease-bounce), opacity .2s; }
+.coupon.is-used .coupon__stamp { opacity: .9; transform: translateY(-50%) rotate(-14deg) scale(1); }
+.coupon.is-used .coupon__t { opacity: .55; }

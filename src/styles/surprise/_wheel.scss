@@ -1,0 +1,7 @@
+/* ---------- גלגל ---------- */
+.wheel { position: relative; width: min(250px, 66vw); aspect-ratio: 1; margin: 4px auto 16px; }
+.wheel__svg { width: 100%; height: 100%; filter: drop-shadow(0 16px 20px rgba(0,0,0,.2)); border-radius: 50%; }
+.wheel__rot { transform-origin: 0 0; }
+.wheel__pointer { position: absolute; z-index: 2; top: -8px; left: 50%; width: 26px; height: 30px; margin-left: -13px; background: var(--ink); clip-path: polygon(0 0, 100% 0, 50% 100%); filter: drop-shadow(0 2px 2px rgba(0,0,0,.3)); }
+.wheel__spin[disabled] { opacity: .6; }
+.wheel + .wheel__spin { margin-bottom: 4px; }

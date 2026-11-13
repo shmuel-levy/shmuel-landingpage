@@ -1,101 +1,102 @@
-# Matanot: הפתעות בקישור
+# Matanot · מתנות — personalized surprises, delivered by link
 
-דף נחיתה, טופס הזמנה שבונה סקיצה חיה, ו-7 אתרי דוגמה. HTML, CSS ו-JavaScript נקיים, בלי framework ובלי שלב build.
+**Live:** https://shmuel-levy.github.io/shmuel-landingpage/ · **Order wizard:** [`order.html`](https://shmuel-levy.github.io/shmuel-landingpage/order.html) · **Example surprise:** [`demos/love.html`](https://shmuel-levy.github.io/shmuel-landingpage/demos/love.html)
 
-## מבנה הקבצים
+Matanot is a small business I built and run: people order a personal, interactive "surprise site" (a wax-sealed envelope that cracks open, quizzes, a runaway "no" button, photo albums, a voice message…) and send it to someone they love over WhatsApp. This repo is the whole product:
+
+| Part | What it does |
+|---|---|
+| **Landing page** | Hebrew RTL, mobile-first. A live surprise plays inside a phone mock-up; a cupid shoots the wax seal to open it. |
+| **Order wizard** | 5 steps with a different questionnaire per surprise type. Builds a **live, playable sketch** of the surprise from the answers and sends the order to WhatsApp. Voice recording, photos, drag-and-drop ordering of the parts, custom Hebrew date picker, draft autosave. |
+| **Surprise engine** | Plays any surprise from plain data: 19 step types (scratch card on canvas, spinning wheel, press-and-hold heart, flip cards…), a synthesized music box, confetti and finishing characters. Powers the 9 examples, the sketch and every real customer gift. |
+| **Event pages** | 6 SEO landing pages, statically pre-rendered with React at build time and hydrated in the browser. |
+
+## Tech stack
+- **React 19 + TypeScript** (strict), **Vite 6** multi-page build (every public URL kept as-is)
+- **Redux Toolkit** for the order wizard, with listener middleware for debounced draft persistence
+- **SCSS** partials (one per section/step type)
+- **SSG**: `react-dom/server` pre-renders the event pages (`scripts/gen-pages.tsx`) + generates `sitemap.xml`
+- Browser APIs: **Web Animations API**, **Web Audio API** (music box + sound effects, no audio files), **MediaRecorder** + **IndexedDB** (voice messages that survive a refresh), **Canvas** (scratch card), Pointer Events (drag-and-drop with FLIP animation), Web Share API
+- **Testing**: Vitest + Testing Library (48 unit/component tests), **Playwright** + **axe-core** (98 end-to-end + accessibility tests on mobile and desktop)
+- **CI/CD**: GitHub Actions → typecheck, lint, unit, build, e2e → deploy to GitHub Pages
+- Accessibility: WCAG 2.1 AA checked by axe in CI, full keyboard support, screen-reader announcements, reduced-motion support, an accessibility menu with 10 adjustments
+
+## Architecture
+```
+src/
+  app/            entry points (one per page type): home, order, surprise, event, legal
+  data/           editable content: site.ts (texts, prices, promo), order.ts (questions per type), pages.ts (event pages)
+  features/
+    surprise/     the engine: SurpriseApp + one component per step type, music, confetti, sketch protection
+    order/        the wizard: Redux store, pure logic (sketch builder, WhatsApp message, validation, dates), components
+    home/         landing page sections, live hero demo, promo popup
+    event/        SEO event page (pre-rendered + hydrated)
+  components/     Envelope (staged animation), Icon, layout (header, menu, accessibility widget)
+  lib/            fx (character animations), sfx, pricing, tracking/attribution, palettes, motion
+  hooks/          scroll reveal, in-view, pointer tilt, sticky CTA
+  styles/         SCSS partials
+e2e/              Playwright specs (home, order, demos, content)
+scripts/          gen-pages.tsx (static generation)
+demos/*.html      each surprise = an HTML file with `window.DEMO = { ... }` data
+```
+Design notes:
+- **Data-driven**: a surprise is just JSON (`window.DEMO`), so the same engine plays examples, sketches and paid gifts.
+- **Pure core**: the sketch builder (`features/order/logic/demo.ts`) and the order message are pure functions, unit-tested.
+- **Imperative where it belongs**: frame-by-frame animation (character scenes, confetti, canvas) lives in small typed modules called from React, not in component state.
+- **Migration**: the site started as vanilla JS. It was migrated page by page against a Playwright baseline recorded on the original, plus pixel-diff screenshots, so behaviour and visuals stayed identical (the compiled CSS is byte-identical).
+
+## Scripts
+```bash
+npm install
+npm run dev          # local dev server
+npm run build        # pre-render event pages + typecheck + production build → dist/
+npm run preview      # serve the build on :4173
+npm test             # unit + component tests (Vitest)
+npm run test:e2e     # end-to-end + accessibility (Playwright; run after build)
+npm run lint         # ESLint
+npm run check        # everything above, in CI order
+```
+
+---
+
+## לעריכה (עברית)
+
+### איפה משנים מה
 | קובץ | מה יש בו |
 |---|---|
-| `config.js` | **כל הטקסטים, המחירים, המבצע והטלפון של דף הנחיתה.** זה הקובץ לעריכה |
-| `order-config.js` | **השאלות בטופס ההזמנה**, טופס נפרד לכל סוג הפתעה |
-| `index.html` / `main.js` / `styles.css` | דף הנחיתה |
-| `order.html` / `order.js` / `order.css` | טופס ההזמנה: סוג ← סיפור ← עיצוב ← פרטים ← סקיצה ← ווטסאפ |
-| `envelope.js` + `envelope.css` | המעטפה (חותם שעווה, בטנה, כרטיס) ו-6 פלטות הצבע |
-| `icons.js` | ספריית האייקונים (במקום אימוג'י) |
-| `a11y.js` | תפריט הנגישות (10 התאמות) |
-| `menu.js` | תפריט ההמבורגר, בכל העמודים ובכל גודל מסך |
-| `track.js` | מדידה (Google Analytics / Meta Pixel) ומקור ההגעה של כל לקוח |
-| `negishut.html` / `privacy.html` / `terms.html` | הצהרת נגישות, מדיניות פרטיות ותנאי שירות |
-| `michtav-ahava.html` ועוד 5 | עמודי אירוע לגוגל ולמודעות. **נוצרים אוטומטית**, ראו למטה |
-| `page.js` | מחיר, מבצע וכפתור דביק בעמודי האירוע |
-| `tools/` | המחולל של עמודי האירוע ו-`sitemap.xml` |
-| `demos/engine.js` + `engine.css` | **מנוע ההפתעות**, משותף לכל הדוגמאות ולסקיצות |
-| `fx.js` + `fx.css` | הדמויות שמסיימות שלב: קופידון, חופה ורב, טבעת, בלון, חסידה, יונה, מטוס נייר |
-| `demos/*.html` | 9 אתרי דוגמה. כל אחד הוא רק רשימת שלבים |
-| `demos/preview.html` | הדף שמציג את הסקיצה מהטופס |
-| `demos/photos/` | תמונות לדוגמאות |
-| `images/examples/` | צילומי מסך של הדוגמאות לכרטיסים בדף הבית |
+| `src/data/site.ts` | **כל הטקסטים, המחירים, המבצע והטלפון של האתר** |
+| `src/data/order.ts` | **השאלות בטופס ההזמנה**, טופס נפרד לכל סוג הפתעה, והצעות כפתור "רעיון" |
+| `src/data/pages.ts` | עמודי האירוע לגוגל ולמודעות. נבנים לבד בכל `npm run build` (וגם `sitemap.xml`) |
+| `public/images/` | תמונות האתר, צילומי המסך של הדוגמאות והמלצות |
+| `public/demos/photos/` | תמונות לדוגמאות |
 
-## רעיונות וסקשן "בשבילו"
-ב-`config.js`: `him` (הסקשן למי שרוצה לכתוב לבת הזוג) ו-`ideas` (מחולל הרעיונות). רעיון חדש = עוד שורה ב-`items`, עם `type` שפותח את הטופס המתאים.
+אחרי שינוי: `git push` ל-`main`, ו-GitHub Actions בודק, בונה ומעלה לבד.
 
-## מבצע
-ב-`config.js` → `promo`: אחוז, תאריך סיום וטקסט. אחרי התאריך המבצע נעלם לבד מהבאנר, מהמחירים ומהטופס.
-כדי לבטל מוקדם: `active: false`.
-החלון הקופץ: `popupEvery` = `"load"` (בכל כניסה ורענון), `"session"` (פעם בביקור) או `"week"` (פעם בשבוע). לבדיקה: `index.html?promo=1`.
+### מבצע
+ב-`src/data/site.ts` → `promo`: אחוז, תאריך סיום וטקסט. אחרי התאריך המבצע נעלם לבד מהמחירים, מהחלון הקופץ ומהטופס. לביטול מוקדם: `active: false`.
+החלון הקופץ: `popupEvery` = `"load"` (בכל כניסה), `"session"` (פעם בביקור) או `"week"`. לבדיקה: `index.html?promo=1`.
 
-## ההדגמה בדף הבית
-בטלפון רצה החוויה האמיתית (`demos/*.html?embed=1`), מוקטנת למסך. בכניסה קופידון יורה חץ אל החותם והמעטפה נפתחת לבד.
-"הגרלת דוגמה אחרת" עובר על כל הדוגמאות מ-`config.js` → `examples` (קודם כולן, אחר כך חוזר). הראשונה תמיד "נצא לדייט?".
+### איך בונים הפתעה ללקוח
+מעתיקים קובץ מ-`demos/` (למשל ל-`demos/noa-dani.html`), משנים את `window.DEMO`, ודוחפים. כל קובץ HTML בתיקייה נבנה לבד.
+**חשוב:** בהפתעה אמיתית שמים `mode: "gift"`. זה מסתיר את התווית "אתר לדוגמה", מכבה את המדידה (פרטיות של מי שמקבל), ומוסיף בסוף:
+- כפתור תגובה בווטסאפ לשולח: `reply: { phone: "972501234567", name: "דני" }`. אפשר לשנות תגובות מוכנות עם `quick: [...]`.
+- שורת קרדיט קטנה. מבטלים עם `credit: false`.
 
-## דמויות שמסיימות שלב
-אחרי כל פעילות (אלבום, קלפים, טריוויה, נרות, לב, גירוד, רשימה, גלגל, "כן"), דמות "פוגעת" בכפתור ההמשך וממשיכים לבד. לחיצה מוקדמת = ממשיכים מיד.
-ברירת מחדל לפי סוג ההפתעה: זוגיות = קופידון, הצעה = טבעת, יום הולדת וחברים = בלון, הריון = חסידה, התנצלות ומשפחה = יונה, תודה = מטוס נייר.
-לשנות להפתעה שלמה: `fx: "chuppah"` ב-`window.DEMO` (למשל ליום נישואין). לשלב אחד: `fx` על השלב. לבטל: `fx: "none"`.
+הגדרות: `palette` (blush / ink / lilac / peach / mint / gold), `liner` (dots / stripes / hearts / confetti), `mood` (romantic / happy / emotional), `fx` (הדמות שמסיימת שלב: cupid / chuppah / ring / balloon / stork / dove / plane, או `"none"`) ו-`steps`.
 
-## הודעה קולית
-בשלב העיצוב בטופס יש כפתור הקלטה (עד דקה וחצי), או העלאת קובץ שמע מהטלפון. ההקלטה נשמרת רק בדפדפן של הלקוח (IndexedDB), נכנסת לסקיצה כשלב `voice`, ובסוף הלקוח שולח לך את הקובץ בכפתור "שליחת ההקלטה" (בטלפון זה פותח את חלון השיתוף, ישר לווטסאפ).
-בהפתעה הסופית: שמים את הקובץ ליד ה-HTML ומוסיפים שלב:
-`{ type: "voice", title: "השארתי לך הודעה", from: "דני", src: "voice.m4a", duration: 42, caption: "כתובית (רשות)" }`
+סוגי השלבים:
+`envelope` (מעטפה) · `voice` (הודעה קולית: `src`, `duration`, `caption`) · `message` (הודעה, אפשר עם `photo`) · `choice` (בחירה) · `runaway` (כפתור לא שבורח) · `checklist` (רשימה לסימון) · `quiz` (טריוויה) · `scratch` (כרטיס גירוד) · `photos` (אלבום פולרואיד) · `hold` (לב שמתמלא) · `candles` (נרות) · `notes` (קיר פתקים) · `countdown` (ספירה לאחור) · `reasons` (קלפי סיבות) · `openwhen` (מעטפות "תפתחי כש...") · `wheel` (גלגל מזל, עם `key`) · `coupons` (שוברים) · `final` (סיום: `ticket` / `invite` / `card`)
 
-## מדידה ומקור הגעה
-1. ב-`config.js` → `analytics`: מדביקים מזהה GA4 (`G-...`) ו/או מספר Meta Pixel. ריק = לא נטען כלום.
-2. בקישורים במודעות מוסיפים מקור, למשל `?utm_source=instagram&utm_campaign=valentine` (או קצר: `?src=tiktok`).
-3. המקור נשמר 30 יום ומופיע בהודעת הווטסאפ מהטופס ("הגעתי דרך"). בנוסף יש בטופס שאלה "איך הגעתם אליי?".
-אירועים שנמדדים: `order_start`, `order_step`, `sketch_view` (ב-Meta: ViewContent), `send_whatsapp` (ב-Meta: Lead, עם הסכום), `voice_added`, `demo_open`, `demo_complete`, `whatsapp_click`, `cta_order`.
-לבדיקה: מוסיפים לכתובת `?debug=track` ורואים את האירועים בקונסול.
+אייקונים: שם מתוך `src/lib/icons.ts` (למשל `heart`, `plane`, `gift`). תשובה בשלב עם `key` מוצגת בהמשך כ-`{key}`. `?step=3` פותח ישר בשלב.
 
-## עמודי אירוע (גוגל ומודעות)
-6 עמודים: מכתב אהבה, מתנה לגננת, יום הולדת, הצעת נישואין, הודעה על הריון, ולנטיין. כל אחד פותח את הטופס בסוג הנכון.
-עורכים את `tools/pages-data.js` ומריצים `node tools/gen-pages.js`. זה בונה מחדש את העמודים ואת `sitemap.xml`.
-המחירים בעמודים נלקחים מ-`config.js` (ומבצע פעיל מוצג לבד). עמוד חדש = עוד אובייקט ברשימה.
-אחרי העלייה: לרשום את האתר ב-Google Search Console ולהגיש את `sitemap.xml`.
+### מדידה ומקור הגעה
+ב-`src/data/site.ts` → `analytics`: מזהה GA4 (`G-...`) ו/או Meta Pixel. ריק = לא נטען כלום.
+בקישורים במודעות: `?utm_source=instagram&utm_campaign=valentine` (או `?src=tiktok`). המקור נשמר 30 יום ומופיע בהודעת הווטסאפ מהטופס. לבדיקה: `?debug=track`.
 
-## איך עובד טופס ההזמנה
-1. הלקוח בוחר סוג הפתעה ועונה על השאלות של הסוג הזה (`order-config.js`).
-2. בוחר פלטה, בטנה למעטפה, אות לחותם, מוזיקה וחלקים. אפשר להוסיף תמונות (הן נשארות בטלפון שלו).
-3. בוחר חבילה ותוספות. המחיר מחושב כולל המבצע.
-4. האתר בונה סקיצה חיה עם מנוע ההפתעות, והלקוח שולח לך את כל הפרטים בווטסאפ בלחיצה.
-
-הטיוטה נשמרת בדפדפן של הלקוח, כך שאפשר לחזור ולהמשיך.
-
-## איך בונים הפתעה ללקוח
-מעתיקים את אחד הקבצים ב-`demos/` ומשנים את `window.DEMO`.
-**חשוב:** בהפתעה אמיתית שמים `mode: "gift"`. זה מסתיר את התווית "אתר לדוגמה" ואת "חזרה", מכבה את המדידה (פרטיות של מי שמקבל), ומוסיף בסוף:
-- כפתור תגובה בווטסאפ לשולח: `reply: { phone: "972501234567", name: "דני" }` (אם הלקוח השאיר את האפשרות מסומנת בטופס). אפשר לשנות את התגובות המוכנות עם `quick: [...]`.
-- שורת קרדיט קטנה "נוצר באהבה ב-Matanot". מבטלים עם `credit: false` (למשל כתוספת בתשלום).
-- תזכורת לשנה הבאה: אם הלקוח סימן בטופס, זה מופיע בהודעה. כדאי לרשום ביומן מיד.
-
-הגדרות:
-`palette` (blush / ink / lilac / peach / mint / gold), `liner` (dots / stripes / hearts / confetti), `mood` (romantic / happy / emotional) ו-`steps`.
-
-סוגי השלבים שהמנוע מכיר:
-`envelope` (מעטפה) · `voice` (הודעה קולית) · `message` (הודעה, אפשר עם `photo`) · `choice` (בחירה) · `runaway` (כפתור לא שבורח) · `checklist` (רשימה לסימון) · `quiz` (טריוויה) · `scratch` (כרטיס גירוד) · `photos` (אלבום פולרואיד, עם `src` לכל תמונה) · `hold` (לב שמתמלא) · `candles` (נרות לכיבוי) · `notes` (קיר פתקים) · `countdown` (ספירה לאחור) · `reasons` (קלפי סיבות שמתהפכים) · `openwhen` (מעטפות "תפתחי כש...") · `wheel` (גלגל מזל, עם `key`) · `coupons` (פנקס שוברים) · `final` (סיום: `ticket` / `invite` / `card`)
-
-אייקונים: בשדה `icon` שמים שם מתוך `icons.js` (למשל `heart`, `plane`, `gift`).
-תשובה בשלב `choice` עם `key` אפשר להציג בהמשך כ-`{key}`. קישור עם `?step=3` פותח ישר בשלב מסוים.
-
-## לפני העלייה לאוויר
-- [x] ווטסאפ: אייקון בהדר, בפוטר, כפתור צף, ובסוף טופס ההזמנה
-- [x] מחירים: בסיסי 79, פרימיום 149, מבצע 20% עד 30.11
-- [x] תוספות: דומיין +59 ₪, אנימציה +39 ₪, אקספרס באותו היום +20 ₪
-- [x] הקישור פעיל חצי שנה (בשאלות הנפוצות ובמדיניות הפרטיות)
-- [x] 3 צילומי מסך אמיתיים של לקוחה (טושטשו הקישור ותמונות הפרופיל)
-- [x] `og:image` בכתובת מלאה (אם עוברים לדומיין משלכם: להחליף את הכתובת ב-`index.html`, `order.html`, `config.js` → `siteUrl`, ולהריץ `node tools/gen-pages.js`)
-- [ ] `terms.html`: טיוטה. להשלים מספר עוסק וכתובת אחרי רישום העסק, ולעבור על התנאים (ביטולים, אחריות) מול מי שמבין
-- [ ] מזהי מדידה ב-`config.js` → `analytics`
+### עוד לפני שמפרסמים
+- [ ] `terms.html`: להשלים מספר עוסק וכתובת, ולעבור על התנאים מול מי שמבין
+- [ ] מזהי מדידה ב-`analytics`
 - [ ] מוזיקה: לוודא שכל שיר בהפתעות הוא מספרייה עם רישיון
 
-## קרדיטים לתמונות
-התמונות ב-`demos/photos/` מ-Unsplash (רישיון Unsplash, מותר לשימוש מסחרי):
-Charlie Foster, Mayur Gala, Roberto Nickson, Margaret Barley, kazuend, Kelley Bozarth, Desi Mendoza, Benjamin Combs, Matthew Wiebe, Lechon Kirb, Steven Spassov, Ales Krivec, Olenka Kotyk, veeterzy, Giu Vicente, José Martín, Thomas Lefebvre, Carli Jean, Matthew Skinner, David Mao, Joanna Kosinska, Anthony DELANOIX.
-חלק מצורות האייקונים מבוססות על Lucide (רישיון ISC).
+## Credits
+Photos in `public/demos/photos/` are from Unsplash (Unsplash license): Charlie Foster, Mayur Gala, Roberto Nickson, Margaret Barley, kazuend, Kelley Bozarth, Desi Mendoza, Benjamin Combs, Matthew Wiebe, Lechon Kirb, Steven Spassov, Ales Krivec, Olenka Kotyk, veeterzy, Giu Vicente, José Martín, Thomas Lefebvre, Carli Jean, Matthew Skinner, David Mao, Joanna Kosinska, Anthony DELANOIX. Some icon shapes are based on Lucide (ISC).
