@@ -1,6 +1,6 @@
 # Matanot · מתנות — personalized surprises, delivered by link
 
-**Live:** https://shmuel-levy.github.io/shmuel-landingpage/ · **Order wizard:** [`order.html`](https://shmuel-levy.github.io/shmuel-landingpage/order.html) · **Example surprise:** [`demos/love.html`](https://shmuel-levy.github.io/shmuel-landingpage/demos/love.html)
+**Live:** https://shmuel-levy.github.io/matanot/ · **Order wizard:** [`order.html`](https://shmuel-levy.github.io/matanot/order.html) · **Example surprise:** [`demos/love.html`](https://shmuel-levy.github.io/matanot/demos/love.html)
 
 Matanot is a small business I built and run: people order a personal, interactive "surprise site" (a wax-sealed envelope that cracks open, quizzes, a runaway "no" button, photo albums, a voice message…) and send it to someone they love over WhatsApp. This repo is the whole product:
 
